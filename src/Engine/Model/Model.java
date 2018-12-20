@@ -17,7 +17,7 @@ public class Model extends Observable {
     public String [] list_lang ; //list of lang returns from parsing the docs
     // will allow to load the term dic to prog memory -
     // will be used in project part 2
-    HashMap < String , String[] > termDictionary = new HashMap<>();
+    TreeMap < String , String > termDictionary = new TreeMap<>();
     TreeMap < String , String > citiesDictionary = new TreeMap<>();
     TreeMap < String , String > docsDictionary = new TreeMap<>();
 
@@ -85,7 +85,7 @@ public class Model extends Observable {
                     String[] splited = StringUtils.split(line, "<D>");
                     String[] termSplited = StringUtils.split(splited[1], ",");
                     term = splited[0];
-                    termDictionary.put(term, termSplited);
+                    termDictionary.put(term, splited[1]);
                 }
             } catch (Exception e) {
             }
@@ -217,6 +217,13 @@ public class Model extends Observable {
     }
 
     public void printTests() {
+        loadDicToMemory(ifStemming());
+        Searcher searcher = new Searcher(termDictionary, citiesDictionary, docsDictionary, postingPath, is_stemming);
+        try {
+            ArrayList<String> ans = searcher.getTermDocs("people");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         printAnswer5();
         printAnswer6();

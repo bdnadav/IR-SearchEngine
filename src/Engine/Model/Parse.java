@@ -139,7 +139,7 @@ public class Parse {
      * @param currDoc - cuur doc obj
      * @return
      */
-    public HashSet<String> parse(String text, Document currDoc) {
+    public ArrayList<String> parse(String text, Document currDoc) {
         termPosition = 0;
         //text = remove_stop_words(text);
         String[] tokens;
