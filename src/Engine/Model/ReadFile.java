@@ -65,6 +65,7 @@ public class ReadFile {
                 String line = "";
                 StringBuilder sb_docInfo = new StringBuilder();
                 StringBuilder sb_text = new StringBuilder();
+                StringBuilder sb_docHeadlines = new StringBuilder();
                 String docNo = "";
                 String docCity = "";
                 String doc_language = "";
@@ -86,11 +87,6 @@ public class ReadFile {
                             break;
                         }
 
-
-                        if (line.equals("<P>") || line.equals("</ P>") || line.equals("<TP>") || line.equals("</ TP>") || line.equals("</P>")) {
-                            line = br.readLine();  // start doc
-                            continue;
-                        }
                         if (line.equals("<TEXT>")) {
                             text_adding = true;
                             line = br.readLine();
@@ -106,15 +102,27 @@ public class ReadFile {
                             if (temp.length > 1)
                                 line = temp[1];
                         }
+                        // Headlines
+                        if ( !text_adding && line.contains("<H") && !line.contains("<HEADER>") && !line.contains("<HT>")){
+                            if ( line.equals("<HEADLINE>")){
+                                while( line !=null && line.startsWith("<"))
+                                    line = br.readLine() ;
+                                sb_docHeadlines.append( " " +line) ;
+
+                            }
+                            else { //<H ..somthing
+                                String[] temp = StringUtils.split(line, "><") ;
+                                if ( line.startsWith("<H3>"))
+                                    sb_docHeadlines.append(" "+temp[3]);
+                                if (line.startsWith("<H5>") || line.startsWith("<H4>")|| line.startsWith("<H2>"))
+                                    sb_docHeadlines.append(" "+temp[1]) ;
 
 
-                        if (!text_adding) // add to doc info
-                            sb_docInfo.append(" " + line);
-                        else sb_text.append(" " + line); // add to text
-
+                            }
+                        }
 
                         // CITY
-                        if (line.startsWith("<F P=104>")) {
+                        if (!text_adding &&line.startsWith("<F P=104>")) {
                             String[] arr = StringUtils.split(line, " ");
                             if (arr.length < 4) {
                                 line = br.readLine();
@@ -140,19 +148,32 @@ public class ReadFile {
                             if (arr.length >= 2)
                                 docNo = arr[1];
                         }
+
+                        if ( line.startsWith("<") && text_adding) {
+                            line = br.readLine();  // start doc
+                            continue;
+                        }
+                        if (!text_adding) // add to doc info
+                            sb_docInfo.append(" " + line);
+                        else sb_text.append(" " + line); // add to text
+
+
+
                         line = br.readLine();
                     }
                     //sb_docInfo.append(line);
                     String text = sb_text.toString();
+                    String headlines = sb_docHeadlines.toString();
                     Document doc = new Document(docNo, parentFileName, docCity, doc_language);
 
 
+                    sb_docHeadlines.delete(0  , sb_docHeadlines.length());
+                    sb_docHeadlines.setLength(0);
                     sb_docInfo.delete(0, sb_docInfo.length());
                     sb_docInfo.setLength(0);
                     sb_text.delete(0, sb_text.length());
                     sb_text.setLength(0);
-                    sb_text = new StringBuilder();
-                    sb_docInfo = new StringBuilder();
+                    parser.parseHeadLines(headlines);
                     parser.parse(text, doc );
                     if ( doc.docNo.equals(""))
                         System.out.println("stop!!!");

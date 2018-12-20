@@ -42,7 +42,7 @@ public class SegmentFilePartition implements Serializable {
             file_buffer_writer.append(term + "\n");
             file_buffer_writer.append(sb.toString() + "\n");
             counter++;
-            if (counter > 500){
+            if (counter > 400){
                 file_buffer_writer.flush();
                 counter = 0;
             }

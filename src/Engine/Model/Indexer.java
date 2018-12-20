@@ -76,7 +76,7 @@ class Indexer {
         }
         while (!finishToRead()) {
 
-            while (termToDocs.size() < 7500 || isContainsTheNextMin(termToDocs)) {
+            while (termToDocs.size() < 500 || isContainsTheNextMin(termToDocs)) {
                 String minTermDetails = getMinimum(chunksCurrLines);
                 if (minTermDetails.contains("null"))
                     break;
@@ -180,7 +180,7 @@ class Indexer {
                 try {
                     termDictionary_bf.append(pair.getKey().toString()).append(",").append(pair.getValue().toString()).append("\n");
                     counter++;
-                    if (counter > 500) {
+                    if (counter > 400) {
                         termDictionary_bf.flush();
                         counter = 0;
                     }
@@ -211,7 +211,7 @@ class Indexer {
             try {
                 docDictionary_bf.append(pair.getKey().toString()).append(",").append(pair.getValue().toString()).append("\n");
                 counter++;
-                if (counter > 500) {
+                if (counter > 400) {
                     docDictionary_bf.flush();
                     counter = 0;
                 }
@@ -241,7 +241,7 @@ class Indexer {
                     String cityDetailsFromApi = getCityDetailsFromApi(key);
                     citiesDictionary_bf.append(key).append(",").append(cityDetailsFromApi).append(",").append(pair.getValue().toString()).append("\n");
                     counter++;
-                    if (counter > 500) {
+                    if (counter > 400) {
                         citiesDictionary_bf.flush();
                         counter = 0;
                     }

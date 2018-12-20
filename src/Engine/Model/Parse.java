@@ -1,14 +1,12 @@
 package Engine.Model;
 
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
 
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +33,7 @@ public class Parse {
     private String mostFreqTerm = "";
     private int tf_mft = 0;
     int num_unique_term = 0;
+    int doc_length = 0 ;
 
 
     boolean debug = false;
@@ -43,6 +42,9 @@ public class Parse {
     TreeMap<String, String> TermsOnly;
     HashMap<String, StringBuilder> FilesTerms;
     TreeMap<String, Integer> FBIS3_Terms;
+    TreeSet HeadLinesTerms;
+    ArrayList <String> QueryTerms;
+
     String lastDoc = "";
 
     private static HashSet<String> stopwords = new HashSet<>(); // list of all stop words
@@ -98,6 +100,7 @@ public class Parse {
             BufferedReader months_br = new BufferedReader(months_fr);
             FBIS3_Terms = new TreeMap<>();
             FilesTerms = new HashMap<>();
+            HeadLinesTerms = new TreeSet() ;
 //            TermsOnly = new TreeMap<String, String>((Comparator) (o1, o2) -> {
 //                String s1 = ((String)(o1)).toLowerCase();
 //                String s2 = ((String)(o2)).toLowerCase();
@@ -132,6 +135,27 @@ public class Parse {
 
     }
 
+    public void parseHeadLines(String text) {
+        termPosition = 0;
+        HeadLinesTerms = new TreeSet() ;
+        //text = remove_stop_words(text);
+        String[] tokens;
+        tokens = StringUtils.split(text, "\\`:)?*(|+@#^;!&=}{[]'<> ");
+        getTerms(tokens, null , "DocHeadline");
+
+
+    }
+
+    public void parseQuery(String text ) {
+        termPosition = 0;
+        //text = remove_stop_words(text);
+        String[] tokens;
+        tokens = StringUtils.split(text, "\\`:)?*(|+@#^;!&=}{[]'<> ");
+        getTerms(tokens, null , "Quary");
+
+
+    }
+
     /**
      * passes the terms from the func getTerms and passes it to the segment file
      *
@@ -139,17 +163,18 @@ public class Parse {
      * @param currDoc - cuur doc obj
      * @return
      */
-    public HashSet<String> parse(String text, Document currDoc) {
+    public void parse(String text, Document currDoc ) {
         termPosition = 0;
         //text = remove_stop_words(text);
         String[] tokens;
         tokens = StringUtils.split(text, "\\`:)?*(|+@#^;!&=}{[]'<> ");
-        getTerms(tokens, currDoc);
+
+        getTerms(tokens, currDoc ,"DocText");
 //        if ( currDoc.docNo.equals("FBIS3-3366"))
 //        printFBIS3ToFile() ;
         currDoc.updateAfterParsing();
 
-        return null;
+
     }
 
     private void printFBIS3ToFile() {
@@ -215,14 +240,15 @@ public class Parse {
      *
      * @param tokensArray - doc text splited by ","
      * @param currDoc     the curr doc obj
+     * @param docText
      * @return a sorted map of all the terms in curr doc text
      */
-    private SortedMap<String, Term> getTerms(String[] tokensArray, Document currDoc) {
+    private SortedMap<String, Term> getTerms(String[] tokensArray, Document currDoc, String type) {
         // < str_term , obj_term >  // will store all the terms in curpos
         //doc no. , perent ,term , tf , n,uniqueterm , pointer
-
         String addTerm = "";
         num_unique_term = 0;
+        doc_length = 0 ;
         mostFreqTerm = "";
         tf_mft = 0;
         for (int i = 0; i < tokensArray.length; ) {
@@ -261,7 +287,10 @@ public class Parse {
                         String phrase_temp = phrase.toString();
                         phrase_temp = cleanToken(phrase_temp);
                         if (debug) System.out.println(phrase_temp);
-                        addTermFunc(phrase_temp, currDoc.docNo);
+                        String doc_num = "" ;
+                        if ( currDoc!= null )
+                            doc_num  = currDoc.docNo ;
+                        addTermFunc(phrase_temp, doc_num , type);
                         break;
                     } else {
                         phrase = phrase.append(" " + tokensArray[j]);
@@ -311,7 +340,10 @@ public class Parse {
                         i = j;
                     }
                     if (debug) System.out.println(what_to_add);
-                    addTermFunc(what_to_add, currDoc.docNo);
+                    String doc_num = "" ;
+                    if ( currDoc!= null )
+                        doc_num  = currDoc.docNo ;
+                    addTermFunc(what_to_add, doc_num ,type);
                     if (stop) break;
                 }
                 i = j;
@@ -430,23 +462,28 @@ public class Parse {
 
             if (debug) System.out.println(addTerm);
 
-            addTermFunc(addTerm, currDoc.docNo);
+
+            String doc_num = "" ;
+            if ( currDoc!= null )
+                doc_num  = currDoc.docNo ;
+            addTermFunc(addTerm, doc_num ,type);
             if (!is_joint_term)
                 i++;
         }//end for
-
-        writeToDocsFiles(currDoc.docNo, currDoc.getParentFileName(), mostFreqTerm, tf_mft, num_unique_term, currDoc.getCity());
+        if ( type.equals("DocText"))
+            writeToDocsFiles(currDoc.docNo, currDoc.getParentFileName(), mostFreqTerm, tf_mft, num_unique_term, currDoc.getCity());
         return null;
     }
 
     private void writeToDocsFiles(String docNo, String parentFileName, String mostFreqTerm, int tf_mft, int numOfUniqueTerms, String city) {
-        Posting.writeToDocumentsPosting(docNo, parentFileName, mostFreqTerm, tf_mft, numOfUniqueTerms, city);
+        Posting.writeToDocumentsPosting(docNo, parentFileName, mostFreqTerm, tf_mft, numOfUniqueTerms, city , HeadLinesTerms ,doc_length);
+        HeadLinesTerms.clear();
 
 
     }
 
 
-    private synchronized void addTermFunc(String addTerm, String docNo) {
+    private synchronized void addTermFunc(String addTerm, String docNo , String type) {
         //help with testin for the word doc
 //        if (docNo.equals("FBIS3-3366"))
 //            addTo_FBIS3_Terms(addTerm);
@@ -462,45 +499,66 @@ public class Parse {
 //        if ( FilesTerms == null ||FilesTerms.isEmpty()  )
 //            return;
         // System.out.println( addTerm + " , " + docNo);
-        if (docNo == "")
-            System.out.println("stop !");
-        if (FilesTerms.containsKey(addTerm)) {
-            StringBuilder value = FilesTerms.get(addTerm);
-            //String[] docs = StringUtils.split(value.toString(), "#") ;
-            //String[] getnum =StringUtils.split(docs[docs.length-1] , "|") ;
-            int start = value.lastIndexOf("#");
-            String doc = StringUtils.substring(value.toString(), start + 1, value.lastIndexOf("|"));
-            //String doc = value.substring(start+1 , value.lastIndexOf("|"));
-            if (!doc.equals(docNo)) { //new doc
-                sb.append(value);
-                value.append("#" + docNo + "|" + "1");
-            } else { //existing doc
-                int num = 0;
-                //if ( isNumber(value.substring(value.lastIndexOf("|")+1 , value.length())))
-                if (isNumber((StringUtils.substring(value.toString(), StringUtils.lastIndexOf(value, "|") + 1, value.length()))))
-                    //num= Integer.parseInt(value.substring(value.lastIndexOf("|")+1 , value.length())) ;
-                    num = Integer.parseInt(StringUtils.substring(value.toString(), StringUtils.lastIndexOf(value, "|") + 1, value.length()));
-                else {
-                    System.out.println("problem : " + value + addTerm);
-                    return;
+
+
+
+
+        if ( type.equals("DocHeadline") ) {
+            HeadLinesTerms.add(addTerm);
+            return;
+        }
+
+        if ( type.equals("Query")) {
+            QueryTerms.add(addTerm);
+            return;
+        }
+
+
+
+
+
+
+        if ( type.equals("DocText") ) {
+            doc_length++;
+            if (FilesTerms.containsKey(addTerm)) {
+                StringBuilder value = FilesTerms.get(addTerm);
+                //String[] docs = StringUtils.split(value.toString(), "#") ;
+                //String[] getnum =StringUtils.split(docs[docs.length-1] , "|") ;
+                int start = value.lastIndexOf("#");
+                String doc = StringUtils.substring(value.toString(), start + 1, value.lastIndexOf("|"));
+                //String doc = value.substring(start+1 , value.lastIndexOf("|"));
+                if (!doc.equals(docNo)) { //new doc
+                    sb.append(value);
+                    value.append("#" + docNo + "|" + "1");
+                } else { //existing doc
+                    int num = 0;
+                    //if ( isNumber(value.substring(value.lastIndexOf("|")+1 , value.length())))
+                    if (isNumber((StringUtils.substring(value.toString(), StringUtils.lastIndexOf(value, "|") + 1, value.length()))))
+                        //num= Integer.parseInt(value.substring(value.lastIndexOf("|")+1 , value.length())) ;
+                        num = Integer.parseInt(StringUtils.substring(value.toString(), StringUtils.lastIndexOf(value, "|") + 1, value.length()));
+                    else {
+                        System.out.println("problem : " + value + addTerm);
+                        return;
+                    }
+                    num++;
+                    if (num > tf_mft) {
+                        tf_mft = num;
+                        mostFreqTerm = addTerm;
+                    }
+                    value.replace(value.lastIndexOf("|") + 1, value.length(), num + "");
+                    //value = StringUtils.substring(value, 0 , value.length()-(getnum[1].length()+1));
+                    //sb.append(value);
+                    //sb.append(num) ;
+                    //value= sb.toString() ;
                 }
-                num++;
-                if (num > tf_mft) {
-                    tf_mft = num;
-                    mostFreqTerm = addTerm;
-                }
-                value.replace(value.lastIndexOf("|") + 1, value.length(), num + "");
-                //value = StringUtils.substring(value, 0 , value.length()-(getnum[1].length()+1));
-                //sb.append(value);
-                //sb.append(num) ;
-                //value= sb.toString() ;
+                FilesTerms.put(addTerm, value);
+            } else {
+
+                num_unique_term++;
+                sb.append("#" + docNo + "|" + "1");
+                FilesTerms.put(addTerm, sb);
+                TermsOnly.put(addTerm, addTerm);
             }
-            FilesTerms.put(addTerm, value);
-        } else {
-            num_unique_term++;
-            sb.append("#" + docNo + "|" + "1");
-            FilesTerms.put(addTerm, sb);
-            TermsOnly.put(addTerm, addTerm);
         }
 
         //sb.delete(0 , sb.length()) ;

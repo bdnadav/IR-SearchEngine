@@ -77,7 +77,7 @@ public class Posting {
                 terms_buffer_writer.append(listOfDocs).append(String.valueOf('\n'));
                 counter++;
 
-                if (counter > 500) {
+                if (counter > 400) {
                     terms_buffer_writer.flush();
                     counter = 0;
                 }
@@ -147,11 +147,13 @@ public class Posting {
      * This method is responsible for writing to Docs,
      * it is synchronized because it is called a method that is run by a thread number at the same time.
      */
-    synchronized public static void writeToDocumentsPosting(String docNo, String parentFileName, String mostFreqTerm, int tf_mft, int numOfUniqueTerms, String city) {
+    synchronized public static void writeToDocumentsPosting(String docNo, String parentFileName, String mostFreqTerm, int tf_mft, int numOfUniqueTerms, String city,TreeSet<String> headlines_terms, int doclength) {
         try {
-            documents_buffer_writer.append(docNo + "," + parentFileName + "," + mostFreqTerm + "," + tf_mft + "," + numOfUniqueTerms + "," + city+ "\n");
+
+            documents_buffer_writer.append(docNo + "," + parentFileName + "," + mostFreqTerm + "," + tf_mft + "," + numOfUniqueTerms + "," + city +","+ doclength+"," +headlines_terms.toString()+"\n");
+            headlines_terms.clear();
             docsCounter++;
-            if (docsCounter > 500) {
+            if (docsCounter > 400) {
                 documents_buffer_writer.flush();
                 docsCounter = 0;
             }
