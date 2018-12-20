@@ -23,11 +23,14 @@ public class Posting {
     private static int docsCounter = 0;
     private static BufferedWriter terms_buffer_writer;
     private static BufferedWriter documents_buffer_writer;
+    private static BufferedReader term_buffer_reader;
+    private static BufferedReader documents_buffer_reader;
 
     public Posting(String postingsPath) {
         String termsPostingPath = postingsPath + "\\Terms\\termsPosting.txt";
         try {
             terms_buffer_writer = new BufferedWriter(new FileWriter(termsPostingPath));
+            term_buffer_reader = new BufferedReader(new FileReader(termsPostingPath));
         } catch (IOException e1) {
             e1.printStackTrace();
         }
@@ -36,6 +39,7 @@ public class Posting {
     public static void initPosting(String postingPath) {
         try {
             documents_buffer_writer = new BufferedWriter(new FileWriter(postingPath + "\\docsPosting.txt"));
+            documents_buffer_reader = new BufferedReader(new FileReader(postingPath + "\\docsPosting.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -163,6 +167,24 @@ public class Posting {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String getTermPostingLineByPointer(int pointer) throws IOException {
+        String ans;
+        for (int i = 1; i < pointer; i++) {
+            term_buffer_reader.readLine();
+        }
+        ans = term_buffer_reader.readLine();
+        return ans;
+    }
+
+    public static String getDocPostingLineByPointer(int pointer) throws IOException {
+        String ans;
+        for (int i = 1; i < pointer; i++) {
+            documents_buffer_reader.readLine();
+        }
+        ans = documents_buffer_reader.readLine();
+        return ans;
     }
 }
 
