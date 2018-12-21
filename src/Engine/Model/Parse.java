@@ -1120,4 +1120,8 @@ public class Parse {
         this.FilesTerms.clear();
         this.TermsOnly.clear();
     }
+
+    public ArrayList<String> getQueryTerms() {
+        return  QueryTerms ;
+    }
 }

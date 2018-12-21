@@ -21,7 +21,8 @@ public class Searcher {
     }
 
     private SortedSet<String> handleQuery (String query){
-        ArrayList<String> queryTerms = parse.parse(query, null);
+         parse.parseQuery(query);
+        ArrayList<String> queryTerms = parse.getQueryTerms() ;
         Set<String> relevantDocs = getRelevantDocs(queryTerms);
         SortedSet<String> rankedDocs = ranker.rankDocs(relevantDocs, queryTerms);
         return  rankedDocs;

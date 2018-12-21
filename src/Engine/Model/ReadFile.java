@@ -153,9 +153,8 @@ public class ReadFile {
                             line = br.readLine();  // start doc
                             continue;
                         }
-                        if (!text_adding) // add to doc info
-                            sb_docInfo.append(" " + line);
-                        else sb_text.append(" " + line); // add to text
+                        if (text_adding) // add to doc info
+                        sb_text.append(" " + line); // add to text
 
 
 
@@ -169,8 +168,8 @@ public class ReadFile {
 
                     sb_docHeadlines.delete(0  , sb_docHeadlines.length());
                     sb_docHeadlines.setLength(0);
-                    sb_docInfo.delete(0, sb_docInfo.length());
-                    sb_docInfo.setLength(0);
+//                    sb_docInfo.delete(0, sb_docInfo.length());
+//                    sb_docInfo.setLength(0);
                     sb_text.delete(0, sb_text.length());
                     sb_text.setLength(0);
                     parser.parseHeadLines(headlines);
