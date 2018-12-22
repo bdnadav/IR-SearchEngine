@@ -218,12 +218,12 @@ public class Model extends Observable {
 
     public void printTests() {
         loadDicToMemory(ifStemming());
-        Searcher searcher = new Searcher(termDictionary, citiesDictionary, docsDictionary, postingPath, is_stemming);
-        try {
-            ArrayList<String> ans = searcher.getTermDocs("people");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        Searcher searcher = new Searcher(termDictionary, citiesDictionary, docsDictionary, postingPath, is_stemming);
+//        try {
+//            ArrayList<String> ans = searcher.getTermDocs("people");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         printAnswer5();
         printAnswer6();

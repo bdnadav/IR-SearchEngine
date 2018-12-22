@@ -103,7 +103,7 @@ public class ReadFile {
                                 line = temp[1];
                         }
                         // Headlines
-                        if ( !text_adding && line.contains("<H") && !line.contains("<HEADER>") && !line.contains("<HT>")){
+                        if (  line.contains("<H") && !line.contains("<HEADER>") && !line.contains("<HT>")){
                             if ( line.equals("<HEADLINE>")){
                                 while( line !=null && line.startsWith("<"))
                                     line = br.readLine() ;
@@ -112,9 +112,9 @@ public class ReadFile {
                             }
                             else { //<H ..somthing
                                 String[] temp = StringUtils.split(line, "><") ;
-                                if ( line.startsWith("<H3>"))
+                                if (  line.startsWith("<H3> <TI>"))
                                     sb_docHeadlines.append(" "+temp[3]);
-                                if (line.startsWith("<H5>") || line.startsWith("<H4>")|| line.startsWith("<H2>"))
+                                else if (line.startsWith("<H5>") || line.startsWith("<H4>")|| line.startsWith("<H2>") || line.startsWith("<H3>"))
                                     sb_docHeadlines.append(" "+temp[1]) ;
 
 
@@ -149,7 +149,7 @@ public class ReadFile {
                                 docNo = arr[1];
                         }
 
-                        if ( line.startsWith("<") && text_adding) {
+                        if ( line.startsWith("<") && text_adding && !line.startsWith("<H") && !line.startsWith("<F") && !line.startsWith("<DATE")) {
                             line = br.readLine();  // start doc
                             continue;
                         }
