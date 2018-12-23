@@ -27,6 +27,7 @@ public class Ranker {
     public SortedSet<String> getRankDocs(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs){
         rankDocs(relevantDocs);
         System.out.println("status");
+        System.out.println(rankedDocs.firstEntry());
         return null;
     }
 
@@ -54,7 +55,7 @@ public class Ranker {
                 int docLength = Integer.parseInt(strDocLength);
 
 
-                // need to add another factors.
+
                 addBM25ValueToDoc(docNo, tf, docLength, termDf);
             }
         }
