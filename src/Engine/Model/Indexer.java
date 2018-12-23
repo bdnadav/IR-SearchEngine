@@ -131,16 +131,6 @@ class Indexer {
                 indexOfMin = i;
             }
         }
-//        for (int i = 0; i < chunksCurrLines.length; i++) {
-//            if(chunksCurrLines[i].equals(minSoFar)){
-//                try {
-//                    String docsListToAdd = segsReaders[i].readLine();
-//                    docsOfTerm += docsOfTerm + docsListToAdd;
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
 
         try {
             docsOfTerm = segsReaders[indexOfMin].readLine();  // The docs which contains the minimum term

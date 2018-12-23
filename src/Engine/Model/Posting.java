@@ -45,6 +45,20 @@ public class Posting {
         }
     }
 
+    public static void initTermPosting(String postingPath) {
+        String termsPostingPath = postingPath + "\\Postings\\Terms\\termsPosting.txt";
+        String docsPostingPath = postingPath + "\\Postings\\Docs\\docsPosting.txt";
+        try {
+            //terms_buffer_writer = new BufferedWriter(new FileWriter(termsPostingPath));
+            term_buffer_reader = new BufferedReader(new FileReader(termsPostingPath));
+            documents_buffer_reader = new BufferedReader(new FileReader(docsPostingPath));
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+
+
     /**
      * Writes to the disk the list of terms that are contained in the TreeMap.
      * In addition, the method adds the terms to the term dictionary.
@@ -171,7 +185,7 @@ public class Posting {
 
     public static String getTermPostingLineByPointer(int pointer) throws IOException {
         String ans;
-        for (int i = 1; i < pointer; i++) {
+        for (int i = 1; i <= pointer; i++) {
             term_buffer_reader.readLine();
         }
         ans = term_buffer_reader.readLine();

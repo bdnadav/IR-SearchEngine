@@ -101,16 +101,16 @@ public class Parse {
             FBIS3_Terms = new TreeMap<>();
             FilesTerms = new HashMap<>();
             HeadLinesTerms = new TreeSet() ;
-//            TermsOnly = new TreeMap<String, String>((Comparator) (o1, o2) -> {
-//                String s1 = ((String)(o1)).toLowerCase();
-//                String s2 = ((String)(o2)).toLowerCase();
-//                if (s1.charAt(0) == '*')
-//                    s1 = StringUtils.substring(s1, 1);
-//                if (s2.charAt(0) == '*')
-//                    s2 = StringUtils.substring(s2, 1);
-//                return s1.compareTo(s2);
-//            });
-            TermsOnly = new TreeMap<>();
+            TermsOnly = new TreeMap<String, String>((Comparator) (o1, o2) -> {
+                String s1 = ((String)(o1)).toLowerCase();
+                String s2 = ((String)(o2)).toLowerCase();
+                if (s1.charAt(0) == '*')
+                    s1 = StringUtils.substring(s1, 1);
+                if (s2.charAt(0) == '*')
+                    s2 = StringUtils.substring(s2, 1);
+                return s1.compareTo(s2);
+            });
+//            TermsOnly = new TreeMap<>();
             String curr_line;
 
             while ((curr_line = stopwords_br.readLine()) != null) {
@@ -147,11 +147,12 @@ public class Parse {
     }
 
     public void parseQuery(String text ) {
+        QueryTerms = new ArrayList<>();
         termPosition = 0;
         //text = remove_stop_words(text);
         String[] tokens;
         tokens = StringUtils.split(text, "\\`:)?*(|+@#^;!&=}{[]'<> ");
-        getTerms(tokens, null , "Quary");
+        getTerms(tokens, null , "Query");
 
 
     }

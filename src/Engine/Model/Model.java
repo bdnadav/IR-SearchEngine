@@ -7,24 +7,28 @@ import javax.swing.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
 /**
  * Part of MVC Design pattern  , get called from controller after View events
  */
 public class Model extends Observable {
     private String corpusPath; //saved corpus path
-    private String postingPath ;// saved outpot posting path
-    private boolean is_stemming ; // using a stemmer on terms ot not
-    public String [] list_lang ; //list of lang returns from parsing the docs
+    private String postingPath;// saved outpot posting path
+    private boolean is_stemming; // using a stemmer on terms ot not
+    public String[] list_lang; //list of lang returns from parsing the docs
     // will allow to load the term dic to prog memory -
     // will be used in project part 2
-    TreeMap < String , String > termDictionary = new TreeMap<>();
-    TreeMap < String , String > citiesDictionary = new TreeMap<>();
-    TreeMap < String , String > docsDictionary = new TreeMap<>();
+    TreeMap<String, String> termDictionary = new TreeMap<>();
+    TreeMap<String, String> termDictionaryToShow = new TreeMap<>();
+    TreeMap<String, String> citiesDictionary = new TreeMap<>();
+    TreeMap<String, String> docsDictionary = new TreeMap<>();
+
 
     /**
      * run corpus processing manager , get back info from posting process and
      * display it at the end ,
      * get lang lind and set it in gui
+     *
      * @param corpusPath
      * @param postingPath
      * @param stemming
@@ -33,7 +37,7 @@ public class Model extends Observable {
         long startTime = System.currentTimeMillis();
         this.corpusPath = corpusPath;
         this.postingPath = postingPath;
-        this.is_stemming = stemming ;
+        this.is_stemming = stemming;
         CorpusProcessingManager corpusProcessingManager = new CorpusProcessingManager(corpusPath, postingPath, stemming);
         corpusProcessingManager.StartCorpusProcessing();
         int uniqueTerms = Indexer.terms_dictionary.size();
@@ -45,14 +49,15 @@ public class Model extends Observable {
         setChanged();
         notifyObservers("finished");
         JOptionPane.showMessageDialog(null, summery, "Build Info", JOptionPane.INFORMATION_MESSAGE);
-
+        loadDicToMemory(ifStemming());
     }
 
     /**
      * help to present a summary of run info in the end of posting
+     *
      * @param estimatedTime - runtime
-     * @param uniqueTerms - num of unique terms in the corpus
-     * @param docsGenerate - how many docs in the corpus
+     * @param uniqueTerms   - num of unique terms in the corpus
+     * @param docsGenerate  - how many docs in the corpus
      * @return
      */
     private String getSummary(long estimatedTime, int uniqueTerms, int docsGenerate) {
@@ -69,6 +74,7 @@ public class Model extends Observable {
 
     /**
      * load the dic file from disk to memory - insert to termDictionary
+     *
      * @param stemming
      */
     public void loadDicToMemory(String stemming) {
@@ -82,11 +88,15 @@ public class Model extends Observable {
 
                     String term = "";
                     String tf = "";
-                    String[] splited = StringUtils.split(line, "<D>");
-                    String[] termSplited = StringUtils.split(splited[1], ",");
-                    term = splited[0];
-                    termDictionary.put(term, splited[1]);
+                    int indexOfFirstComma = StringUtils.indexOf(line, ",");
+                    term = StringUtils.substring(line, 0, indexOfFirstComma);
+                    String details = StringUtils.substring(line, indexOfFirstComma);
+                    termDictionary.put(term, details);
+                    String[] splitedDetails = StringUtils.split(details, ",");
+                    tf = splitedDetails[2];
+                    termDictionaryToShow.put(term, tf);
                 }
+                br_dic.close();
             } catch (Exception e) {
             }
 
@@ -114,6 +124,7 @@ public class Model extends Observable {
 
                     citiesDictionary.put(city, docsList);
                 }
+                br_dic.close();
             } catch (Exception e) {
             }
 
@@ -129,7 +140,7 @@ public class Model extends Observable {
         if (dir != null && docsDir.exists()) {
             StringBuilder sb = new StringBuilder();
             try {
-                BufferedReader br_dic = new BufferedReader(new FileReader(postingPath + "\\Postings" + ifStemming() + "\\docsDictionary.txt"));
+                BufferedReader br_dic = new BufferedReader(new FileReader(postingPath + "\\Postings" + ifStemming() + "\\docDictionary.txt"));
                 String line = "";
                 while ((line = br_dic.readLine()) != null) {
 
@@ -137,10 +148,11 @@ public class Model extends Observable {
                     String pointer = "";
                     int firstIndexOfComma = StringUtils.indexOf(line, ",");
                     docNumber = StringUtils.substring(line, 0, firstIndexOfComma);
-                    pointer = StringUtils.substring(line,  firstIndexOfComma + 1);
+                    pointer = StringUtils.substring(line, firstIndexOfComma + 1);
 
                     docsDictionary.put(docNumber, pointer);
                 }
+                br_dic.close();
             } catch (Exception e) {
             }
 //            String docPointer = docsDictionary.get("FBIS3-3366");
@@ -160,18 +172,20 @@ public class Model extends Observable {
 //
 //
 //            String line = null;
-
-
+            JOptionPane.showMessageDialog(null, "Directoy Loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /**
      * delete all files & folder created after posting process
+     *
      * @return
      */
     public boolean resetAll() {
         File dir = new File(postingPath + "\\Postings" + ifStemming());
-        System.out.println("Deletes: " + postingPath + "\\Postings"+ifStemming());
+        System.out.println("Deletes: " + postingPath + "\\Postings" + ifStemming());
         if (dir.exists()) {
 
             try {
@@ -179,7 +193,7 @@ public class Model extends Observable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }else {
+        } else {
 
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -204,10 +218,11 @@ public class Model extends Observable {
         }
         return false;
     }
-    public void pathUpdate ( String corpusPath , String postingPath , boolean stemming ) {
+
+    public void pathUpdate(String corpusPath, String postingPath, boolean stemming) {
         this.corpusPath = corpusPath;
         this.postingPath = postingPath;
-        this.is_stemming = stemming ;
+        this.is_stemming = stemming;
     }
 
     private String ifStemming() {
@@ -217,33 +232,34 @@ public class Model extends Observable {
     }
 
     public void printTests() {
-        loadDicToMemory(ifStemming());
+        //  loadDicToMemory(ifStemming());
 //        Searcher searcher = new Searcher(termDictionary, citiesDictionary, docsDictionary, postingPath, is_stemming);
 //        try {
 //            ArrayList<String> ans = searcher.getTermDocs("people");
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-
-        printAnswer5();
-        printAnswer6();
-        try {
-            printAnswer7();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
+        searcher.handleQuery("DEVRIES");
+//        printAnswer5();
+//        printAnswer6();
+//        try {
+//            printAnswer7();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
-    private void printAnswer5(){
+    private void printAnswer5() {
         int noneCapitalCity = 0;
         int totalNumOfCities = citiesDictionary.size();
-        for(Map.Entry<String,String> entry : citiesDictionary.entrySet()) {
+        for (Map.Entry<String, String> entry : citiesDictionary.entrySet()) {
             String currCity = entry.getKey();
             String[] cityAndDetails = StringUtils.split(currCity, ",");
-            if (cityAndDetails.length < 2 || cityAndDetails[1].equals("")){
+            if (cityAndDetails.length < 2 || cityAndDetails[1].equals("")) {
                 noneCapitalCity++;
-                }
             }
+        }
         System.out.println("---THE ANSWER FOR QUESTION 5---");
         System.out.println("Number of unique cities: " + totalNumOfCities);
         System.out.println("Number of none capital cities: " + noneCapitalCity);
@@ -258,13 +274,13 @@ public class Model extends Observable {
         String maxDocNumSoFar = "";
         int maxTfSoFar = 0;
 
-        for(Map.Entry<String,String> entry : citiesDictionary.entrySet()) {
+        for (Map.Entry<String, String> entry : citiesDictionary.entrySet()) {
             String currCity = entry.getKey();
             String docsList = entry.getValue();
             String[] docs = StringUtils.split(docsList, "#");
             for (int i = 0; i < docs.length; i++) {
                 String[] docNumAndTf = StringUtils.split(docs[i], "|");
-                if ((Integer.parseInt(docNumAndTf[1]) > maxTfSoFar)){
+                if ((Integer.parseInt(docNumAndTf[1]) > maxTfSoFar)) {
                     maxCitySoFar = currCity;
                     maxDocNumSoFar = docNumAndTf[0];
                     maxTfSoFar = Integer.parseInt(docNumAndTf[1]);
@@ -274,7 +290,7 @@ public class Model extends Observable {
         System.out.println("---THE ANSWER FOR QUESTION 6---");
 
 
-        System.out.println(maxDocNumSoFar + " " +  maxCitySoFar + " " +  maxTfSoFar);
+        System.out.println(maxDocNumSoFar + " " + maxCitySoFar + " " + maxTfSoFar);
     }
 
     private void printAnswer7() throws IOException {
@@ -282,18 +298,18 @@ public class Model extends Observable {
         PriorityQueue<String> maxQueue = new PriorityQueue<>(new TermMaxTFComparator());
         PriorityQueue<String> minQueue = new PriorityQueue<>(new TermMinTFComparator());
         String line = null;
-        while ((line = br_dic.readLine()) != null){
+        while ((line = br_dic.readLine()) != null) {
             String term = "";
             String tf = "";
-            String[] splited = StringUtils.split(line,",");
+            String[] splited = StringUtils.split(line, ",");
             String[] termSplited = StringUtils.split(splited[0], "<D>");
             if (termSplited.length < 1)
                 continue;
             term = termSplited[0];
-            if (splited.length > 4){
-                tf = splited[splited.length-3];
+            if (splited.length > 4) {
+                tf = splited[splited.length - 3];
             }
-            if (!tf.equals("")){
+            if (!tf.equals("")) {
                 maxQueue.add(tf + "," + term);
                 minQueue.add(tf + "," + term);
             }
@@ -311,6 +327,7 @@ public class Model extends Observable {
         }
 
     }
+
 
     public static class TermMaxTFComparator implements Comparator<Object> {
         @Override
