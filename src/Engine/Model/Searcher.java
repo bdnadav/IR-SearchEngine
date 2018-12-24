@@ -8,7 +8,8 @@ import java.util.*;
 public class Searcher {
     private final int MAX_DOCS_TO_RETURN = 50;
 
-    private Parse parse;
+    private Parse queryParse;
+    private Parse descParse;
     private TreeMap<String, String> terms_dictionary;
     private TreeMap<String, String> cities_dictionary;
     private TreeMap<String, String> docs_dictionary;
@@ -23,7 +24,8 @@ public class Searcher {
         this.cities_dictionary = citiesDic;
         this.docs_dictionary = docsDic;
         this.ranker = new Ranker(docsDic.size(), 250);
-        this.parse = new Parse(posting, stemming);
+        this.queryParse = new Parse(posting, stemming);
+        this.descParse = new Parse(posting, stemming);
         this.posting = posting;
         Posting.initTermPosting(posting);
         if (specificCities != null && !specificCities.isEmpty()) {
@@ -50,18 +52,62 @@ public class Searcher {
 
 
     public ArrayList<String> handleQuery(String query_id, String query, String desc, String narr) {
-        parse.parseQuery(query);
-        ArrayList<String> queryTerms = parse.getQueryTerms();
-        HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsForEachQueryTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
+        queryParse.parseQuery(query);
+        ArrayList<String> queryTerms = queryParse.getQueryTerms();
+        descParse.parseQuery(desc);
+        ArrayList<String> descTerms = descParse.getQueryTerms();
+        descTerms = filterDescTerms(descTerms);
+        HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
+        HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByDescTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
-        relevantDocsForEachQueryTerm = getRelevantDocs(queryTerms);
+        relevantDocsByQueryTerm = getRelevantDocs(queryTerms);
+        Posting.initTermPosting(posting);
+        relevantDocsByDescTerm = getRelevantDocs(descTerms);
 
         String queryId = query_id; // need to change
 
-        ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsForEachQueryTerm, queryId);
+        ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsByQueryTerm, relevantDocsByDescTerm, queryId);
         // NEED TO DO: Create SubSet of rankedDocs according to the final integer MAX_DOCS_TO_RETURN
         return rankedDocs;
+    }
+
+    private ArrayList<String> filterDescTerms(ArrayList<String> descTerms) {
+        ArrayList<String> ans = new ArrayList<>();
+        TreeMap<Integer, String> termDfInCorpus = new TreeMap<>();
+        for (String term : descTerms) {
+            if (term.charAt(0) == '*')
+                term = StringUtils.substring(term, 1);
+            int df = getTermTf(term);
+            termDfInCorpus.put(df, term);
+        }
+        for (int i = 0; i < 3; i++) {
+            ans.add(termDfInCorpus.pollFirstEntry().getValue());
+        }
+
+//        for (Object o : termDfInCorpus.entrySet()){
+//            Map.Entry<Integer, String> dfWithTerm = (Map.Entry<Integer, String>) o;
+//            int df = dfWithTerm.getKey();
+//            if (df > 10 && df < docs_dictionary.size()/5)
+//                ans.add(dfWithTerm.getValue());
+//            if (ans.size() > 2)
+//                break;
+//        }
+        return ans;
+    }
+
+    private int getTermTf(String term) {
+        String dicTermLine = terms_dictionary.get(term);
+        if (dicTermLine == null)
+            dicTermLine = terms_dictionary.get(term.toUpperCase());
+        if (dicTermLine == null)
+            return -1;
+        String[] split = StringUtils.split(dicTermLine, ",");
+        if (split.length < 5)
+            return -1;
+        String strDf = split[3];
+        int ans = Integer.parseInt(strDf);
+        return ans;
     }
 
 
@@ -82,6 +128,8 @@ public class Searcher {
                         if (!legalDocs.contains(docNo))
                             continue;
                     }
+                    if (!docs_dictionary.containsKey(docNo))
+                        continue;
                     String strDocPointer = docs_dictionary.get(docNo);
                     int intDocPointer = Integer.parseInt(strDocPointer);
                     linesInPostingFile.put(intDocPointer, currDocWithTf);
@@ -96,14 +144,13 @@ public class Searcher {
                     String docHeaders = "[" + splited[1];
                     String[] firstPartSplited = StringUtils.split(splited[0], ",");
                     /* docDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength */
-                    int index = 6;
-                    if (firstPartSplited.length == 6)
-                        index = 5;
-                    else if (firstPartSplited.length < 6){
-                        System.out.println("Problematic DocNo: " + currDocWithTf + " ");
+                    if (firstPartSplited.length < 7 )
                         continue;
-                    }
-                    String docDetails = firstPartSplited[2] + "," + firstPartSplited[3] + "," + firstPartSplited[4] + "," + firstPartSplited[index];
+                    String length = firstPartSplited[6];
+                    if (length.equals("NULL"))
+                        length = firstPartSplited[7];
+                    String docDetails = firstPartSplited[2] + "," + firstPartSplited[3] + "," + firstPartSplited[4] + "," + length;
+//                    System.out.println(currDocWithTf + " " + firstPartSplited[6]);
                     ArrayList<String> currDocDetails = new ArrayList<>();
                     currDocDetails.add(docDetails);
                     currDocDetails.add(docHeaders);

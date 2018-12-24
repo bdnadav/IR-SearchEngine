@@ -239,7 +239,7 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        readQueryFromFile("C:\\Users\\harel_000\\Desktop\\queries.txt");
+        readQueryFromFile("C:\\Users\\Nadav\\QueriesTests\\queries.txt");
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
        // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
 
@@ -263,6 +263,7 @@ public class Model extends Observable {
 
             StringBuilder sb_narr =new StringBuilder() ;
             StringBuilder sb_desc=new StringBuilder() ;
+            //loadDicToMemory(ifStemming());
 
 
             String line = "" , query_id  ="" ,query = "" ;
@@ -285,14 +286,14 @@ public class Model extends Observable {
                     }
                     if ( line.startsWith("<desc>")){
                         line = br.readLine();
-                        while (!line.equals("")) {
+                        while (line != null && !line.equals("")) {
                             sb_desc.append(" " + line);
                             line = br.readLine();
                         }
                     }
                     if ( line.startsWith("<narr>")){
                         line = br.readLine();
-                        while (!line.equals("")) {
+                        while (line != null && !line.equals("")) {
                             sb_narr.append(" " + line);
                             line = br.readLine();
                         }

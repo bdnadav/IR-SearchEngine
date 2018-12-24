@@ -11,8 +11,9 @@ public class Ranker {
     private final int MAX_DOCS_TO_RETURN = 50;
 
     /* Ranking factors and their weight*/
-    private final double BM25_WEIGHT = 0.6;
-    private final double IN_TITLE_WEIGHT = 0.4;
+    private final double BM25_WEIGHT_CLASSIC = 0.5;
+    private final double BM25_WEIGHT_DESCRIPTION = 0.25;
+    private final double IN_TITLE_WEIGHT = 0.25;
 
     /* BM25 Constants*/
     private final double K = 1.5;
@@ -21,30 +22,78 @@ public class Ranker {
     private final int NUM_OF_DOCS_IN_CORPUS;
 
     private TreeMap<String, Double> rankedDocs;
+    private TreeMap<String, Double> BM25_ClassicWeight;
+    private TreeMap<String, Double> BM25_DescriptionWeight;
+    private TreeMap<String, Double> QueryTermInTitleWeight;
+    private TreeMap<String, Double> DescTermInTitleWeight;
+    static private BufferedWriter results_bw;
+
+    static {
+        try {
+            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\Nadav\\QueriesTests\\results\\results.txt"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     Ranker(int numberOfDocsInCorpus, double avgDocsLength) {
         this.NUM_OF_DOCS_IN_CORPUS = numberOfDocsInCorpus;
         this.AVG_LENGTH_OF_DOCS_IN_CORPUS = avgDocsLength;
         rankedDocs = new TreeMap<>();
+        BM25_ClassicWeight = new TreeMap<>();
+        BM25_DescriptionWeight = new TreeMap<>();
+        QueryTermInTitleWeight = new TreeMap<>();
+        DescTermInTitleWeight = new TreeMap<>();
     }
 
-    public ArrayList<String> getRankDocs(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs, String queryId){
-        rankDocs(relevantDocs);
+    public ArrayList<String> getRankDocs(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQuery,
+                                         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByDesc,
+                                         String queryId){
+        calculateBM25AndInHeadersWeight(relevantDocsByQuery, "Query");
+        calculateBM25AndInHeadersWeight(relevantDocsByDesc, "Description");
+        mergeValues();
         ArrayList<String> ans = getSortedDocs();
-        System.out.println("status");
+        System.out.println("Finish query number: " + queryId);
         printResultToFile(ans, queryId);
         return ans;
     }
 
+    private void mergeValues() {
+        for (Object o : BM25_ClassicWeight.entrySet()){
+            Map.Entry<String, Double> docWithValue = (Map.Entry<String, Double>) o;
+            String docNo = docWithValue.getKey();
+            Double bm25ClassicWeight = docWithValue.getValue();
+            Double bm25DescriptionWeight = 0.0;
+            Double queryTermInHeadersWeight = 0.0;
+            Double descTermInHeadersWeight = 0.0;
+            if (BM25_DescriptionWeight.containsKey(docNo)){
+                bm25DescriptionWeight = BM25_DescriptionWeight.get(docNo);
+            }
+            if (QueryTermInTitleWeight.containsKey(docNo)){
+                queryTermInHeadersWeight = QueryTermInTitleWeight.get(docNo);
+            }
+            if (DescTermInTitleWeight.containsKey(docNo)){
+                descTermInHeadersWeight = QueryTermInTitleWeight.get(docNo);
+            }
+            double bm25Classic = BM25_WEIGHT_CLASSIC * bm25ClassicWeight;
+            double bm25Description = BM25_WEIGHT_DESCRIPTION * bm25DescriptionWeight;
+            double inTitle = IN_TITLE_WEIGHT * (queryTermInHeadersWeight + descTermInHeadersWeight);
+
+            double mergedValue = bm25Classic + bm25Description + inTitle;
+
+            rankedDocs.put(docNo,mergedValue);
+        }
+
+    }
+
     private void printResultToFile(ArrayList<String> ans,String queryId) {
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\Nadav\\IdeaProjects\\IR-SearchEngine\\IR-SearchEngine\\src\\Engine\\resources\\queryResults.txt"));
             for (int i = 0; i < ans.size(); i++) {
-                bw.append(queryId).append(" ").append("0").append(" ").
+                results_bw.append(queryId).append(" ").append("0").append(" ").
                         append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
             }
-            bw.flush();
+            results_bw.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,7 +104,8 @@ public class Ranker {
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
-    private void rankDocs(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs) {
+    private void calculateBM25AndInHeadersWeight(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs, String mode) {
+        HashMap<String, ArrayList<String>> docsHeaders = new HashMap<>();
         for (Object o1 : relevantDocs.entrySet()) {
             Map.Entry pair = (Map.Entry) o1; // <QueryTerm, <HashMap<DocNo|tf, [DocDetails, DocHeaders]>>>
             String queryTerm = (String) pair.getKey();
@@ -70,34 +120,75 @@ public class Ranker {
                 ArrayList<String> value = (ArrayList<String>) doc.getValue(); // ArrayList<String> = [DocDetails, DocHeaders]
                 String docDetails = value.get(0);
                 String docHeaders = value.get(1);
+                docsHeaders.put(docNo, createHeaderArray(docHeaders));
                 String[] docDetailsSplited = StringUtils.split(docDetails, ",");
                 String strDocLength = docDetailsSplited[3];
+//                System.out.println("Ranker" + " " + docNo + " " + strDocLength);
                 int docLength = Integer.parseInt(strDocLength);
-
-
-                addBM25ValueToDoc(docNo, tf, docLength, termDf);
-                addInHeadlinesValueToDoc(docNo, queryTerm, docHeaders);
+                addBM25ValueToDoc(docNo, tf, docLength, termDf, mode);
             }
         }
-//        it_queryTerms.remove(); // avoids a ConcurrentModificationException
+        TreeMap<String, Double> tm;
+        if (mode.equals("Query"))
+            tm = QueryTermInTitleWeight;
+        else
+            tm = DescTermInTitleWeight;
+        Set<String> queryTerms = relevantDocs.keySet();
+        for (Object o : docsHeaders.entrySet()){
+            Map.Entry docHeaders = (Map.Entry) o;
+            String docNo = (String) docHeaders.getKey();
+            if (!tm.containsKey(docNo)){
+                ArrayList<String> headers = (ArrayList<String>) docHeaders.getValue();
+                calculateHeadersWeight(docNo, queryTerms, headers, mode);
+            }
+        }
     }
-    /* DocHeaders = [headerTerm, headerTerm, ... ] */
-    private void addInHeadlinesValueToDoc(String docNo, String queryTerm, String docHeaders) {
 
+    private void calculateHeadersWeight(String docNo, Set<String> queryTerms, ArrayList<String> headers, String mode) {
+        TreeMap<String, Double> tm;
+        if (mode.equals("Query"))
+            tm = QueryTermInTitleWeight;
+        else
+            tm = DescTermInTitleWeight;
+        int counter = 0;
+        int headersSize = headers.size();
+        for (String term : queryTerms){
+            if (headers.contains(term))
+                counter++;
+        }
+        double value = 0.0;
+        if (headersSize != 0)
+            value = counter/headersSize;
+        tm.put(docNo, value);
+    }
+
+    // DocHeaders = [headerTerm, headerTerm, ... ]
+    private ArrayList<String> createHeaderArray(String docHeaders) {
+        ArrayList<String> ans = new ArrayList<>();
+        docHeaders = StringUtils.substring(docHeaders, 1, docHeaders.length()-1); // trim the '[ ]'
+        String[] headersTerms = StringUtils.split(docHeaders, ",");
+        ans.addAll(Arrays.asList(headersTerms));
+        return ans;
     }
 
 
-    private void addBM25ValueToDoc(String docNo, int tf, int docLength, int df) {
+    private void addBM25ValueToDoc(String docNo, int tf, int docLength, int df, String mode) {
+        TreeMap<String, Double> tm;
+        if (mode.equals("Query"))
+            tm = BM25_ClassicWeight;
+        else
+            tm = BM25_DescriptionWeight;
         double bm25Value = ( ( ( (K + 1) * tf ) / ( tf + K * (1 - B + B * docLength/AVG_LENGTH_OF_DOCS_IN_CORPUS) ) )
                 * Math.log((NUM_OF_DOCS_IN_CORPUS + 1) / df));
-        if (rankedDocs.get(docNo) != null){
-            double currValue = rankedDocs.get(docNo);
+        if (tm.get(docNo) != null){
+            double currValue = tm.get(docNo);
             currValue += bm25Value;
-            rankedDocs.put(docNo, currValue);
+            tm.put(docNo, currValue);
         }
         else
-            rankedDocs.put(docNo, bm25Value);
+            tm.put(docNo, bm25Value);
     }
+
     private ArrayList<String> getSortedDocs() {
         ArrayList<String> ans = new ArrayList<>();
         TreeSet<Map.Entry<String, Double>> sortedSet = entriesSortedByValues(rankedDocs);
