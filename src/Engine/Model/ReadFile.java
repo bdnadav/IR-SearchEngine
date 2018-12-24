@@ -200,6 +200,7 @@ public class ReadFile {
                 }
             }
         }
+        parser.cleanAll();
     }
 
 
