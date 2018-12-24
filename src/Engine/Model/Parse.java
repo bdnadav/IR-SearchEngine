@@ -262,7 +262,6 @@ public class Parse {
                 continue;
             }
 
-
             // catch point joint terms
             String temp_char = cleanToken(tokensArray[i]);
             if ((tokensArray[i].length() > 5 && Character.isUpperCase(temp_char.charAt(0)) || Character.isLowerCase(temp_char.charAt(0)))
@@ -622,7 +621,7 @@ public class Parse {
      * @param token
      * @return clean token
      */
-    private String cleanToken(String token) {
+    public static String cleanToken(String token) {
         StringBuilder s = null;
         boolean changed = true;
         while (token != null && token.length() > 0 && !token.equals("") && changed) {
