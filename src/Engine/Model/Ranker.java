@@ -2,6 +2,9 @@ package Engine.Model;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class Ranker {
@@ -17,31 +20,50 @@ public class Ranker {
     private final double AVG_LENGTH_OF_DOCS_IN_CORPUS;
     private final int NUM_OF_DOCS_IN_CORPUS;
 
-    TreeMap<String, Double> rankedDocs;
+    private TreeMap<String, Double> rankedDocs;
 
 
-    public Ranker(int numberOfDocsInCorpus, double avgDocsLength) {
+    Ranker(int numberOfDocsInCorpus, double avgDocsLength) {
         this.NUM_OF_DOCS_IN_CORPUS = numberOfDocsInCorpus;
         this.AVG_LENGTH_OF_DOCS_IN_CORPUS = avgDocsLength;
         rankedDocs = new TreeMap<>();
     }
 
-    public ArrayList<String> getRankDocs(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs){
+    public ArrayList<String> getRankDocs(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs, String queryId){
         rankDocs(relevantDocs);
         ArrayList<String> ans = getSortedDocs();
         System.out.println("status");
-        System.out.println(rankedDocs.firstEntry());
+        printResultToFile(ans, queryId);
         return ans;
+    }
+
+    private void printResultToFile(ArrayList<String> ans,String queryId) {
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\Nadav\\IdeaProjects\\IR-SearchEngine\\IR-SearchEngine\\src\\Engine\\resources\\queryResults.txt"));
+            for (int i = 0; i < ans.size(); i++) {
+                bw.append(queryId).append(" ").append("0").append(" ").
+                        append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
+            }
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void print(ArrayList<String> ans) {
+        for (int i = 0; i < ans.size(); i++) {
+            System.out.println(ans.get(i));
+        }
     }
 
     //HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsForEachQueryTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
-    public void rankDocs(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs) {
-        Iterator it_queryTerms = relevantDocs.entrySet().iterator();
-        while (it_queryTerms.hasNext()) {
-            Map.Entry pair = (Map.Entry) it_queryTerms.next(); // <QueryTerm, <HashMap<DocNo|tf, [DocDetails, DocHeaders]>>>
+    private void rankDocs(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs) {
+        for (Object o1 : relevantDocs.entrySet()) {
+            Map.Entry pair = (Map.Entry) o1; // <QueryTerm, <HashMap<DocNo|tf, [DocDetails, DocHeaders]>>>
             String queryTerm = (String) pair.getKey();
             HashMap<String, ArrayList<String>> docs = (HashMap<String, ArrayList<String>>) pair.getValue();
             int termDf = docs.size();
@@ -57,7 +79,6 @@ public class Ranker {
                 String[] docDetailsSplited = StringUtils.split(docDetails, ",");
                 String strDocLength = docDetailsSplited[3];
                 int docLength = Integer.parseInt(strDocLength);
-
 
 
                 addBM25ValueToDoc(docNo, tf, docLength, termDf);
@@ -84,19 +105,20 @@ public class Ranker {
     }
     private ArrayList<String> getSortedDocs() {
         ArrayList<String> ans = new ArrayList<>();
-        SortedSet<Map.Entry<String, Double>> sortedSet = entriesSortedByValues(rankedDocs);
+        TreeSet<Map.Entry<String, Double>> sortedSet = entriesSortedByValues(rankedDocs);
+
         for (int i = 0; i < MAX_DOCS_TO_RETURN; i++) {
             if (i > sortedSet.size())
                 break;
-            Map.Entry pair = sortedSet.first();
+            Map.Entry pair = sortedSet.pollLast();
             ans.add((String)pair.getKey());
         }
         return ans;
     }
 
 
-    static <K,V extends Comparable<? super V>> SortedSet<Map.Entry<K,V>> entriesSortedByValues(Map<K,V> map) {
-    SortedSet<Map.Entry<K,V>> sortedEntries = new TreeSet<>(
+    private <K,V extends Comparable<? super V>> TreeSet<Map.Entry<K,V>> entriesSortedByValues(Map<K,V> map) {
+    TreeSet<Map.Entry<K,V>> sortedEntries = new TreeSet<>(
             (e1, e2) -> {
                 int res = e1.getValue().compareTo(e2.getValue());
                 return res != 0 ? res : 1;

@@ -240,7 +240,7 @@ public class Model extends Observable {
 //            e.printStackTrace();
 //        }
         Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
-        searcher.handleQuery("Falkland petroleum exploration");
+        searcher.handleQuery("British Chunnel impact");
 //        printAnswer5();
 //        printAnswer6();
 //        try {

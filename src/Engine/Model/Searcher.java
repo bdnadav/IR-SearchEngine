@@ -48,6 +48,8 @@ public class Searcher {
         return ans;
     }
 
+
+
     public ArrayList<String> handleQuery(String query) {
         parse.parseQuery(query);
         ArrayList<String> queryTerms = parse.getQueryTerms();
@@ -55,7 +57,10 @@ public class Searcher {
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
         relevantDocsForEachQueryTerm = getRelevantDocs(queryTerms);
-        ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsForEachQueryTerm);
+
+        String queryId = "352"; // need to change
+
+        ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsForEachQueryTerm, queryId);
         // NEED TO DO: Create SubSet of rankedDocs according to the final integer MAX_DOCS_TO_RETURN
         return rankedDocs;
     }
@@ -147,4 +152,6 @@ public class Searcher {
         public SortedSet<String> getDocDominantEntities (String docId){
             return null;
         }
+
+
     }
