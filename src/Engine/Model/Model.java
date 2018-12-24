@@ -15,6 +15,7 @@ public class Model extends Observable {
     private String corpusPath; //saved corpus path
     private String postingPath;// saved outpot posting path
     private boolean is_stemming; // using a stemmer on terms ot not
+    private boolean useSemantics;
     public String[] list_lang; //list of lang returns from parsing the docs
     // will allow to load the term dic to prog memory -
     // will be used in project part 2
@@ -268,7 +269,7 @@ public class Model extends Observable {
 
             String line = "" , query_id  ="" ,query = "" ;
             while ((line = br.readLine()) != null) {
-                Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
+                Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary , useSemantics);
                 while ((line = br.readLine()) != null ) {
                     if (line.equals("<top>")) { // start of query
                             continue ;

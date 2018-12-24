@@ -1,12 +1,18 @@
 package Engine.Model;
 
+import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 public class Searcher {
     private final int MAX_DOCS_TO_RETURN = 50;
+    private final boolean useSemantic;
 
     private Parse queryParse;
     private Parse descParse;
@@ -19,7 +25,8 @@ public class Searcher {
     private boolean citiesConstraint;
     private String posting;
 
-    public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, String> citiesDic) {
+
+    public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, String> citiesDic , boolean semantic) {
         this.terms_dictionary = termsDic;
         this.cities_dictionary = citiesDic;
         this.docs_dictionary = docsDic;
@@ -27,6 +34,7 @@ public class Searcher {
         this.queryParse = new Parse(posting, stemming);
         this.descParse = new Parse(posting, stemming);
         this.posting = posting;
+        this.useSemantic = semantic ;
         Posting.initTermPosting(posting);
         if (specificCities != null && !specificCities.isEmpty()) {
             citiesConstraint = true;
@@ -61,6 +69,12 @@ public class Searcher {
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByDescTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
+
+        /** Handle Semantic **/
+        if ( this.useSemantic){
+            Map<String, List<Pair<String, String>>> semanticTerms = getSemanticTerms (queryTerms) ;
+
+        }
         relevantDocsByQueryTerm = getRelevantDocs(queryTerms);
         Posting.initTermPosting(posting);
         relevantDocsByDescTerm = getRelevantDocs(descTerms);
@@ -70,6 +84,39 @@ public class Searcher {
         ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsByQueryTerm, relevantDocsByDescTerm, queryId);
         // NEED TO DO: Create SubSet of rankedDocs according to the final integer MAX_DOCS_TO_RETURN
         return rankedDocs;
+    }
+
+    private Map<String, List<Pair<String,String>>> getSemanticTerms(ArrayList<String> queryTerms) {
+        for (String term :queryTerms
+             ) {
+            try {
+                String[] splited_terms = useUrlSemantic(term);
+
+                /** do somthing **/
+
+            }
+            catch (Exception e ){}
+        }
+        return  null ;
+    }
+
+    private String[] useUrlSemantic(String term) throws Exception {
+        URL url = new URL("https://api.datamuse.com/words?rel_trg=" + term);
+
+
+        //URLConnection connection = website.openConnection();
+        HttpURLConnection con  = ( HttpURLConnection)  url.openConnection();
+        con.setRequestMethod("GET");
+
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(
+                        con.getInputStream()));
+
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+        inputLine = in.readLine() ;
+        return null ;
     }
 
     private ArrayList<String> filterDescTerms(ArrayList<String> descTerms) {

@@ -133,6 +133,7 @@ public class ReadFile {
                             docCity = arr[2]; // only the first word between tags
                             this.cities.put(docCity.toLowerCase(), new City(docCity));
                             docCity = docCity.toUpperCase();
+                            docCity = Parse.cleanToken(docCity);
                         }
                         // Doc Language
                         if (line.contains("<F P=105>")) {
