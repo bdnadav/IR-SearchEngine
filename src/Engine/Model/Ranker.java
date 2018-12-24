@@ -51,12 +51,6 @@ public class Ranker {
 
     }
 
-    private void print(ArrayList<String> ans) {
-        for (int i = 0; i < ans.size(); i++) {
-            System.out.println(ans.get(i));
-        }
-    }
-
     //HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsForEachQueryTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
@@ -89,6 +83,7 @@ public class Ranker {
     }
     /* DocHeaders = [headerTerm, headerTerm, ... ] */
     private void addInHeadlinesValueToDoc(String docNo, String queryTerm, String docHeaders) {
+
     }
 
 
