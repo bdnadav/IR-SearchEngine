@@ -67,7 +67,7 @@ public class ReadFile {
                 StringBuilder sb_text = new StringBuilder();
                 StringBuilder sb_docHeadlines = new StringBuilder();
                 String docNo = "";
-                String docCity = "";
+                String docCity = "null";
                 String doc_language = "";
                 String doc_date = "";
                 String doc_Headline = "";
@@ -84,6 +84,7 @@ public class ReadFile {
                         }
                         if (line.equals("</DOC>")) {
                             line = br.readLine();
+                            text_adding =false ;
                             break;
                         }
 
@@ -160,6 +161,7 @@ public class ReadFile {
 
                         line = br.readLine();
                     }
+
                     //sb_docInfo.append(line);
                     String text = sb_text.toString();
                     String headlines = sb_docHeadlines.toString();
@@ -172,6 +174,7 @@ public class ReadFile {
 //                    sb_docInfo.setLength(0);
                     sb_text.delete(0, sb_text.length());
                     sb_text.setLength(0);
+                    if ( line == null ) break; // end of file
                     parser.parseHeadLines(headlines);
                     parser.parse(text, doc );
                     if ( doc.docNo.equals(""))
