@@ -1,6 +1,5 @@
 package Engine.Model;
 
-import javafx.geometry.Pos;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -50,7 +49,7 @@ public class Searcher {
 
 
 
-    public ArrayList<String> handleQuery(String query) {
+    public ArrayList<String> handleQuery(String query_id, String query, String desc, String narr) {
         parse.parseQuery(query);
         ArrayList<String> queryTerms = parse.getQueryTerms();
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsForEachQueryTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
@@ -58,7 +57,7 @@ public class Searcher {
            DocHeaders = [headerTerm, headerTerm, ... ] */
         relevantDocsForEachQueryTerm = getRelevantDocs(queryTerms);
 
-        String queryId = "352"; // need to change
+        String queryId = query_id; // need to change
 
         ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsForEachQueryTerm, queryId);
         // NEED TO DO: Create SubSet of rankedDocs according to the final integer MAX_DOCS_TO_RETURN

@@ -239,8 +239,10 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
-        searcher.handleQuery("British Chunnel impact");
+        readQueryFromFile("C:\\Users\\harel_000\\Desktop\\queries.txt");
+        //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
+       // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
+
 //        printAnswer5();
 //        printAnswer6();
 //        try {
@@ -248,6 +250,71 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
+    }
+
+    /**
+     * read queries from file one by one
+     * @param path
+     */
+    public void readQueryFromFile( String path ){
+            BufferedReader br ;
+        try {
+            br = new BufferedReader(new FileReader(path));
+
+            StringBuilder sb_narr =new StringBuilder() ;
+            StringBuilder sb_desc=new StringBuilder() ;
+
+
+            String line = "" , query_id  ="" ,query = "" ;
+            while ((line = br.readLine()) != null) {
+                Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
+                while ((line = br.readLine()) != null ) {
+                    if (line.equals("<top>")) { // start of query
+                            continue ;
+                    }
+                    if (line.equals("</top>")) { // start of query
+                            break ;
+                    }
+
+                    if (line.startsWith("<num>")) {
+                       String[] temp = line.split(" ");
+                       query_id = temp[2];
+                    }
+                    if ( line.startsWith("<title>")){
+                        query = line.split("> ")[1];
+                    }
+                    if ( line.startsWith("<desc>")){
+                        line = br.readLine();
+                        while (!line.equals("")) {
+                            sb_desc.append(" " + line);
+                            line = br.readLine();
+                        }
+                    }
+                    if ( line.startsWith("<narr>")){
+                        line = br.readLine();
+                        while (!line.equals("")) {
+                            sb_narr.append(" " + line);
+                            line = br.readLine();
+                        }
+                    }
+
+                }
+                searcher.handleQuery(query_id , query , sb_desc.toString() , sb_narr.toString());
+                sb_desc.delete(0, sb_desc.length());
+                sb_desc.setLength(0);
+                sb_narr.delete(0, sb_narr.length());
+                sb_narr.setLength(0);
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+
+
+
     }
 
     private void printAnswer5() {
