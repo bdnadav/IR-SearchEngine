@@ -5,6 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 
 public class Ranker {
+    private final int MAX_DOCS_TO_RETURN = 50;
+
     /* Ranking factors and their weight*/
     private final double BM25_WEIGHT = 0.6;
     private final double IN_TITLE_WEIGHT = 0.4;
@@ -24,11 +26,12 @@ public class Ranker {
         rankedDocs = new TreeMap<>();
     }
 
-    public SortedSet<String> getRankDocs(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs){
+    public ArrayList<String> getRankDocs(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs){
         rankDocs(relevantDocs);
+        ArrayList<String> ans = getSortedDocs();
         System.out.println("status");
         System.out.println(rankedDocs.firstEntry());
-        return null;
+        return ans;
     }
 
     //HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsForEachQueryTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
@@ -50,6 +53,7 @@ public class Ranker {
                 int tf = Integer.parseInt(strTf);
                 ArrayList<String> value = (ArrayList<String>) doc.getValue(); // ArrayList<String> = [DocDetails, DocHeaders]
                 String docDetails = value.get(0);
+                String docHeaders = value.get(1);
                 String[] docDetailsSplited = StringUtils.split(docDetails, ",");
                 String strDocLength = docDetailsSplited[3];
                 int docLength = Integer.parseInt(strDocLength);
@@ -57,11 +61,14 @@ public class Ranker {
 
 
                 addBM25ValueToDoc(docNo, tf, docLength, termDf);
+                addInHeadlinesValueToDoc(docNo, queryTerm, docHeaders);
             }
         }
 //        it_queryTerms.remove(); // avoids a ConcurrentModificationException
     }
-
+    /* DocHeaders = [headerTerm, headerTerm, ... ] */
+    private void addInHeadlinesValueToDoc(String docNo, String queryTerm, String docHeaders) {
+    }
 
 
     private void addBM25ValueToDoc(String docNo, int tf, int docLength, int df) {
@@ -74,5 +81,28 @@ public class Ranker {
         }
         else
             rankedDocs.put(docNo, bm25Value);
+    }
+    private ArrayList<String> getSortedDocs() {
+        ArrayList<String> ans = new ArrayList<>();
+        SortedSet<Map.Entry<String, Double>> sortedSet = entriesSortedByValues(rankedDocs);
+        for (int i = 0; i < MAX_DOCS_TO_RETURN; i++) {
+            if (i > sortedSet.size())
+                break;
+            Map.Entry pair = sortedSet.first();
+            ans.add((String)pair.getKey());
+        }
+        return ans;
+    }
+
+
+    static <K,V extends Comparable<? super V>> SortedSet<Map.Entry<K,V>> entriesSortedByValues(Map<K,V> map) {
+    SortedSet<Map.Entry<K,V>> sortedEntries = new TreeSet<>(
+            (e1, e2) -> {
+                int res = e1.getValue().compareTo(e2.getValue());
+                return res != 0 ? res : 1;
+            }
+    );
+        sortedEntries.addAll(map.entrySet());
+        return sortedEntries;
     }
 }

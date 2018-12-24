@@ -240,7 +240,7 @@ public class Model extends Observable {
 //            e.printStackTrace();
 //        }
         Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
-        searcher.handleQuery("DEVRIES");
+        searcher.handleQuery("Falkland petroleum exploration");
 //        printAnswer5();
 //        printAnswer6();
 //        try {

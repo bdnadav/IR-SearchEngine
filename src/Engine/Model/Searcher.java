@@ -48,14 +48,14 @@ public class Searcher {
         return ans;
     }
 
-    public SortedSet<String> handleQuery(String query) {
+    public ArrayList<String> handleQuery(String query) {
         parse.parseQuery(query);
         ArrayList<String> queryTerms = parse.getQueryTerms();
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsForEachQueryTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
         relevantDocsForEachQueryTerm = getRelevantDocs(queryTerms);
-        SortedSet<String> rankedDocs = ranker.getRankDocs(relevantDocsForEachQueryTerm);
+        ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsForEachQueryTerm);
         // NEED TO DO: Create SubSet of rankedDocs according to the final integer MAX_DOCS_TO_RETURN
         return rankedDocs;
     }
@@ -95,6 +95,10 @@ public class Searcher {
                     int index = 6;
                     if (firstPartSplited.length == 6)
                         index = 5;
+                    else if (firstPartSplited.length < 6){
+                        System.out.println("Problematic DocNo: " + currDocWithTf);
+                        continue;
+                    }
                     String docDetails = firstPartSplited[2] + "," + firstPartSplited[3] + "," + firstPartSplited[4] + "," + firstPartSplited[index];
                     ArrayList<String> currDocDetails = new ArrayList<>();
                     currDocDetails.add(docDetails);
