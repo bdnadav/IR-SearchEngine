@@ -101,7 +101,7 @@ public class Searcher {
                     if (firstPartSplited.length == 6)
                         index = 5;
                     else if (firstPartSplited.length < 6){
-                        System.out.println("Problematic DocNo: " + currDocWithTf);
+                        System.out.println("Problematic DocNo: " + currDocWithTf + " ");
                         continue;
                     }
                     String docDetails = firstPartSplited[2] + "," + firstPartSplited[3] + "," + firstPartSplited[4] + "," + firstPartSplited[index];
@@ -133,6 +133,8 @@ public class Searcher {
             if (dictionaryTermLine == null)
                 dictionaryTermLine = terms_dictionary.get(term.toUpperCase());
             String[] splitLine = StringUtils.split(dictionaryTermLine, ",");
+            if (splitLine == null)
+                return listTermDocs;
             String strPointer = splitLine[splitLine.length - 1];
             int intPointer = Integer.parseInt(strPointer);
             String termPostingLine = Posting.getTermPostingLineByPointer(intPointer);

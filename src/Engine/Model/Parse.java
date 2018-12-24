@@ -477,6 +477,10 @@ public class Parse {
     }
 
     private void writeToDocsFiles(String docNo, String parentFileName, String mostFreqTerm, int tf_mft, int numOfUniqueTerms, String city) {
+        if (mostFreqTerm == null || mostFreqTerm.equals("")){
+            HeadLinesTerms.clear();
+            return;
+        }
         Posting.writeToDocumentsPosting(docNo, parentFileName, mostFreqTerm, tf_mft, numOfUniqueTerms, city , HeadLinesTerms ,doc_length);
         HeadLinesTerms.clear();
 
