@@ -200,6 +200,20 @@ public class Posting {
         ans = documents_buffer_reader.readLine();
         return ans;
     }
+
+    public static void flushAndClose() {
+        try {
+            documents_buffer_writer.flush();
+            //documents_buffer_writer.close();
+            terms_buffer_writer.flush();
+            //terms_buffer_writer.close();
+            //documents_buffer_reader.close();
+            //term_buffer_reader.close();
+        }
+        catch (Exception e ){}
+
+
+    }
 }
 
 

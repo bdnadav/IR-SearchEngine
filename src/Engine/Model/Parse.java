@@ -542,7 +542,7 @@ public class Parse {
                         return;
                     }
                     num++;
-                    if (num > tf_mft) {
+                    if (num >tf_mft) {
                         tf_mft = num;
                         mostFreqTerm = addTerm;
                     }
@@ -554,7 +554,10 @@ public class Parse {
                 }
                 FilesTerms.put(addTerm, value);
             } else {
-
+                if (mostFreqTerm.equals("")){
+                    mostFreqTerm = addTerm ;
+                    tf_mft = 1 ;
+                }
                 num_unique_term++;
                 sb.append("#" + docNo + "|" + "1");
                 FilesTerms.put(addTerm, sb);
@@ -1117,6 +1120,7 @@ public class Parse {
     }
 
     public void cleanAll() {
+        Posting.flushAndClose();
         this.FBIS3_Terms.clear();
         this.FilesTerms.clear();
         this.TermsOnly.clear();
