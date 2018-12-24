@@ -241,7 +241,7 @@ public class Parse {
      *
      * @param tokensArray - doc text splited by ","
      * @param currDoc     the curr doc obj
-     * @param docText
+     * @param
      * @return a sorted map of all the terms in curr doc text
      */
     private SortedMap<String, Term> getTerms(String[] tokensArray, Document currDoc, String type) {
@@ -632,7 +632,7 @@ public class Parse {
                 token = s.toString();
                 changed = true;
             }
-            if (token != null && token.length() > 0 && !token.equals("") && (specialchars.contains("" + s.charAt(s.length() - 1)) || a.equals("" + s.charAt(0)))) {
+            if (token != null && token.length() > 0 && !token.equals("") && (specialchars.contains("" + s.charAt(s.length() - 1)) || a.equals("" + s.charAt(s.length() - 1)))) {
                 s.deleteCharAt(s.length() - 1);
                 changed = true;
             }
