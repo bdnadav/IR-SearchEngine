@@ -263,6 +263,9 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
+//        Posting.initTermPosting(postingPath);
+//        analyzeQrles("C:\\Users\\Nadav\\QueriesTests\\qrels.txt");
+
         readQueryFromFile("C:\\Users\\Nadav\\QueriesTests\\queries.txt");
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
         // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
@@ -274,6 +277,41 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
+    }
+
+    private void analyzeQrles(String s) {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(s));
+            BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\Nadav\\QueriesTests\\analayze.txt"));
+            String query_id = "";
+            String line = "";
+            while ((line = br.readLine()) != null){
+                String[] split = StringUtils.split(line, " ");
+                String queryId = split[0];
+                if (query_id.equals("") || !query_id.equals(queryId)){
+                    query_id = queryId;
+                    bw.append(query_id).append("\n");
+                }
+                String docNo = split[2];
+                String strRelevant = split[3];
+                if (strRelevant.equals("1")){
+                    Posting.initTermPosting(postingPath);
+                    String strPointer = docsDictionary.get(docNo);
+                    if (strPointer == null){
+                        System.out.println("Not exist: " + docNo);
+                        continue;
+                    }
+                    int intPointer = Integer.parseInt(strPointer);
+                    String parentPath = Posting.getDocPostingLineByPointer(intPointer).split(",")[1];
+                    bw.append(docNo).append(" ").append(parentPath).append("\n");
+                }
+            }
+            bw.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -325,6 +363,7 @@ public class Model extends Observable {
                     }
 
                 }
+                System.out.println(query_id);
                 searcher.handleQuery(query_id, query, sb_desc.toString(), sb_narr.toString());
                 sb_desc.delete(0, sb_desc.length());
                 sb_desc.setLength(0);

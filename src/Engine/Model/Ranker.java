@@ -11,10 +11,10 @@ public class Ranker {
     private final int MAX_DOCS_TO_RETURN = 50;
 
     /* Ranking factors and their weight*/
-    private final double BM25_TITLE_FACTOR_WEIGHT = 0.5;
-    private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0.2;
-    private final double TITLE_IN_HEADERS_FACTOR_WEIGHT = 0.15;
-    private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0.15;
+    private final double BM25_TITLE_FACTOR_WEIGHT = 0.8;
+    private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0.1;
+    private final double TITLE_IN_HEADERS_FACTOR_WEIGHT = 0.05;
+    private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0.05;
 
     /* BM25 Constants*/
     private final double K = 1.75;
@@ -48,20 +48,8 @@ public class Ranker {
         QueryDescTermInHeaders = new TreeMap<>();
     }
 
-//    public ArrayList<String> getRankDocs(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQuery,
-//                                         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByDesc,
-//                                         String queryId){
-//        calculateWeights(relevantDocsByQuery, "Query");
-//        calculateWeights(relevantDocsByDesc, "Description");
-//        mergeValues();
-//        ArrayList<String> ans = getSortedDocs();
-//        System.out.println("Finish query number: " + queryId);
-//        printResultToFile(ans, queryId);
-//        return ans;
-//    }
-
     public ArrayList<String> getRankDocs(String queryId, HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByTitle, ArrayList<String> queryOtherTerms){ // queryOtherTerms is title/desc.
-        calculateWeights(relevantDocsByTitle, queryOtherTerms, "Description");
+        calculateWeights(relevantDocsByTitle, queryOtherTerms);
         mergeValues();
         ArrayList<String> ans = getSortedDocs();
         System.out.println("Finish query number: " + queryId);
@@ -97,8 +85,8 @@ public class Ranker {
 
             double bm25Classic = BM25_TITLE_FACTOR_WEIGHT * bm25ClassicWeight;
             double bm25Description = BM25_DESCRIPTION_FACTOR_WEIGHT * bm25DescriptionWeight;
-            double titleTermInHeader = TITLE_IN_HEADERS_FACTOR_WEIGHT * titleTermInHeadersWeight;
-            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight;
+            double titleTermInHeader = TITLE_IN_HEADERS_FACTOR_WEIGHT * titleTermInHeadersWeight*10;
+            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight*10;
 
             double mergedValue = bm25Classic + bm25Description + titleTermInHeader + descTermInHeader;
 
@@ -123,7 +111,7 @@ public class Ranker {
     //HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsForEachQueryTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
-    private void calculateWeights(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs, ArrayList<String> queryOtherTerms, String mode) {
+    private void calculateWeights(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs, ArrayList<String> queryOtherTerms) {
         HashMap<String, ArrayList<String>> allDocsHeaders = new HashMap<>(); // For future use (after the for loop)
         for (Object o1 : relevantDocs.entrySet()) {
             Map.Entry pair = (Map.Entry) o1; // <DescTerm, <HashMap<DocNo|tf, [DocDetails, DocHeaders]>>>
@@ -144,6 +132,13 @@ public class Ranker {
                 String[] docDetailsSplited = StringUtils.split(docDetails, ",");
                 String strDocLength = docDetailsSplited[3];
 //                System.out.println("Ranker" + " " + docNo + " " + strDocLength);
+                if (!Character.isDigit(strDocLength.charAt(0))) {
+                    if (docDetailsSplited.length >= 5)
+                        strDocLength = docDetailsSplited[4];
+                    else
+                        continue;
+                }
+                String mode = "";
                 int docLength = Integer.parseInt(strDocLength);
                 if (queryOtherTerms.contains(queryTitleTerm)) {
                     mode = "BOTH"; // The description term is title term as well.
@@ -159,35 +154,11 @@ public class Ranker {
         }
 
         Set<String> queryDescTerms = relevantDocs.keySet();
-//        for (Object term : queryDescTerms) { // Loop on Query Description Terms
-//            String queryDescTerm = (String) term;
-//            if (queryDescTerm.charAt(0) == '*') {
-//                String newQueryDescTerm = StringUtils.substring(queryDescTerm, 1);
-//                queryDescTerms.remove(queryDescTerm);
-//                queryDescTerms.add(newQueryDescTerm);
-//            }
-//        }
         Set<String> relevantDocsWithHeaders = getRelevantDocsWithHeaders(queryDescTerms, queryOtherTerms);
         for (String docNum : relevantDocsWithHeaders){
             ArrayList<String> docHeaders = allDocsHeaders.get(docNum);
             calculateHeadersWeight(docNum, docHeaders, queryDescTerms, queryOtherTerms);
     }
-
-
-//        TreeMap<String, Double> tm;
-//        if (mode.equals("Query"))
-//            tm = QueryTitleTermInHeaders;
-//        else
-//            tm = QueryDescTermInHeaders;
-//        Set<String> queryTerms = relevantDocs.keySet();
-//        for (Object o : allDocsHeaders.entrySet()){
-//            Map.Entry docHeaders = (Map.Entry) o;
-//            String docNo = (String) docHeaders.getKey();
-//            if (!tm.containsKey(docNo)){
-//                ArrayList<String> headers = (ArrayList<String>) docHeaders.getValue();
-//                calculateHeadersWeight(docNo, queryTerms, new ArrayList<String>(headers), mode);
-//            }
-//        }
         }
 
     private Set<String> getRelevantDocsWithHeaders(Set<String> queryDescTerms, ArrayList<String> queryTitleTerms) {
@@ -219,15 +190,21 @@ public class Ranker {
             return;
 
         int queryDescInHeaderCounter = 0;
+        double bonus = 0;
         double queryDescInHeaderValue;
         int headersSize = docHeaders.size();
         for (String queryDescTerm : queryDescTerms){
             if (queryDescTerm.charAt(0) == '*')
                 queryDescTerm = StringUtils.substring(queryDescTerm, 1);
-            if (docHeaders.contains(queryDescTerm))
+            if (docHeaders.contains(queryDescTerm)){
                 queryDescInHeaderCounter++;
+                if (StringUtils.split(queryDescTerm, " -").length > 1)
+                    bonus += 2;
+            }
         }
-        queryDescInHeaderValue = ((double)queryDescInHeaderCounter/(double)headersSize)*10.0;
+        queryDescInHeaderValue = ((double)queryDescInHeaderCounter/(double)headersSize);
+        if (bonus != 0)
+            queryDescInHeaderValue *= bonus;
         if (QueryDescTermInHeaders.containsKey(docNum)){
             double currValue = QueryDescTermInHeaders.get(docNum);
             double newValue = currValue + queryDescInHeaderValue;
@@ -236,15 +213,21 @@ public class Ranker {
         else
             QueryDescTermInHeaders.put(docNum, queryDescInHeaderValue);
 
+        bonus = 0;
         int queryTitleInHeaderCounter = 0;
         double queryTitleInHeaderValue;
         for (String queryTitleTerm : queryTitleTerms) {
             if (queryTitleTerm.charAt(0) == '*')
                 queryTitleTerm = StringUtils.substring(queryTitleTerm, 1);
-            if (docHeaders.contains(queryTitleTerm))
+            if (docHeaders.contains(queryTitleTerm)){
                 queryTitleInHeaderCounter++;
+                if (StringUtils.split(queryTitleTerm, " -").length > 1)
+                    bonus += 2;
+            }
         }
-        queryTitleInHeaderValue = ((double)queryTitleInHeaderCounter/(double)headersSize)*10.0;
+        queryTitleInHeaderValue = ((double)queryTitleInHeaderCounter/(double)headersSize*(double)bonus);
+        if (bonus != 0)
+            queryDescInHeaderValue *= bonus;
         if (QueryTitleTermInHeaders.containsKey(docNum)){
             double currValue = QueryTitleTermInHeaders.get(docNum);
             double newValue = currValue + queryTitleInHeaderValue;
@@ -300,20 +283,9 @@ public class Ranker {
 
 
     private void addBM25ValueToDoc(String docNo, int tf, int docLength, int df, String mode) {
-//        TreeMap<String, Double> tm;
-//        if (mode.equals("Query"))
-//            tm = BM25_QueryTitleWeight;
-//        else
-//            tm = BM25_QueryDescriptionWeight;
         double bm25Value = ( ( ( (K + 1) * tf ) / ( tf + K * (1 - B + B * docLength/AVG_LENGTH_OF_DOCS_IN_CORPUS) ) )
                 * Math.log((NUM_OF_DOCS_IN_CORPUS + 1) / df));
-//        if (BM25_QueryDescriptionWeight.get(docNo) != null){
-//            double currValue = BM25_QueryDescriptionWeight.get(docNo);
-//            currValue += bm25Value;
-//            BM25_QueryDescriptionWeight.put(docNo, currValue);
-//        }
-//        else
-//            BM25_QueryDescriptionWeight.put(docNo, bm25Value);
+
         if (BM25_QueryTitleWeight.get(docNo) != null){
             double currValue = BM25_QueryTitleWeight.get(docNo);
             currValue += bm25Value;

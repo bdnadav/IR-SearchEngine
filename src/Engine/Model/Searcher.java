@@ -107,7 +107,7 @@ public class Searcher {
             dfOfTerms.put(df, term);
         }
         for (int i = 0; i < termsExtra; i++) {
-            ans.add(dfOfTerms.pollLastEntry().getValue());
+            ans.add(dfOfTerms.pollFirstEntry().getValue());
         }
         return ans;
     }
