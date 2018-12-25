@@ -19,6 +19,7 @@ public class Searcher {
     private TreeMap<String, String> terms_dictionary;
     private TreeMap<String, String> cities_dictionary;
     private TreeMap<String, String> docs_dictionary;
+    public static HashMap<String, String> headers_dictionary;
     private Ranker ranker;
     private ArrayList<String> speceficCities;
     private HashSet<String> legalDocs; // If cities constraint, this data structure will hold all the docs whose can be return.
@@ -26,10 +27,11 @@ public class Searcher {
     private String posting;
 
 
-    public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, String> citiesDic , boolean semantic) {
+    public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, String> citiesDic, HashMap<String, String> headersDictionary, boolean semantic) {
         this.terms_dictionary = termsDic;
         this.cities_dictionary = citiesDic;
         this.docs_dictionary = docsDic;
+        this.headers_dictionary = headersDictionary;
         this.ranker = new Ranker(docsDic.size(), 250);
         this.queryParse = new Parse(posting, stemming);
         this.descParse = new Parse(posting, stemming);
@@ -59,29 +61,30 @@ public class Searcher {
 
 
 
-    public ArrayList<String> handleQuery(String query_id, String query, String desc, String narr) {
-        queryParse.parseQuery(query);
-        ArrayList<String> queryTerms = queryParse.getQueryTerms();
-        descParse.parseQuery(desc);
-        ArrayList<String> descTerms = descParse.getQueryTerms();
-        descTerms = filterDescTerms(descTerms);
-        HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
-        HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByDescTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
+    public ArrayList<String> handleQuery(String query_id, String queryTitle, String queryDescription, String queryNarrative) {
+        queryParse.parseQuery(queryTitle);
+        ArrayList<String> queryTitleTerms = queryParse.getQueryTerms();
+        descParse.parseQuery(queryDescription);
+        ArrayList<String> queryDescTerms = descParse.getQueryTerms();
+        //queryDescTerms = filterDescTerms(queryDescTerms);
+        //HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTitleTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
+        HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryDescTerm; // <DescTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
         /** Handle Semantic **/
         if ( this.useSemantic){
-            Map<String, List<Pair<String, String>>> semanticTerms = getSemanticTerms (queryTerms) ;
+            Map<String, List<Pair<String, String>>> semanticTerms = getSemanticTerms (queryTitleTerms) ;
 
         }
-        relevantDocsByQueryTerm = getRelevantDocs(queryTerms);
-        Posting.initTermPosting(posting);
-        relevantDocsByDescTerm = getRelevantDocs(descTerms);
+        //relevantDocsByQueryTitleTerm = getRelevantDocs(queryTerms);
+        //Posting.initTermPosting(posting);
+        relevantDocsByQueryDescTerm = getRelevantDocs(queryDescTerms);
 
         String queryId = query_id; // need to change
 
-        ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsByQueryTerm, relevantDocsByDescTerm, queryId);
+        //ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsByQueryTitleTerm, relevantDocsByQueryDescTerm, queryId);
+        ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryDescTerm, queryTitleTerms);
         // NEED TO DO: Create SubSet of rankedDocs according to the final integer MAX_DOCS_TO_RETURN
         return rankedDocs;
     }

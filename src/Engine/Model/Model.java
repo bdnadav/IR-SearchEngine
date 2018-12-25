@@ -23,6 +23,7 @@ public class Model extends Observable {
     TreeMap<String, String> termDictionaryToShow = new TreeMap<>();
     TreeMap<String, String> citiesDictionary = new TreeMap<>();
     TreeMap<String, String> docsDictionary = new TreeMap<>();
+    HashMap<String, String> headersDictionary = new HashMap<>();
 
 
     /**
@@ -103,7 +104,7 @@ public class Model extends Observable {
 
             String line = null;
 
-            JOptionPane.showMessageDialog(null, "Directoy Loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Term dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -132,7 +133,7 @@ public class Model extends Observable {
             String line = null;
 
 
-            JOptionPane.showMessageDialog(null, "Directoy Loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Cities dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -173,7 +174,29 @@ public class Model extends Observable {
 //
 //
 //            String line = null;
-            JOptionPane.showMessageDialog(null, "Directoy Loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Docs dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        if (dir != null && dir.exists()) {
+            try {
+                BufferedReader br_dic = new BufferedReader(new FileReader(postingPath + "\\Postings" + ifStemming() + "\\headersDictionary.txt"));
+                String line = "";
+                while ((line = br_dic.readLine()) != null) {
+
+                    String headerTerm = "";
+                    String listOfDocs = "";
+                    int indexOfFirstComma = StringUtils.indexOf(line, ",");
+                    headerTerm = StringUtils.substring(line, 0, indexOfFirstComma);
+                    listOfDocs = StringUtils.substring(line, indexOfFirstComma + 1);
+                    headersDictionary.put(headerTerm, listOfDocs);
+                }
+                br_dic.close();
+            } catch (Exception e) {
+            }
+
+            JOptionPane.showMessageDialog(null, "Headers dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -242,7 +265,7 @@ public class Model extends Observable {
 //        }
         readQueryFromFile("C:\\Users\\Nadav\\QueriesTests\\queries.txt");
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
-       // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
+        // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
 
 //        printAnswer5();
 //        printAnswer6();
@@ -255,44 +278,45 @@ public class Model extends Observable {
 
     /**
      * read queries from file one by one
+     *
      * @param path
      */
-    public void readQueryFromFile( String path ){
-            BufferedReader br ;
+    public void readQueryFromFile(String path) {
+        BufferedReader br;
         try {
             br = new BufferedReader(new FileReader(path));
 
-            StringBuilder sb_narr =new StringBuilder() ;
-            StringBuilder sb_desc=new StringBuilder() ;
+            StringBuilder sb_narr = new StringBuilder();
+            StringBuilder sb_desc = new StringBuilder();
             //loadDicToMemory(ifStemming());
 
 
-            String line = "" , query_id  ="" ,query = "" ;
+            String line = "", query_id = "", query = "";
             while ((line = br.readLine()) != null) {
-                Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary , useSemantics);
-                while ((line = br.readLine()) != null ) {
+                Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary, headersDictionary, useSemantics);
+                while ((line = br.readLine()) != null) {
                     if (line.equals("<top>")) { // start of query
-                            continue ;
+                        continue;
                     }
                     if (line.equals("</top>")) { // start of query
-                            break ;
+                        break;
                     }
 
                     if (line.startsWith("<num>")) {
-                       String[] temp = line.split(" ");
-                       query_id = temp[2];
+                        String[] temp = line.split(" ");
+                        query_id = temp[2];
                     }
-                    if ( line.startsWith("<title>")){
+                    if (line.startsWith("<title>")) {
                         query = line.split("> ")[1];
                     }
-                    if ( line.startsWith("<desc>")){
+                    if (line.startsWith("<desc>")) {
                         line = br.readLine();
                         while (line != null && !line.equals("")) {
                             sb_desc.append(" " + line);
                             line = br.readLine();
                         }
                     }
-                    if (line != null && line.startsWith("<narr>")){
+                    if (line != null && line.startsWith("<narr>")) {
                         line = br.readLine();
                         while (line != null && !line.equals("")) {
                             sb_narr.append(" " + line);
@@ -301,7 +325,7 @@ public class Model extends Observable {
                     }
 
                 }
-                searcher.handleQuery(query_id , query , sb_desc.toString() , sb_narr.toString());
+                searcher.handleQuery(query_id, query, sb_desc.toString(), sb_narr.toString());
                 sb_desc.delete(0, sb_desc.length());
                 sb_desc.setLength(0);
                 sb_narr.delete(0, sb_narr.length());
@@ -311,10 +335,6 @@ public class Model extends Observable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-
-
 
 
     }
