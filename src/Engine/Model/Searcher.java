@@ -66,6 +66,7 @@ public class Searcher {
         ArrayList<String> queryTitleTerms = queryParse.getQueryTerms();
         descParse.parseQuery(queryDescription);
         ArrayList<String> queryDescTerms = descParse.getQueryTerms();
+
         //queryDescTerms = filterDescTerms(queryDescTerms);
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTitleTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryDescTerm; // <DescTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
@@ -77,6 +78,11 @@ public class Searcher {
             Map<String, List<Pair<String, String>>> semanticTerms = getSemanticTerms (queryTitleTerms) ;
 
         }
+        if (extraTermsMayHelp(queryTitleTerms, queryDescTerms)){
+            ArrayList<String> queryDescTermsToAdd = getExtraTerms(queryDescTerms, queryTitleTerms);
+            queryTitleTerms.addAll(queryDescTermsToAdd);
+        }
+
         relevantDocsByQueryTitleTerm = getRelevantDocs(queryTitleTerms);
         //Posting.initTermPosting(posting);
         //relevantDocsByQueryDescTerm = getRelevantDocs(queryDescTerms);
@@ -88,6 +94,44 @@ public class Searcher {
         ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryTitleTerm, queryDescTerms);
         // NEED TO DO: Create SubSet of rankedDocs according to the final integer MAX_DOCS_TO_RETURN
         return rankedDocs;
+    }
+
+    private ArrayList<String> getExtraTerms(ArrayList<String> queryDescTerms, ArrayList<String> queryTitleTerms) {
+        ArrayList<String> ans = new ArrayList<>();
+        queryDescTerms.removeAll(queryTitleTerms);
+        int termsExtra = queryDescTerms.size()/2;
+        TreeMap<Integer, String> dfOfTerms = new TreeMap<>();
+        for (int i = 0; i < queryDescTerms.size(); i++) {
+            String term = queryDescTerms.get(i);
+            int df = getTermDf(term);
+            dfOfTerms.put(df, term);
+        }
+        for (int i = 0; i < termsExtra; i++) {
+            ans.add(dfOfTerms.pollLastEntry().getValue());
+        }
+        return ans;
+    }
+
+    private int getTermDf(String term) {
+        if (term.charAt(0) == '*')
+            term = StringUtils.substring(term, 1);
+        String dicTermLine = terms_dictionary.get(term);
+        if (dicTermLine == null)
+            dicTermLine = terms_dictionary.get(term.toUpperCase());
+        if (dicTermLine == null)
+            return -1;
+        String[] split = StringUtils.split(dicTermLine, ",");
+        if (split.length < 5)
+            return -1;
+        String strDf = split[3];
+        int ans = Integer.parseInt(strDf);
+        return ans;
+    }
+
+    private boolean extraTermsMayHelp(ArrayList<String> queryTitleTerms, ArrayList<String> queryDescTerms) {
+        if (queryDescTerms.size() >= 2 * queryTitleTerms.size())
+            return true;
+        return false;
     }
 
     private Map<String, List<Pair<String,String>>> getSemanticTerms(ArrayList<String> queryTerms) {
