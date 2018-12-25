@@ -60,8 +60,8 @@ public class Ranker {
 //        return ans;
 //    }
 
-    public ArrayList<String> getRankDocs(String queryId, HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByDesc, ArrayList<String> queryTitleTerms){
-        calculateWeights(relevantDocsByDesc, queryTitleTerms, "Description");
+    public ArrayList<String> getRankDocs(String queryId, HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByTitle, ArrayList<String> queryOtherTerms){ // queryOtherTerms is title/desc.
+        calculateWeights(relevantDocsByTitle, queryOtherTerms, "Description");
         mergeValues();
         ArrayList<String> ans = getSortedDocs();
         System.out.println("Finish query number: " + queryId);
@@ -123,11 +123,11 @@ public class Ranker {
     //HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsForEachQueryTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
-    private void calculateWeights(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs, ArrayList<String> queryTitleTerms, String mode) {
+    private void calculateWeights(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs, ArrayList<String> queryOtherTerms, String mode) {
         HashMap<String, ArrayList<String>> allDocsHeaders = new HashMap<>(); // For future use (after the for loop)
         for (Object o1 : relevantDocs.entrySet()) {
             Map.Entry pair = (Map.Entry) o1; // <DescTerm, <HashMap<DocNo|tf, [DocDetails, DocHeaders]>>>
-            String queryDescTerm = (String) pair.getKey();
+            String queryTitleTerm = (String) pair.getKey();
             HashMap<String, ArrayList<String>> docs = (HashMap<String, ArrayList<String>>) pair.getValue();
             int termDf = docs.size();
             for (Object o : docs.entrySet()) {
@@ -145,17 +145,17 @@ public class Ranker {
                 String strDocLength = docDetailsSplited[3];
 //                System.out.println("Ranker" + " " + docNo + " " + strDocLength);
                 int docLength = Integer.parseInt(strDocLength);
-                if (queryTitleTerms.contains(queryDescTerm)) {
+                if (queryOtherTerms.contains(queryTitleTerm)) {
                     mode = "BOTH"; // The description term is title term as well.
                 }
                 addBM25ValueToDoc(docNo, tf, docLength, termDf, mode);
             }
         }
         /* Handle headers weight calculates */
-        for (int i = 0; i < queryTitleTerms.size(); i++) {
-            String queryTitleTerm = queryTitleTerms.get(i);
+        for (int i = 0; i < queryOtherTerms.size(); i++) {
+            String queryTitleTerm = queryOtherTerms.get(i);
             if (queryTitleTerm.charAt(0) == '*')
-                queryTitleTerms.set(i, StringUtils.substring(queryTitleTerm, 1));
+                queryOtherTerms.set(i, StringUtils.substring(queryTitleTerm, 1));
         }
 
         Set<String> queryDescTerms = relevantDocs.keySet();
@@ -167,10 +167,10 @@ public class Ranker {
 //                queryDescTerms.add(newQueryDescTerm);
 //            }
 //        }
-        Set<String> relevantDocsWithHeaders = getRelevantDocsWithHeaders(queryDescTerms, queryTitleTerms);
+        Set<String> relevantDocsWithHeaders = getRelevantDocsWithHeaders(queryDescTerms, queryOtherTerms);
         for (String docNum : relevantDocsWithHeaders){
             ArrayList<String> docHeaders = allDocsHeaders.get(docNum);
-            calculateHeadersWeight(docNum, docHeaders, queryDescTerms, queryTitleTerms);
+            calculateHeadersWeight(docNum, docHeaders, queryDescTerms, queryOtherTerms);
     }
 
 
@@ -307,23 +307,39 @@ public class Ranker {
 //            tm = BM25_QueryDescriptionWeight;
         double bm25Value = ( ( ( (K + 1) * tf ) / ( tf + K * (1 - B + B * docLength/AVG_LENGTH_OF_DOCS_IN_CORPUS) ) )
                 * Math.log((NUM_OF_DOCS_IN_CORPUS + 1) / df));
-        if (BM25_QueryDescriptionWeight.get(docNo) != null){
-            double currValue = BM25_QueryDescriptionWeight.get(docNo);
+//        if (BM25_QueryDescriptionWeight.get(docNo) != null){
+//            double currValue = BM25_QueryDescriptionWeight.get(docNo);
+//            currValue += bm25Value;
+//            BM25_QueryDescriptionWeight.put(docNo, currValue);
+//        }
+//        else
+//            BM25_QueryDescriptionWeight.put(docNo, bm25Value);
+        if (BM25_QueryTitleWeight.get(docNo) != null){
+            double currValue = BM25_QueryTitleWeight.get(docNo);
             currValue += bm25Value;
-            BM25_QueryDescriptionWeight.put(docNo, currValue);
+            BM25_QueryTitleWeight.put(docNo, currValue);
         }
         else
-            BM25_QueryDescriptionWeight.put(docNo, bm25Value);
+            BM25_QueryTitleWeight.put(docNo, bm25Value);
 
         if (mode.equals("BOTH")){
-            if (BM25_QueryTitleWeight.get(docNo) != null){
-                double currValue = BM25_QueryTitleWeight.get(docNo);
+            if (BM25_QueryDescriptionWeight.get(docNo) != null){
+                double currValue = BM25_QueryDescriptionWeight.get(docNo);
                 currValue += bm25Value;
-                BM25_QueryTitleWeight.put(docNo, currValue);
+                BM25_QueryDescriptionWeight.put(docNo, currValue);
             }
             else
-                BM25_QueryTitleWeight.put(docNo, bm25Value);
+                BM25_QueryDescriptionWeight.put(docNo, bm25Value);
         }
+//        if (mode.equals("BOTH")){
+//            if (BM25_QueryTitleWeight.get(docNo) != null){
+//                double currValue = BM25_QueryTitleWeight.get(docNo);
+//                currValue += bm25Value;
+//                BM25_QueryTitleWeight.put(docNo, currValue);
+//            }
+//            else
+//                BM25_QueryTitleWeight.put(docNo, bm25Value);
+//        }
     }
 
     private ArrayList<String> getSortedDocs() {

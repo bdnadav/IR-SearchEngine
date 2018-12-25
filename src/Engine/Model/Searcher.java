@@ -67,7 +67,7 @@ public class Searcher {
         descParse.parseQuery(queryDescription);
         ArrayList<String> queryDescTerms = descParse.getQueryTerms();
         //queryDescTerms = filterDescTerms(queryDescTerms);
-        //HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTitleTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
+        HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTitleTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryDescTerm; // <DescTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
@@ -77,14 +77,15 @@ public class Searcher {
             Map<String, List<Pair<String, String>>> semanticTerms = getSemanticTerms (queryTitleTerms) ;
 
         }
-        //relevantDocsByQueryTitleTerm = getRelevantDocs(queryTerms);
+        relevantDocsByQueryTitleTerm = getRelevantDocs(queryTitleTerms);
         //Posting.initTermPosting(posting);
-        relevantDocsByQueryDescTerm = getRelevantDocs(queryDescTerms);
+        //relevantDocsByQueryDescTerm = getRelevantDocs(queryDescTerms);
 
         String queryId = query_id; // need to change
 
         //ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsByQueryTitleTerm, relevantDocsByQueryDescTerm, queryId);
-        ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryDescTerm, queryTitleTerms);
+        //ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryDescTerm, queryTitleTerms);
+        ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryTitleTerm, queryDescTerms);
         // NEED TO DO: Create SubSet of rankedDocs according to the final integer MAX_DOCS_TO_RETURN
         return rankedDocs;
     }
