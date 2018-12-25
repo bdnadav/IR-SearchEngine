@@ -75,28 +75,32 @@ public class Ranker {
             String docNo = docWithValue.getKey();
             Double bm25ClassicWeight = docWithValue.getValue();
             Double bm25DescriptionWeight = 0.0;
-            Double queryTermInHeadersWeight = 0.0;
+            Double titleTermInHeadersWeight = 0.0;
             Double descTermInHeadersWeight = 0.0;
             if (BM25_QueryDescriptionWeight.containsKey(docNo)){
                 bm25DescriptionWeight = BM25_QueryDescriptionWeight.get(docNo);
                 if (bm25DescriptionWeight == null)
                     bm25DescriptionWeight = 0.0;
             }
+
             if (QueryTitleTermInHeaders.containsKey(docNo)){
-                queryTermInHeadersWeight = QueryTitleTermInHeaders.get(docNo);
-                if (queryTermInHeadersWeight == null)
-                    queryTermInHeadersWeight = 0.0;
+                titleTermInHeadersWeight = QueryTitleTermInHeaders.get(docNo);
+                if (titleTermInHeadersWeight == null)
+                    titleTermInHeadersWeight = 0.0;
             }
             if (QueryDescTermInHeaders.containsKey(docNo)){
                 descTermInHeadersWeight = QueryTitleTermInHeaders.get(docNo);
                 if (descTermInHeadersWeight == null)
                     descTermInHeadersWeight = 0.0;
             }
+
+
             double bm25Classic = BM25_TITLE_FACTOR_WEIGHT * bm25ClassicWeight;
             double bm25Description = BM25_DESCRIPTION_FACTOR_WEIGHT * bm25DescriptionWeight;
-            double inTitle = TITLE_IN_HEADERS_FACTOR_WEIGHT * (queryTermInHeadersWeight + descTermInHeadersWeight);
+            double titleTermInHeader = TITLE_IN_HEADERS_FACTOR_WEIGHT * titleTermInHeadersWeight;
+            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight;
 
-            double mergedValue = bm25Classic + bm25Description + inTitle;
+            double mergedValue = bm25Classic + bm25Description + titleTermInHeader + descTermInHeader;
 
             rankedDocs.put(docNo,mergedValue);
         }
@@ -148,29 +152,27 @@ public class Ranker {
             }
         }
         /* Handle headers weight calculates */
-        mode = "";
         for (int i = 0; i < queryTitleTerms.size(); i++) {
             String queryTitleTerm = queryTitleTerms.get(i);
             if (queryTitleTerm.charAt(0) == '*')
                 queryTitleTerms.set(i, StringUtils.substring(queryTitleTerm, 1));
         }
-        for (Object term : relevantDocs.keySet()) { // Loop on Query Description Terms
-            String queryDescTerm = (String) term;
-            if (queryDescTerm.charAt(0) == '*') {
-                queryDescTerm = StringUtils.substring(queryDescTerm, 1);
-            }
-            if (queryTitleTerms.contains(queryDescTerm))
-                mode = "BOTH";
-            String inDocsHeaderList = Searcher.headers_dictionary.get(queryDescTerm);
-            String[] docNums = StringUtils.split(inDocsHeaderList, "#");
-            if (docNums == null) // There is no header with that term.
-                continue;
-            for (String currDocNum : docNums) {
-                ArrayList<String> docHeaders = allDocsHeaders.get(currDocNum);
-                if (docHeaders == null)
-                    continue;
-                calculateHeadersWeight(currDocNum, queryDescTerm, docHeaders, mode);
-            }
+
+        Set<String> queryDescTerms = relevantDocs.keySet();
+//        for (Object term : queryDescTerms) { // Loop on Query Description Terms
+//            String queryDescTerm = (String) term;
+//            if (queryDescTerm.charAt(0) == '*') {
+//                String newQueryDescTerm = StringUtils.substring(queryDescTerm, 1);
+//                queryDescTerms.remove(queryDescTerm);
+//                queryDescTerms.add(newQueryDescTerm);
+//            }
+//        }
+        Set<String> relevantDocsWithHeaders = getRelevantDocsWithHeaders(queryDescTerms, queryTitleTerms);
+        for (String docNum : relevantDocsWithHeaders){
+            ArrayList<String> docHeaders = allDocsHeaders.get(docNum);
+            calculateHeadersWeight(docNum, docHeaders, queryDescTerms, queryTitleTerms);
+    }
+
 
 //        TreeMap<String, Double> tm;
 //        if (mode.equals("Query"))
@@ -187,6 +189,69 @@ public class Ranker {
 //            }
 //        }
         }
+
+    private Set<String> getRelevantDocsWithHeaders(Set<String> queryDescTerms, ArrayList<String> queryTitleTerms) {
+        HashSet<String> docsNum = new HashSet<>();
+        for (String queryDescTerm : queryDescTerms){
+            if (queryDescTerm.charAt(0) == '*')
+                queryDescTerm = StringUtils.substring(queryDescTerm, 1);
+            String inDocsHeaderList = Searcher.headers_dictionary.get(queryDescTerm);
+            if (inDocsHeaderList == null)
+                continue;
+            String[] tmpDocsNum = StringUtils.split(inDocsHeaderList, "#");
+            docsNum.addAll(Arrays.asList(tmpDocsNum));
+        }
+        for (String queryTitleTerm : queryTitleTerms) {
+            if (queryTitleTerm.charAt(0) == '*')
+                queryTitleTerm = StringUtils.substring(queryTitleTerm, 1);
+            String inDocsHeaderList = Searcher.headers_dictionary.get(queryTitleTerm);
+            if (inDocsHeaderList == null)
+                continue;
+            String[] tmpDocsNum = StringUtils.split(inDocsHeaderList, "#");
+            docsNum.addAll(Arrays.asList(tmpDocsNum));
+        }
+        return docsNum;
+    }
+
+
+    private void calculateHeadersWeight(String docNum, ArrayList<String> docHeaders, Set<String> queryDescTerms, ArrayList<String> queryTitleTerms) {
+        if (docHeaders == null || docHeaders.size() == 0)
+            return;
+
+        int queryDescInHeaderCounter = 0;
+        double queryDescInHeaderValue;
+        int headersSize = docHeaders.size();
+        for (String queryDescTerm : queryDescTerms){
+            if (queryDescTerm.charAt(0) == '*')
+                queryDescTerm = StringUtils.substring(queryDescTerm, 1);
+            if (docHeaders.contains(queryDescTerm))
+                queryDescInHeaderCounter++;
+        }
+        queryDescInHeaderValue = ((double)queryDescInHeaderCounter/(double)headersSize)*10.0;
+        if (QueryDescTermInHeaders.containsKey(docNum)){
+            double currValue = QueryDescTermInHeaders.get(docNum);
+            double newValue = currValue + queryDescInHeaderValue;
+            QueryDescTermInHeaders.put(docNum, newValue);
+        }
+        else
+            QueryDescTermInHeaders.put(docNum, queryDescInHeaderValue);
+
+        int queryTitleInHeaderCounter = 0;
+        double queryTitleInHeaderValue;
+        for (String queryTitleTerm : queryTitleTerms) {
+            if (queryTitleTerm.charAt(0) == '*')
+                queryTitleTerm = StringUtils.substring(queryTitleTerm, 1);
+            if (docHeaders.contains(queryTitleTerm))
+                queryTitleInHeaderCounter++;
+        }
+        queryTitleInHeaderValue = ((double)queryTitleInHeaderCounter/(double)headersSize)*10.0;
+        if (QueryTitleTermInHeaders.containsKey(docNum)){
+            double currValue = QueryTitleTermInHeaders.get(docNum);
+            double newValue = currValue + queryTitleInHeaderValue;
+            QueryTitleTermInHeaders.put(docNum, newValue);
+        }
+        else
+            QueryTitleTermInHeaders.put(docNum, queryDescInHeaderValue);
     }
 
     private void calculateHeadersWeight(String docNo, String term, ArrayList<String> headers, String mode) {
@@ -223,8 +288,11 @@ public class Ranker {
         String[] headersTerms = StringUtils.split(docHeaders, ",");
         for (int i = 0; i < headersTerms.length; i++) {
             String header = headersTerms[i];
+            if (StringUtils.startsWith(header, " "))
+                header = StringUtils.substring(header,1);
             if (header.charAt(0) == '*')
                 header = StringUtils.substring(header,1);
+
             ans.add(header);
         }
         return ans;
