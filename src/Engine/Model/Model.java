@@ -292,7 +292,7 @@ public class Model extends Observable {
                             line = br.readLine();
                         }
                     }
-                    if ( line.startsWith("<narr>")){
+                    if (line != null && line.startsWith("<narr>")){
                         line = br.readLine();
                         while (line != null && !line.equals("")) {
                             sb_narr.append(" " + line);

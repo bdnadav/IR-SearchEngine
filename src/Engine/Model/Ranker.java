@@ -11,12 +11,12 @@ public class Ranker {
     private final int MAX_DOCS_TO_RETURN = 50;
 
     /* Ranking factors and their weight*/
-    private final double BM25_WEIGHT_CLASSIC = 0.5;
-    private final double BM25_WEIGHT_DESCRIPTION = 0.25;
-    private final double IN_TITLE_WEIGHT = 0.25;
+    private final double BM25_WEIGHT_CLASSIC = 0.6;
+    private final double BM25_WEIGHT_DESCRIPTION = 0.2;
+    private final double IN_TITLE_WEIGHT = 0.2;
 
     /* BM25 Constants*/
-    private final double K = 1.5;
+    private final double K = 1.75;
     private final double B = 0.75;
     private final double AVG_LENGTH_OF_DOCS_IN_CORPUS;
     private final int NUM_OF_DOCS_IN_CORPUS;
@@ -139,7 +139,7 @@ public class Ranker {
             String docNo = (String) docHeaders.getKey();
             if (!tm.containsKey(docNo)){
                 ArrayList<String> headers = (ArrayList<String>) docHeaders.getValue();
-                calculateHeadersWeight(docNo, queryTerms, headers, mode);
+                calculateHeadersWeight(docNo, queryTerms, new ArrayList<String>(headers), mode);
             }
         }
     }
@@ -167,7 +167,12 @@ public class Ranker {
         ArrayList<String> ans = new ArrayList<>();
         docHeaders = StringUtils.substring(docHeaders, 1, docHeaders.length()-1); // trim the '[ ]'
         String[] headersTerms = StringUtils.split(docHeaders, ",");
-        ans.addAll(Arrays.asList(headersTerms));
+        for (int i = 0; i < headersTerms.length; i++) {
+            String header = headersTerms[i];
+            if (header.charAt(0) == '*')
+                header = StringUtils.substring(header,1);
+            ans.add(header);
+        }
         return ans;
     }
 
