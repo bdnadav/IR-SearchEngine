@@ -17,8 +17,10 @@ class Indexer {
     static TreeMap<String, String> terms_dictionary;
     static TreeMap<String, String> cities_dictionary;
     static TreeMap<String, Integer> docs_dictionary;
+    static HashMap<String, String> headers_dictionary;
     private static String staticPostingsPath;
     private static BufferedWriter termDictionary_bf;
+    private static BufferedWriter headersDictionary_bw;
 
 
     static void initIndexer(String postingPath) {
@@ -26,11 +28,14 @@ class Indexer {
         try {
             FileWriter termDictionary_fw = new FileWriter(postingPath + "\\termDictionary.txt");
             termDictionary_bf = new BufferedWriter(termDictionary_fw);
+            FileWriter headersDictionary_fw = new FileWriter(postingPath + "\\headersDictionary.txt");
+            headersDictionary_bw = new BufferedWriter(headersDictionary_fw);
         } catch (IOException e) {
             e.printStackTrace();
         }
         cities_dictionary = new TreeMap<>();
         docs_dictionary = new TreeMap<>(new DocComparator());
+        headers_dictionary = new HashMap<>();
         staticPostingsPath = postingPath;
     }
 
@@ -192,6 +197,7 @@ class Indexer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         assert docDictionary_fw.get() != null;
         BufferedWriter docDictionary_bf = new BufferedWriter(docDictionary_fw.get());
         Iterator docIt = docs_dictionary.entrySet().iterator();
@@ -242,6 +248,30 @@ class Indexer {
             }
             citiesDictionary_bf.flush();
             citiesDictionary_bf.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Iterator termIt = headers_dictionary.entrySet().iterator();
+            counter = 0;
+            while (termIt.hasNext()) {
+                Map.Entry pair = (Map.Entry) termIt.next();
+                try {
+                    headersDictionary_bw.append(pair.getKey().toString()).append(",").append(pair.getValue().toString()).append("\n");
+                    counter++;
+                    if (counter > 400) {
+                        headersDictionary_bw.flush();
+                        counter = 0;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                headersDictionary_bw.flush();
+                termIt.remove(); // avoids a ConcurrentModificationException
+            }
+            headersDictionary_bw.flush();
+            headersDictionary_bw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

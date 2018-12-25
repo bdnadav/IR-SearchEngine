@@ -10,6 +10,7 @@ package Engine.Model;
  * by a line number of the relevant information in posting file.
  */
 
+import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -169,7 +170,6 @@ public class Posting {
         try {
 
             documents_buffer_writer.append(docNo + "," + parentFileName + "," + mostFreqTerm + "," + tf_mft + "," + numOfUniqueTerms + "," + city +","+ doclength+"," +headlines_terms.toString()+"\n");
-            headlines_terms.clear();
             docsCounter++;
             if (docsCounter > 400) {
                 documents_buffer_writer.flush();
@@ -177,11 +177,31 @@ public class Posting {
             }
             Indexer.addNewDocToDocDictionary(docNo, docsPointer);
             docsPointer++;
+            addHeadersToDictionary(docNo, headlines_terms);
+            headlines_terms.clear();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    synchronized private static void addHeadersToDictionary(String docNo, TreeSet<String> headlines_terms) {
+        Iterator it = headlines_terms.iterator();
+        while (it.hasNext()){
+            String header = (String)it.next();
+            if (header.charAt(0) == '*')
+                header = StringUtils.substring(header, 1);
+            if (!Character.isLetter(header.charAt(0)))
+                continue;
+            if (Indexer.headers_dictionary.containsKey(header)){
+                String currValue = Indexer.headers_dictionary.get(header);
+                String newValue = currValue + "#" + docNo;
+                Indexer.headers_dictionary.put(header, newValue);
+            }
+            else
+                Indexer.headers_dictionary.put(header, docNo);
+        }
+}
 
     public static String getTermPostingLineByPointer(int pointer) throws IOException {
         String ans;
