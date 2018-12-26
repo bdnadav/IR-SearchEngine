@@ -43,6 +43,7 @@ public class Parse {
     HashMap<String, StringBuilder> FilesTerms;
     TreeMap<String, Integer> FBIS3_Terms;
     TreeSet HeadLinesTerms;
+    TreeMap<String, Integer> potentialEntities;
     ArrayList <String> QueryTerms;
 
     String lastDoc = "";
@@ -101,6 +102,7 @@ public class Parse {
             FBIS3_Terms = new TreeMap<>();
             FilesTerms = new HashMap<>();
             HeadLinesTerms = new TreeSet() ;
+            potentialEntities = new TreeMap();
             TermsOnly = new TreeMap<String, String>((Comparator) (o1, o2) -> {
                 String s1 = ((String)(o1)).toLowerCase();
                 String s2 = ((String)(o2)).toLowerCase();
@@ -166,6 +168,7 @@ public class Parse {
      */
     public void parse(String text, Document currDoc ) {
         termPosition = 0;
+        potentialEntities = new TreeMap();
         //text = remove_stop_words(text);
         String[] tokens;
         tokens = StringUtils.split(text, "\\`:)?*(|+@#^;!&=}{[]'<> ");
@@ -485,10 +488,8 @@ public class Parse {
             HeadLinesTerms.clear();
             return;
         }
-        Posting.writeToDocumentsPosting(docNo, parentFileName, mostFreqTerm, tf_mft, numOfUniqueTerms, city , HeadLinesTerms ,doc_length);
+        Posting.writeToDocumentsPosting(docNo, parentFileName, mostFreqTerm, tf_mft, numOfUniqueTerms, city , HeadLinesTerms ,doc_length, potentialEntities);
         HeadLinesTerms.clear();
-
-
     }
 
 
@@ -569,6 +570,15 @@ public class Parse {
                 num_unique_term++;
                 sb.append("#" + docNo + "|" + "1");
                 FilesTerms.put(addTerm, sb);
+                if (addTerm.charAt(0) == '*'){
+//                    if (potentialEntities.containsKey(addTerm)) {
+//                        int count = potentialEntities.get(addTerm);
+//                        count += 1;
+//                        potentialEntities.put(addTerm, count);
+//                    }
+//                    else
+//                        potentialEntities.put(addTerm, 1);
+                }
                 TermsOnly.put(addTerm, addTerm);
             }
         }

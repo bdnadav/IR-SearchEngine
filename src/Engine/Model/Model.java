@@ -157,6 +157,7 @@ public class Model extends Observable {
                 br_dic.close();
             } catch (Exception e) {
             }
+
 //            String docPointer = docsDictionary.get("FBIS3-3366");
 //            int docPointerInt = Integer.parseInt(docPointer);
 //            try {
@@ -174,6 +175,7 @@ public class Model extends Observable {
 //
 //
 //            String line = null;
+
             JOptionPane.showMessageDialog(null, "Docs dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
@@ -266,7 +268,7 @@ public class Model extends Observable {
 //        Posting.initTermPosting(postingPath);
 //        analyzeQrles("C:\\Users\\Nadav\\QueriesTests\\qrels.txt");
 
-        readQueryFromFile("C:\\Users\\Nadav\\QueriesTests\\queries.txt");
+        readQueryFromFile("C:\\Users\\Nadav\\QueriesTests\\queries-352358.txt");
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
         // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
 

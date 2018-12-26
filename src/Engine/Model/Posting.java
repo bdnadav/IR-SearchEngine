@@ -166,10 +166,10 @@ public class Posting {
      * This method is responsible for writing to Docs,
      * it is synchronized because it is called a method that is run by a thread number at the same time.
      */
-    synchronized public static void writeToDocumentsPosting(String docNo, String parentFileName, String mostFreqTerm, int tf_mft, int numOfUniqueTerms, String city,TreeSet<String> headlines_terms, int doclength) {
+    synchronized public static void writeToDocumentsPosting(String docNo, String parentFileName, String mostFreqTerm, int tf_mft, int numOfUniqueTerms, String city, TreeSet<String> headlines_terms, int doclength, TreeMap potentialEntities) {
         try {
 
-            documents_buffer_writer.append(docNo + "," + parentFileName + "," + mostFreqTerm + "," + tf_mft + "," + numOfUniqueTerms + "," + city +","+ doclength+"," +headlines_terms.toString()+"\n");
+            documents_buffer_writer.append(docNo + "," + parentFileName + "," + mostFreqTerm + "," + tf_mft + "," + numOfUniqueTerms + "," + city +","+ doclength+"," +headlines_terms.toString()+ "," + potentialEntities.toString() +"\n");
             docsCounter++;
             if (docsCounter > 400) {
                 documents_buffer_writer.flush();
