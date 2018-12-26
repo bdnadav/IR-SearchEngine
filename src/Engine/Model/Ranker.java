@@ -319,7 +319,7 @@ public class Ranker {
     }
 
 
-    private <K,V extends Comparable<? super V>> TreeSet<Map.Entry<K,V>> entriesSortedByValues(Map<K,V> map) {
+    public static <K,V extends Comparable<? super V>> TreeSet<Map.Entry<K,V>> entriesSortedByValues(Map<K,V> map) {
     TreeSet<Map.Entry<K,V>> sortedEntries = new TreeSet<>(
             (e1, e2) -> {
                 int res = e1.getValue().compareTo(e2.getValue());

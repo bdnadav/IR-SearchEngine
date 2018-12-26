@@ -68,7 +68,7 @@ public class Searcher {
         ArrayList<String> queryDescTerms = descParse.getQueryTerms();
 
         //queryDescTerms = filterDescTerms(queryDescTerms);
-        HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTitleTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
+        HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTitleTerms; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryDescTerm; // <DescTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
@@ -76,14 +76,17 @@ public class Searcher {
         /** Handle Semantic **/
         if ( this.useSemantic){
             Map<String, List<Pair<String, String>>> semanticTerms = getSemanticTerms (queryTitleTerms) ;
-
         }
+
+
+
+
         if (extraTermsMayHelp(queryTitleTerms, queryDescTerms)){
             ArrayList<String> queryDescTermsToAdd = getExtraTerms(queryDescTerms, queryTitleTerms);
             queryTitleTerms.addAll(queryDescTermsToAdd);
         }
 
-        relevantDocsByQueryTitleTerm = getRelevantDocs(queryTitleTerms);
+        relevantDocsByQueryTitleTerms = getRelevantDocs(queryTitleTerms);
         //Posting.initTermPosting(posting);
         //relevantDocsByQueryDescTerm = getRelevantDocs(queryDescTerms);
 
@@ -91,7 +94,7 @@ public class Searcher {
 
         //ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsByQueryTitleTerm, relevantDocsByQueryDescTerm, queryId);
         //ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryDescTerm, queryTitleTerms);
-        ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryTitleTerm, queryDescTerms);
+        ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryTitleTerms, queryDescTerms);
         // NEED TO DO: Create SubSet of rankedDocs according to the final integer MAX_DOCS_TO_RETURN
         return rankedDocs;
     }

@@ -10,7 +10,7 @@ package Engine.Model;
  * by a line number of the relevant information in posting file.
  */
 
-import org.apache.commons.lang3.CharUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -24,11 +24,16 @@ public class Posting {
     private static int docsCounter = 0;
     private static BufferedWriter terms_buffer_writer;
     private static BufferedWriter documents_buffer_writer;
+    private static BufferedWriter documentsTmpEntities_buffer_writer;
     private static BufferedReader term_buffer_reader;
     private static BufferedReader documents_buffer_reader;
+    private static BufferedReader documentsTmpEntities_buffer_reader;
+    private static String postingPath;
+
 
     public Posting(String postingsPath) {
         String termsPostingPath = postingsPath + "\\Terms\\termsPosting.txt";
+        this.postingPath = postingsPath;
         try {
             terms_buffer_writer = new BufferedWriter(new FileWriter(termsPostingPath));
             term_buffer_reader = new BufferedReader(new FileReader(termsPostingPath));
@@ -41,6 +46,8 @@ public class Posting {
         try {
             documents_buffer_writer = new BufferedWriter(new FileWriter(postingPath + "\\docsPosting.txt"));
             documents_buffer_reader = new BufferedReader(new FileReader(postingPath + "\\docsPosting.txt"));
+            documentsTmpEntities_buffer_writer = new BufferedWriter(new FileWriter(postingPath + "\\tmpDocsEntities.txt"));
+            documentsTmpEntities_buffer_reader = new BufferedReader(new FileReader(postingPath + "\\tmpDocsEntities.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,11 +60,32 @@ public class Posting {
             //terms_buffer_writer = new BufferedWriter(new FileWriter(termsPostingPath));
             term_buffer_reader = new BufferedReader(new FileReader(termsPostingPath));
             documents_buffer_reader = new BufferedReader(new FileReader(docsPostingPath));
+            documentsTmpEntities_buffer_reader = new BufferedReader(new FileReader(postingPath + "Postings\\Docs\\tmpDocsEntities.txt"));
         } catch (IOException e1) {
             e1.printStackTrace();
         }
     }
 
+    public static HashSet<String> getChunkOfEntitiesLines() {
+        HashSet<String> chunk = new HashSet<>();
+        for (int i = 0; i < 1000; i++) {
+            try {
+                String entityLine = documentsTmpEntities_buffer_reader.readLine();
+                if (entityLine == null){
+                    documentsTmpEntities_buffer_writer.close();
+                    //FileUtils.deleteQuietly(new File(postingPath + "\\Docs\\tmpDocsEntities.txt"));
+                    break;
+                }
+                chunk.add(entityLine);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (chunk.size() > 0)
+            return chunk;
+        else
+            return null;
+    }
 
 
     /**
@@ -169,10 +197,12 @@ public class Posting {
     synchronized public static void writeToDocumentsPosting(String docNo, String parentFileName, String mostFreqTerm, int tf_mft, int numOfUniqueTerms, String city, TreeSet<String> headlines_terms, int doclength, TreeMap potentialEntities) {
         try {
 
-            documents_buffer_writer.append(docNo + "," + parentFileName + "," + mostFreqTerm + "," + tf_mft + "," + numOfUniqueTerms + "," + city +","+ doclength+"," +headlines_terms.toString()+ "," + potentialEntities.toString() +"\n");
+            documents_buffer_writer.append(docNo + "," + parentFileName + "," + mostFreqTerm + "," + tf_mft + "," + numOfUniqueTerms + "," + city +","+ doclength+"," +headlines_terms.toString() +"\n");
+            documentsTmpEntities_buffer_writer.append(docNo).append("|").append(potentialEntities.toString() + "\n");
             docsCounter++;
             if (docsCounter > 400) {
                 documents_buffer_writer.flush();
+                documentsTmpEntities_buffer_writer.flush();
                 docsCounter = 0;
             }
             Indexer.addNewDocToDocDictionary(docNo, docsPointer);

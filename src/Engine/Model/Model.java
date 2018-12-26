@@ -326,10 +326,13 @@ public class Model extends Observable {
             StringBuilder sb_desc = new StringBuilder();
             //loadDicToMemory(ifStemming());
 
+            ArrayList<String> cities = new ArrayList<>();
+            cities.add("BUENOS");
+
 
             String line = "" , query_id  ="" ,query = "" ;
             while ((line = br.readLine()) != null) {
-                Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary, headersDictionary, useSemantics);
+                Searcher searcher = new Searcher(postingPath, is_stemming, cities, termDictionary, docsDictionary, citiesDictionary, headersDictionary, useSemantics);
                 while ((line = br.readLine()) != null) {
                     if (line.equals("<top>")) { // start of query
                             continue ;

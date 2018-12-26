@@ -123,7 +123,7 @@ public class CorpusProcessingManager {
 
 
     private void buildInvertedIndex() throws FileNotFoundException {
-        inverter.appendSegmentPartitionRangeToPostingAndIndexes();
+        inverter.startIndexerOperations();
         System.out.println("done");
     }
 

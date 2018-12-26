@@ -576,16 +576,16 @@ public class Parse {
                 num_unique_term++;
                 sb.append("#" + docNo + "|" + "1");
                 FilesTerms.put(addTerm, sb);
-                if (addTerm.charAt(0) == '*'){
-//                    if (potentialEntities.containsKey(addTerm)) {
-//                        int count = potentialEntities.get(addTerm);
-//                        count += 1;
-//                        potentialEntities.put(addTerm, count);
-//                    }
-//                    else
-//                        potentialEntities.put(addTerm, 1);
-                }
                 TermsOnly.put(addTerm, addTerm);
+            }
+            if (addTerm.charAt(0) == '*' && StringUtils.split(addTerm, " ") != null && StringUtils.split(addTerm, " ").length > 1 && !StringUtils.containsAny(addTerm, "=,")){
+                if (potentialEntities.containsKey(addTerm)) {
+                    int count = potentialEntities.get(addTerm);
+                    count += 1;
+                    potentialEntities.put(addTerm, count);
+                }
+                else
+                    potentialEntities.put(addTerm, 1);
             }
         }
 
