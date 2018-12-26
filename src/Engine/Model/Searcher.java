@@ -72,7 +72,7 @@ public class Searcher {
 
         /** Handle Semantic **/
         //if ( this.useSemantic){
-            Map<String, List<Pair<String, String>>> semanticTerms = getSemanticTerms (queryTerms) ;
+            //Map<String, List<Pair<String, String>>> semanticTerms = getSemanticTerms (queryTerms) ;
 
       //  }
         relevantDocsByQueryTerm = getRelevantDocs(queryTerms);

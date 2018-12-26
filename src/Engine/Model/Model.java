@@ -287,14 +287,14 @@ public class Model extends Observable {
                     }
                     if ( line.startsWith("<desc>")){
                         line = br.readLine();
-                        while (line != null && !line.equals("")) {
+                        while (line != null && !line.equals("")&&!line.startsWith("<")) {
                             sb_desc.append(" " + line);
                             line = br.readLine();
                         }
                     }
                     if (line != null && line.startsWith("<narr>")){
                         line = br.readLine();
-                        while (line != null && !line.equals("")) {
+                        while (line != null && !line.equals("")&& !line.startsWith("<")&&!line.equals(" ")) {
                             sb_narr.append(" " + line);
                             line = br.readLine();
                         }
