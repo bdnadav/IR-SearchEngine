@@ -64,14 +64,14 @@ public class Parse {
     private int termPosition; // counts the term position inside the doc text
 
     static {
-        try {
-            specialwords_fr = new FileReader("src\\Engine\\resources\\special_words.txt"); // read stop words from the file
-            specialchars_fr = new FileReader("src\\Engine\\resources\\special_chars.txt");
-            months_fr = new FileReader("src\\Engine\\resources\\months.txt");
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            specialwords_fr = new FileReader("src\\Engine\\resources\\special_words.txt"); // read stop words from the file
+//            specialchars_fr = new FileReader("src\\Engine\\resources\\special_chars.txt");
+//            months_fr = new FileReader("src\\Engine\\resources\\months.txt");
+//
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private static Pattern NUMBER_ADDS = Pattern.compile("\\d+" + " " + "(Thousand|Million|Billion|Trillion|percent|percentage|Dollars)");
@@ -95,9 +95,9 @@ public class Parse {
             this.path = path;
             this.stemming = stemming;
             BufferedReader stopwords_br = new BufferedReader(stopwords_fr);
-            BufferedReader specialwords_br = new BufferedReader(specialwords_fr);
-            BufferedReader specialchars_br = new BufferedReader(specialchars_fr);
-            BufferedReader months_br = new BufferedReader(months_fr);
+//            BufferedReader specialwords_br = new BufferedReader(specialwords_fr);
+//            BufferedReader specialchars_br = new BufferedReader(specialchars_fr);
+//           BufferedReader months_br = new BufferedReader(months_fr);
             FBIS3_Terms = new TreeMap<>();
             FilesTerms = new HashMap<>();
             HeadLinesTerms = new TreeSet() ;
@@ -116,14 +116,20 @@ public class Parse {
             while ((curr_line = stopwords_br.readLine()) != null) {
                 stopwords.add(curr_line);
             }
-            while ((curr_line = specialwords_br.readLine()) != null) {
-                specialwords.add(curr_line);
+            String[] words = { "thousand","million","billion","trillion","percent","percentage","dollars","january","february","march","april","may","june","july","august","september","october","november","december","jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"} ;
+            for (String s: words
+            ) {
+                specialwords.add(s);
             }
-            while ((curr_line = specialchars_br.readLine()) != null) {
-                specialchars.add(curr_line);
+            String[] chars = { ",","}","{","\\","/",">","<","(",")","'",":",";","\"","[","]","&",".","?","|","`","*","+","!","~","@","#","^","-"} ;
+            for (String s: chars
+            ) {
+                specialchars.add(s);
             }
-            while ((curr_line = months_br.readLine()) != null) {
-                months.add(curr_line);
+            String[] months_arr = {"January","February","March","April","May","June","July","August","September","October","November","December","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"} ;
+            for (String s: months_arr
+            ) {
+                months.add(s);
             }
             //SegmentFile parserSegmentFile = new SegmentFile();
             termPosition = 0;

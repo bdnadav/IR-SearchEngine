@@ -30,7 +30,7 @@ public class Ranker {
 
     static {
         try {
-            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\Nadav\\QueriesTests\\results\\results.txt"));
+            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\harel_000\\Desktop\\result.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -64,17 +64,17 @@ public class Searcher {
         ArrayList<String> queryTerms = queryParse.getQueryTerms();
         descParse.parseQuery(desc);
         ArrayList<String> descTerms = descParse.getQueryTerms();
-        descTerms = filterDescTerms(descTerms);
+        //descTerms = filterDescTerms(descTerms);
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByDescTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
         /** Handle Semantic **/
-        if ( this.useSemantic){
+        //if ( this.useSemantic){
             Map<String, List<Pair<String, String>>> semanticTerms = getSemanticTerms (queryTerms) ;
 
-        }
+      //  }
         relevantDocsByQueryTerm = getRelevantDocs(queryTerms);
         Posting.initTermPosting(posting);
         relevantDocsByDescTerm = getRelevantDocs(descTerms);
