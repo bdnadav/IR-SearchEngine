@@ -1,7 +1,9 @@
 package Engine.Model;
 
+import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+
 
 import javax.swing.*;
 import java.io.*;
@@ -21,7 +23,7 @@ public class Model extends Observable {
     // will be used in project part 2
     TreeMap<String, String> termDictionary = new TreeMap<>();
     TreeMap<String, String> termDictionaryToShow = new TreeMap<>();
-    TreeMap<String, String> citiesDictionary = new TreeMap<>();
+    TreeMap<String, Pair> citiesDictionary = new TreeMap<>();
     TreeMap<String, String> docsDictionary = new TreeMap<>();
 
 
@@ -91,7 +93,7 @@ public class Model extends Observable {
                     String tf = "";
                     int indexOfFirstComma = StringUtils.indexOf(line, ",");
                     term = StringUtils.substring(line, 0, indexOfFirstComma);
-                    String details = StringUtils.substring(line, indexOfFirstComma);
+                    String details = StringUtils.substring(line, indexOfFirstComma+1);
                     termDictionary.put(term, details);
                     String[] splitedDetails = StringUtils.split(details, ",");
                     tf = splitedDetails[2];
@@ -118,12 +120,16 @@ public class Model extends Observable {
 
                     String city = "";
                     String docsList = "";
+                    String info = "";
                     int firstIndexOfComma = StringUtils.indexOf(line, ",");
                     int lastIndexOfComma = StringUtils.lastIndexOf(line, ",");
-                    city = StringUtils.substring(line, 0, lastIndexOfComma); // city with details
+                    city = StringUtils.substring(line, 0, firstIndexOfComma); // city with details
+                    info = StringUtils.substring(line, firstIndexOfComma + 1, lastIndexOfComma);
+                    if (info.equals(","))
+                        info = "null";
                     docsList = StringUtils.substring(line, lastIndexOfComma + 1);
 
-                    citiesDictionary.put(city, docsList);
+                    citiesDictionary.put(city, new Pair<String, String>(info, docsList));
                 }
                 br_dic.close();
             } catch (Exception e) {
@@ -268,8 +274,8 @@ public class Model extends Observable {
 
 
             String line = "" , query_id  ="" ,query = "" ;
+            Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary , useSemantics);
             while ((line = br.readLine()) != null) {
-                Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary , useSemantics);
                 while ((line = br.readLine()) != null ) {
                     if (line.equals("<top>")) { // start of query
                             continue ;
@@ -322,7 +328,7 @@ public class Model extends Observable {
     private void printAnswer5() {
         int noneCapitalCity = 0;
         int totalNumOfCities = citiesDictionary.size();
-        for (Map.Entry<String, String> entry : citiesDictionary.entrySet()) {
+        for (Map.Entry<String, Pair> entry : citiesDictionary.entrySet()) {
             String currCity = entry.getKey();
             String[] cityAndDetails = StringUtils.split(currCity, ",");
             if (cityAndDetails.length < 2 || cityAndDetails[1].equals("")) {
@@ -343,9 +349,9 @@ public class Model extends Observable {
         String maxDocNumSoFar = "";
         int maxTfSoFar = 0;
 
-        for (Map.Entry<String, String> entry : citiesDictionary.entrySet()) {
+        for (Map.Entry<String, Pair> entry : citiesDictionary.entrySet()) {
             String currCity = entry.getKey();
-            String docsList = entry.getValue();
+            String docsList = (String) entry.getValue().getValue();
             String[] docs = StringUtils.split(docsList, "#");
             for (int i = 0; i < docs.length; i++) {
                 String[] docNumAndTf = StringUtils.split(docs[i], "|");
