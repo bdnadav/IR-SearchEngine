@@ -157,7 +157,6 @@ public class Model extends Observable {
                 br_dic.close();
             } catch (Exception e) {
             }
-
 //            String docPointer = docsDictionary.get("FBIS3-3366");
 //            int docPointerInt = Integer.parseInt(docPointer);
 //            try {
@@ -265,12 +264,9 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-//        Posting.initTermPosting(postingPath);
-//        analyzeQrles("C:\\Users\\Nadav\\QueriesTests\\qrels.txt");
-
-        readQueryFromFile("C:\\Users\\Nadav\\QueriesTests\\queries-352358.txt");
+        readQueryFromFile("C:\\Users\\Nadav\\QueriesTests\\queries.txt");
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
-        // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
+       // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
 
 //        printAnswer5();
 //        printAnswer6();
@@ -331,34 +327,34 @@ public class Model extends Observable {
             //loadDicToMemory(ifStemming());
 
 
-            String line = "", query_id = "", query = "";
+            String line = "" , query_id  ="" ,query = "" ;
             while ((line = br.readLine()) != null) {
-                Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary, headersDictionary, useSemantics);
-                while ((line = br.readLine()) != null) {
+                Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary , useSemantics);
+                while ((line = br.readLine()) != null ) {
                     if (line.equals("<top>")) { // start of query
-                        continue;
+                            continue ;
                     }
                     if (line.equals("</top>")) { // start of query
-                        break;
+                            break ;
                     }
 
                     if (line.startsWith("<num>")) {
-                        String[] temp = line.split(" ");
-                        query_id = temp[2];
+                       String[] temp = line.split(" ");
+                       query_id = temp[2];
                     }
-                    if (line.startsWith("<title>")) {
+                    if ( line.startsWith("<title>")){
                         query = line.split("> ")[1];
                     }
-                    if (line.startsWith("<desc>")) {
+                    if ( line.startsWith("<desc>")){
                         line = br.readLine();
-                        while (line != null && !line.equals("")) {
+                        while (line != null && !line.equals("")&&!line.startsWith("<")) {
                             sb_desc.append(" " + line);
                             line = br.readLine();
                         }
                     }
-                    if (line != null && line.startsWith("<narr>")) {
+                    if (line != null && line.startsWith("<narr>")){
                         line = br.readLine();
-                        while (line != null && !line.equals("")) {
+                        while (line != null && !line.equals("")&& !line.startsWith("<")&&!line.equals(" ")) {
                             sb_narr.append(" " + line);
                             line = br.readLine();
                         }
@@ -376,6 +372,10 @@ public class Model extends Observable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
+
+
 
 
     }

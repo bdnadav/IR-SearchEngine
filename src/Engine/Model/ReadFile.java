@@ -56,8 +56,8 @@ public class ReadFile {
             String parentFileName = getParentFileName(filePathName);
             counterToFullChunk++;
             try {
-                br = new BufferedReader(new FileReader(filePathName));
-            } catch (FileNotFoundException e) {
+                br = new BufferedReader(new InputStreamReader(new FileInputStream((filePathName)), "UTF-8"));
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             try {
