@@ -9,6 +9,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 public class Searcher {
     private final int MAX_DOCS_TO_RETURN = 50;
@@ -17,8 +20,9 @@ public class Searcher {
     private Parse queryParse;
     private Parse descParse;
     private TreeMap<String, String> terms_dictionary;
-    private TreeMap<String, String> cities_dictionary;
+    private TreeMap<String, Pair> cities_dictionary;
     private TreeMap<String, String> docs_dictionary;
+    private HashMap<String , String> synonymous_terms;
     public static HashMap<String, String> headers_dictionary;
     private Ranker ranker;
     private ArrayList<String> speceficCities;
@@ -27,8 +31,10 @@ public class Searcher {
     private String posting;
 
 
-    public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, String> citiesDic, HashMap<String, String> headersDictionary, boolean semantic) {
+    public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, boolean semantic) {
         this.terms_dictionary = termsDic;
+        this.synonymous_terms = new HashMap<>();
+        //this.synonymous_and_pointers = new HashMap<>() ;
         this.cities_dictionary = citiesDic;
         this.docs_dictionary = docsDic;
         this.headers_dictionary = headersDictionary;
@@ -48,7 +54,7 @@ public class Searcher {
     private HashSet<String> getLegalDocs(ArrayList<String> specificCities) {
         HashSet<String> ans = new HashSet<>();
         for (String currCity : specificCities) {
-            String citiesDicValue = cities_dictionary.get(currCity);
+            String citiesDicValue = (String) cities_dictionary.get(currCity).getValue();
             String[] splited = StringUtils.split(citiesDicValue, "#");
             for (int j = 1; j < splited.length; j++) {
                 int indexOfSeparator = StringUtils.indexOf(splited[j], "|");
@@ -62,6 +68,7 @@ public class Searcher {
 
 
     public ArrayList<String> handleQuery(String query_id, String queryTitle, String queryDescription, String queryNarrative) {
+        resetAllDateStructures() ; //a new query has arrived - cleanall
         queryParse.parseQuery(queryTitle);
         ArrayList<String> queryTitleTerms = queryParse.getQueryTerms();
         descParse.parseQuery(queryDescription);
@@ -74,12 +81,10 @@ public class Searcher {
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
         /** Handle Semantic **/
-        if ( this.useSemantic){
-            Map<String, List<Pair<String, String>>> semanticTerms = getSemanticTerms (queryTitleTerms) ;
+        if ( this.useSemantic) {
+            //if ( this.useSemantic){
+            getSemanticTerms(queryTitleTerms);
         }
-
-
-
 
         if (extraTermsMayHelp(queryTitleTerms, queryDescTerms)){
             ArrayList<String> queryDescTermsToAdd = getExtraTerms(queryDescTerms, queryTitleTerms);
@@ -97,6 +102,12 @@ public class Searcher {
         ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryTitleTerms, queryDescTerms);
         // NEED TO DO: Create SubSet of rankedDocs according to the final integer MAX_DOCS_TO_RETURN
         return rankedDocs;
+    }
+
+    private void resetAllDateStructures() {
+        this.synonymous_terms.clear();
+        this.synonymous_terms = new HashMap<>();
+
     }
 
     private ArrayList<String> getExtraTerms(ArrayList<String> queryDescTerms, ArrayList<String> queryTitleTerms) {
@@ -141,7 +152,8 @@ public class Searcher {
         for (String term :queryTerms
              ) {
             try {
-                String[] splited_terms = useUrlSemantic(term);
+                term = Parse.cleanToken(term) ; // clean *
+                useUrlSemantic(term); // insert to  synonymous map all the terms and their docs
 
                 /** do somthing **/
 
@@ -151,23 +163,48 @@ public class Searcher {
         return  null ;
     }
 
-    private String[] useUrlSemantic(String term) throws Exception {
+    /**
+     * check for each term in query if the is synonymouse terms in the api , check if any of them
+     * in the dic terms , if they are in the func will save the pointer to the term's posting row
+     * @param term
+     * @throws Exception
+     */
+    private void useUrlSemantic(String term) throws Exception {
         URL url = new URL("https://api.datamuse.com/words?rel_trg=" + term);
-
-
         //URLConnection connection = website.openConnection();
         HttpURLConnection con  = ( HttpURLConnection)  url.openConnection();
         con.setRequestMethod("GET");
-
-
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(
-                        con.getInputStream()));
-
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
         StringBuilder response = new StringBuilder();
-        String inputLine;
-        inputLine = in.readLine() ;
-        return null ;
+
+        String json_str = "";
+        String line ="";
+        while ((line = in.readLine()) != null) {
+            json_str = json_str + line;
+        }
+        in.close();
+        JSONArray jsonArray = new JSONArray(json_str);
+        int count_legit_terms = 0 ;
+        for (int k = 0 ; k < jsonArray.length() ; k++) {
+            JSONObject obj = (JSONObject) jsonArray.get(k);
+            String synonymous_term= (String) obj.get("word");
+            String synonymous_score= (String) obj.get("score");
+            String termData ;
+            termData = terms_dictionary.get(synonymous_term);
+            if ( termData == null )  // try capital term
+               termData = terms_dictionary.get(synonymous_term.toUpperCase());
+            if ( termData == null )// the term isnt in the corpus
+                continue;
+            /** set a threshhold for term relavence by score !!! ***/
+            synonymous_terms.put(synonymous_term, synonymous_score);
+            count_legit_terms++ ;
+
+            if (count_legit_terms == 5 ) //save only the 5 top terms
+                break;
+        }
+
+
+        //return null ;
     }
 
     private ArrayList<String> filterDescTerms(ArrayList<String> descTerms) {
