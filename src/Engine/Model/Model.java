@@ -26,6 +26,7 @@ public class Model extends Observable {
     TreeMap<String, Pair> citiesDictionary = new TreeMap<>();
     TreeMap<String, String> docsDictionary = new TreeMap<>();
     HashMap<String, String> headersDictionary = new HashMap<>();
+    HashMap<String, String> docEntities = new HashMap<>();
 
 
     /**
@@ -207,7 +208,40 @@ public class Model extends Observable {
         } else {
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
         }
+
+        if (dir != null && dir.exists()) {
+            try {
+                BufferedReader br_dic = new BufferedReader(new FileReader(postingPath + "\\Postings" + ifStemming() + "\\docsEntities.txt"));
+                String line = "";
+                while ((line = br_dic.readLine()) != null) {
+
+                    String docNum = "";
+                    String listOfEntities = "";
+                    int indexOfFirstComma = StringUtils.indexOf(line, ",");
+                    docNum = StringUtils.substring(line, 0, indexOfFirstComma);
+                    StringBuilder value = new StringBuilder();
+                    listOfEntities = StringUtils.substring(line, indexOfFirstComma + 3); // Triming the ", {"
+                    listOfEntities = StringUtils.substring(listOfEntities, 0, listOfEntities.length()-1);
+                    String[] entities = StringUtils.split(listOfEntities, ",");
+                    for (String entity1 : entities) {
+                        String entity = entity1;
+                        if (entity.charAt(0) == ' ')
+                            entity = entity.substring(1);
+                        value.append(entity).append(",");
+                    }
+                    docEntities.put(docNum, value.toString());
+                }
+                br_dic.close();
+            } catch (Exception e) {
+            }
+
+            JOptionPane.showMessageDialog(null, "Docs Entities loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
+
+
 
     /**
      * delete all files & folder created after posting process
@@ -338,9 +372,9 @@ public class Model extends Observable {
 
 
             String line = "" , query_id  ="" ,query = "" ;
-            Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary , useSemantics);
+            Searcher searcher = new Searcher(postingPath, is_stemming, cities, termDictionary, docsDictionary, citiesDictionary, headersDictionary, docEntities, useSemantics);
             while ((line = br.readLine()) != null) {
-                while ((line = br.readLine()) != null ) {
+                while ((line = br.readLine()) != null) {
                     if (line.equals("<top>")) { // start of query
                             continue ;
                     }
@@ -371,7 +405,8 @@ public class Model extends Observable {
                     }
 
                 }
-                searcher.handleQuery(query_id , query , sb_desc.toString() , sb_narr.toString());
+                System.out.println(query_id);
+                searcher.handleQuery(query_id, query, sb_desc.toString(), sb_narr.toString());
                 sb_desc.delete(0, sb_desc.length());
                 sb_desc.setLength(0);
                 sb_narr.delete(0, sb_narr.length());

@@ -24,6 +24,7 @@ public class Searcher {
     private TreeMap<String, String> docs_dictionary;
     private HashMap<String , String> synonymous_terms;
     public static HashMap<String, String> headers_dictionary;
+    private HashMap<String, String> docs_entities;
     private Ranker ranker;
     private ArrayList<String> speceficCities;
     private HashSet<String> legalDocs; // If cities constraint, this data structure will hold all the docs whose can be return.
@@ -31,13 +32,14 @@ public class Searcher {
     private String posting;
 
 
-    public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, boolean semantic) {
+    public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String,String> docEntities, boolean semantic) {
         this.terms_dictionary = termsDic;
         this.synonymous_terms = new HashMap<>();
         //this.synonymous_and_pointers = new HashMap<>() ;
         this.cities_dictionary = citiesDic;
         this.docs_dictionary = docsDic;
         this.headers_dictionary = headersDictionary;
+        this.docs_entities = docEntities;
         this.ranker = new Ranker(docsDic.size(), 250);
         this.queryParse = new Parse(posting, stemming);
         this.descParse = new Parse(posting, stemming);
