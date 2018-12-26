@@ -11,10 +11,10 @@ public class Ranker {
     private final int MAX_DOCS_TO_RETURN = 50;
 
     /* Ranking factors and their weight*/
-    private final double BM25_TITLE_FACTOR_WEIGHT = 0.8;
-    private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0.1;
-    private final double TITLE_IN_HEADERS_FACTOR_WEIGHT = 0.05;
-    private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0.05;
+    private final double BM25_TITLE_FACTOR_WEIGHT = 0.9;
+    private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0;
+    private final double TITLE_IN_HEADERS_FACTOR_WEIGHT = 0.1;
+    private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0;
 
     /* BM25 Constants*/
     private final double K = 1.75;
@@ -31,7 +31,7 @@ public class Ranker {
 
     static {
         try {
-            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\harel_000\\Desktop\\result.txt"));
+            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\Nadav\\QueriesTests\\results\\results.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -85,8 +85,8 @@ public class Ranker {
 
             double bm25Classic = BM25_TITLE_FACTOR_WEIGHT * bm25ClassicWeight;
             double bm25Description = BM25_DESCRIPTION_FACTOR_WEIGHT * bm25DescriptionWeight;
-            double titleTermInHeader = TITLE_IN_HEADERS_FACTOR_WEIGHT * titleTermInHeadersWeight*10;
-            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight*10;
+            double titleTermInHeader = TITLE_IN_HEADERS_FACTOR_WEIGHT * titleTermInHeadersWeight*100;
+            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight*100;
 
             double mergedValue = bm25Classic + bm25Description + titleTermInHeader + descTermInHeader;
 
@@ -303,15 +303,6 @@ public class Ranker {
             else
                 BM25_QueryDescriptionWeight.put(docNo, bm25Value);
         }
-//        if (mode.equals("BOTH")){
-//            if (BM25_QueryTitleWeight.get(docNo) != null){
-//                double currValue = BM25_QueryTitleWeight.get(docNo);
-//                currValue += bm25Value;
-//                BM25_QueryTitleWeight.put(docNo, currValue);
-//            }
-//            else
-//                BM25_QueryTitleWeight.put(docNo, bm25Value);
-//        }
     }
 
     private ArrayList<String> getSortedDocs() {
