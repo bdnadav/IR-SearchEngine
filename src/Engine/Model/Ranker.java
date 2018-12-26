@@ -11,10 +11,10 @@ public class Ranker {
     private final int MAX_DOCS_TO_RETURN = 50;
 
     /* Ranking factors and their weight*/
-    private final double BM25_TITLE_FACTOR_WEIGHT = 0.9;
-    private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0;
-    private final double TITLE_IN_HEADERS_FACTOR_WEIGHT = 0.1;
-    private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0;
+    private final double BM25_TITLE_FACTOR_WEIGHT = 0.8;
+    private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0.1;
+    private final double TITLE_IN_HEADERS_FACTOR_WEIGHT = 0.05;
+    private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0.05;
 
     /* BM25 Constants*/
     private final double K = 1.75;
@@ -83,10 +83,10 @@ public class Ranker {
             }
 
 
-            double bm25Classic = BM25_TITLE_FACTOR_WEIGHT * bm25ClassicWeight;
+            double bm25Classic = BM25_TITLE_FACTOR_WEIGHT * bm25ClassicWeight * 1.5;
             double bm25Description = BM25_DESCRIPTION_FACTOR_WEIGHT * bm25DescriptionWeight;
-            double titleTermInHeader = TITLE_IN_HEADERS_FACTOR_WEIGHT * titleTermInHeadersWeight*100;
-            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight*100;
+            double titleTermInHeader = TITLE_IN_HEADERS_FACTOR_WEIGHT * titleTermInHeadersWeight*75;
+            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight*75;
 
             double mergedValue = bm25Classic + bm25Description + titleTermInHeader + descTermInHeader;
 

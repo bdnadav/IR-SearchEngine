@@ -95,7 +95,7 @@ public class Model extends Observable {
                     String tf = "";
                     int indexOfFirstComma = StringUtils.indexOf(line, ",");
                     term = StringUtils.substring(line, 0, indexOfFirstComma);
-                    String details = StringUtils.substring(line, indexOfFirstComma+1);
+                    String details = StringUtils.substring(line, indexOfFirstComma);
                     termDictionary.put(term, details);
                     String[] splitedDetails = StringUtils.split(details, ",");
                     tf = splitedDetails[2];
@@ -370,6 +370,7 @@ public class Model extends Observable {
 //            cities.add("BUENOS");
             cities = null;
 
+   //public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String,String> docEntities, boolean semantic) {
 
             String line = "" , query_id  ="" ,query = "" ;
             Searcher searcher = new Searcher(postingPath, is_stemming, cities, termDictionary, docsDictionary, citiesDictionary, headersDictionary, docEntities, useSemantics);

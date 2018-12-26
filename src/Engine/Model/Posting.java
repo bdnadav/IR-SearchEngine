@@ -60,7 +60,7 @@ public class Posting {
             //terms_buffer_writer = new BufferedWriter(new FileWriter(termsPostingPath));
             term_buffer_reader = new BufferedReader(new FileReader(termsPostingPath));
             documents_buffer_reader = new BufferedReader(new FileReader(docsPostingPath));
-            documentsTmpEntities_buffer_reader = new BufferedReader(new FileReader(postingPath + "Postings\\Docs\\tmpDocsEntities.txt"));
+            documentsTmpEntities_buffer_reader = new BufferedReader(new FileReader(postingPath + "\\Postings\\Docs\\tmpDocsEntities.txt"));
         } catch (IOException e1) {
             e1.printStackTrace();
         }

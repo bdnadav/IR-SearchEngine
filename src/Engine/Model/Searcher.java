@@ -24,7 +24,7 @@ public class Searcher {
     private TreeMap<String, String> docs_dictionary;
     private HashMap<String , String> synonymous_terms;
     public static HashMap<String, String> headers_dictionary;
-    private HashMap<String, String> docs_entities;
+    public static HashMap<String, String> docs_entities;
     private Ranker ranker;
     private ArrayList<String> speceficCities;
     private HashSet<String> legalDocs; // If cities constraint, this data structure will hold all the docs whose can be return.
@@ -71,6 +71,7 @@ public class Searcher {
 
     public ArrayList<String> handleQuery(String query_id, String queryTitle, String queryDescription, String queryNarrative) {
         resetAllDateStructures() ; //a new query has arrived - cleanall
+        this.ranker = new Ranker(docs_dictionary.size(), 250);
         queryParse.parseQuery(queryTitle);
         ArrayList<String> queryTitleTerms = queryParse.getQueryTerms();
         descParse.parseQuery(queryDescription);
@@ -96,8 +97,6 @@ public class Searcher {
         relevantDocsByQueryTitleTerms = getRelevantDocs(queryTitleTerms);
         //Posting.initTermPosting(posting);
         //relevantDocsByQueryDescTerm = getRelevantDocs(queryDescTerms);
-
-        String queryId = query_id; // need to change
 
         //ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsByQueryTitleTerm, relevantDocsByQueryDescTerm, queryId);
         //ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryDescTerm, queryTitleTerms);
