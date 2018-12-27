@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 public class Searcher {
     private final int MAX_DOCS_TO_RETURN = 50;
+    private final int MAX_SYN_TERMS_FROM_API = 5 ;
     private final boolean useSemantic;
 
     private Parse queryParse;
@@ -22,7 +23,8 @@ public class Searcher {
     private TreeMap<String, String> terms_dictionary;
     private TreeMap<String, Pair> cities_dictionary;
     private TreeMap<String, String> docs_dictionary;
-    private HashMap<String , String> synonymous_terms;
+   // private HashMap<String , String> synonymous_terms;
+    private ArrayList<String> synonymous_terms;
     public static HashMap<String, String> headers_dictionary;
     public static HashMap<String, String> docs_entities;
     private Ranker ranker;
@@ -30,17 +32,19 @@ public class Searcher {
     private HashSet<String> legalDocs; // If cities constraint, this data structure will hold all the docs whose can be return.
     private boolean citiesConstraint;
     private String posting;
+    private double AVL;
 
 
-    public Searcher(String posting,String corpusPath ,Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String,String> docEntities, boolean semantic) {
+    public Searcher(String posting, String corpusPath, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String, String> docEntities, boolean semantic, double AVL) {
         this.terms_dictionary = termsDic;
-        this.synonymous_terms = new HashMap<>();
+        this.AVL = AVL ;
+        this.synonymous_terms = new ArrayList<>();
         //this.synonymous_and_pointers = new HashMap<>() ;
         this.cities_dictionary = citiesDic;
         this.docs_dictionary = docsDic;
         this.headers_dictionary = headersDictionary;
         this.docs_entities = docEntities;
-        this.ranker = new Ranker(docsDic.size(), 250);
+        this.ranker = new Ranker(docsDic.size(), AVL);
         this.queryParse = new Parse(posting, stemming , corpusPath);
         this.descParse = new Parse(posting, stemming , corpusPath);
         this.posting = posting;
@@ -71,7 +75,7 @@ public class Searcher {
 
     public ArrayList<String> handleQuery(String query_id, String queryTitle, String queryDescription, String queryNarrative) {
         resetAllDateStructures() ; //a new query has arrived - cleanall
-        this.ranker = new Ranker(docs_dictionary.size(), 250);
+        this.ranker = new Ranker(docs_dictionary.size(), this.AVL);
         queryParse.parseQuery(queryTitle);
         ArrayList<String> queryTitleTerms = queryParse.getQueryTerms();
         descParse.parseQuery(queryDescription);
@@ -87,6 +91,12 @@ public class Searcher {
         if ( this.useSemantic) {
             //if ( this.useSemantic){
             getSemanticTerms(queryTitleTerms);
+            if ( !synonymous_terms.isEmpty()){
+                for (String s :synonymous_terms
+                     ) {
+                    queryTitleTerms.add(s);
+                }
+            }
         }
 
         if (extraTermsMayHelp(queryTitleTerms, queryDescTerms)){
@@ -107,7 +117,7 @@ public class Searcher {
 
     private void resetAllDateStructures() {
         this.synonymous_terms.clear();
-        this.synonymous_terms = new HashMap<>();
+        this.synonymous_terms = new ArrayList<>();
 
     }
 
@@ -171,7 +181,7 @@ public class Searcher {
      * @throws Exception
      */
     private void useUrlSemantic(String term) throws Exception {
-        URL url = new URL("https://api.datamuse.com/words?rel_trg=" + term);
+        URL url = new URL("https://api.datamuse.com/words?rel_trg=" + term +"&max=20"); //only from the top 20 results
         //URLConnection connection = website.openConnection();
         HttpURLConnection con  = ( HttpURLConnection)  url.openConnection();
         con.setRequestMethod("GET");
@@ -197,10 +207,11 @@ public class Searcher {
             if ( termData == null )// the term isnt in the corpus
                 continue;
             /** set a threshhold for term relavence by score !!! ***/
-            synonymous_terms.put(synonymous_term, synonymous_score);
+            //synonymous_terms.put(synonymous_term, synonymous_score);
+            synonymous_terms.add(synonymous_term) ;
             count_legit_terms++ ;
 
-            if (count_legit_terms == 5 ) //save only the 5 top terms
+            if (count_legit_terms == MAX_SYN_TERMS_FROM_API ) //save only the 5 top terms
                 break;
         }
 

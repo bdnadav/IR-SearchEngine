@@ -145,6 +145,14 @@ public class Parse {
 
     }
 
+    public static double getDocNum() {
+        return DOC_NUM;
+    }
+
+    public static double getTotalTerms() {
+        return TOTOAL_TERMS;
+    }
+
     public void parseHeadLines(String text) {
         termPosition = 0;
         HeadLinesTerms = new TreeSet() ;
@@ -495,6 +503,7 @@ public class Parse {
 
     public static double getAVL ( ){
         return TOTOAL_TERMS/DOC_NUM ;
+        //return  250 ;
     }
 
     synchronized private void updateAVL() {

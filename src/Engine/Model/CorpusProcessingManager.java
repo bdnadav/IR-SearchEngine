@@ -176,6 +176,9 @@ public class CorpusProcessingManager {
             if (fileEntry.isDirectory()) {
                 listFilesOfFolder(fileEntry);
             } else {
+                String t =  fileEntry.getName() ;
+                if ( t.equals("stop_words.txt"))
+                    continue;
                 filesPathsList.add(fileEntry.getPath());
             }
         }
