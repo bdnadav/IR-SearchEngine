@@ -4,12 +4,17 @@ package Engine.View;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,7 +33,11 @@ public class View extends Observable {
     public javafx.scene.control.Button reset_btn;
     public javafx.scene.control.TextArea txtArea_dictionary;
     public javafx.scene.control.Button btn_test;
+    public javafx.scene.control.ListView list_view;
+    public javafx.scene.control.ListView filter_city_view ;
     public javafx.scene.control.ScrollPane pane_for_cities;
+    public javafx.scene.control.ScrollPane pane_for_cities1;
+
 
     public javafx.scene.control.cell.CheckBoxListCell<String> cell_choice;
     @FXML
@@ -206,9 +215,34 @@ public class View extends Observable {
         notifyObservers("showTests");
     }
 
-    public void setCitiesFilter() {
-       //pane_for_cities.se
+
+    public void setCitiesView(ArrayList<String> citiesView) {
+
+        ObservableList<String> items =FXCollections.observableArrayList (
+                "Single", "Double", "Suite", "Family App");
+        list_view.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 
+        list_view.setOnMouseClicked(new EventHandler<Event>() {
+
+            @Override
+            public void handle(Event event) {
+                ObservableList<String> selectedItems =  list_view.getSelectionModel().getSelectedItems();
+
+
+                //if (filter_city_view)
+                ObservableList<String> oldValues = filter_city_view.getItems() ;
+
+                for (String s :selectedItems
+                     ) {
+                    if ( !oldValues.contains(s))
+                        oldValues.add(s);
+                }
+                filter_city_view.setItems(selectedItems);
+
+            }
+
+        });
+        list_view.setItems(items);
     }
 }

@@ -27,7 +27,7 @@ public class Main extends Application {
         Controller controller = new Controller();
         //view notify controller
         View view = fxmlLoader.getController();
-        view.setCitiesFilter() ;
+        //view.setCitiesFilter() ;
         view.posting_txt_field.appendText( "d:\\documents\\users\\harelsa\\Downloads\\run" );
         view.corpus_txt_field.appendText("d:\\documents\\users\\harelsa\\Downloads\\run\\mini corpus");
         view.setParent(primaryStage) ;

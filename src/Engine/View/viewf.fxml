@@ -4,6 +4,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -79,12 +80,26 @@
                   <Image url="@logo.png" />
                </image>
             </ImageView>
-            <ScrollPane layoutX="255.0" layoutY="322.0" prefHeight="91.0" prefWidth="277.0">
+            <ScrollPane fx:id="pane_for_cities" layoutX="255.0" layoutY="322.0" prefHeight="91.0" prefWidth="277.0">
               <content>
-                <AnchorPane fx:id="pane_for_cities" minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="274.0" />
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="274.0">
+                     <children>
+                        <ListView fx:id="list_view" layoutX="-3.0" layoutY="1.0" prefHeight="80.0" prefWidth="277.0" />
+                     </children>
+                  </AnchorPane>
               </content>
             </ScrollPane>
-            <Label layoutX="264.0" layoutY="301.0" text="Filter Search By Cities:" />
+            <Label layoutX="264.0" layoutY="301.0" text="Choose Search By Cities:" />
+            <ScrollPane fx:id="pane_for_cities1" layoutX="46.0" layoutY="322.0" prefHeight="91.0" prefWidth="197.0">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="89.0" prefWidth="196.0">
+                     <children>
+                        <ListView fx:id="filter_city_view" layoutX="-3.0" layoutY="1.0" prefHeight="80.0" prefWidth="185.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </ScrollPane>
+            <Label layoutX="43.0" layoutY="299.0" text="Filter Search By :" />
             </children>
         </Pane>
     </children>

@@ -27,6 +27,7 @@ public class Controller extends Observable implements Observer {
                     if ( view.check_stemming.isSelected())
                         stemming = "Stemming" ;
                     model.loadDicToMemory(stemming);
+                    view.setCitiesView(model.getCitiesView());
                     break;
                 case "reset":
                     model.resetAll();

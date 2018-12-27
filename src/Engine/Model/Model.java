@@ -28,6 +28,7 @@ public class Model extends Observable {
     HashMap<String, String> headersDictionary = new HashMap<>();
     HashMap<String, String> docEntities = new HashMap<>();
     private double  AVL;
+    private ArrayList citiesView;
 
 
     /**
@@ -131,7 +132,7 @@ public class Model extends Observable {
                     if (info.equals(","))
                         info = "null";
                     docsList = StringUtils.substring(line, lastIndexOfComma + 1);
-
+                    citiesView.add( city) ;
                     citiesDictionary.put(city, new Pair<String, String>(info, docsList));
                 }
                 br_dic.close();
@@ -549,5 +550,8 @@ public class Model extends Observable {
                 return 0;
             return 1;
         }
+    }
+    public ArrayList<String> getCitiesView (){
+        return citiesView;
     }
 }
