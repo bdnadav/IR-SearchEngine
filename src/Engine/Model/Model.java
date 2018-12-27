@@ -130,9 +130,9 @@ public class Model extends Observable {
                     city = StringUtils.substring(line, 0, firstIndexOfComma); // city with details
                     info = StringUtils.substring(line, firstIndexOfComma + 1, lastIndexOfComma);
                     if (info.equals(","))
-                        info = "null";
+                        info = "NULL";
                     docsList = StringUtils.substring(line, lastIndexOfComma + 1);
-                    citiesView.add( city) ;
+                    //citiesView.add( city) ;
                     citiesDictionary.put(city, new Pair<String, String>(info, docsList));
                 }
                 br_dic.close();
@@ -374,7 +374,8 @@ public class Model extends Observable {
 
             ArrayList<String> cities = new ArrayList<>();
 //            cities.add("BUENOS");
-            cities = null;
+//            cities.add("MOSCOW");
+            //cities = null;
 
             //public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String,String> docEntities, boolean semantic) {
 
