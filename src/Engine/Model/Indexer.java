@@ -61,7 +61,7 @@ class Indexer {
     void startIndexerOperations() throws FileNotFoundException{
         appendSegmentPartitionRangeToPostingAndIndexes();
         buildDocsEntities();
-        System.out.println("lala");
+        //System.out.println("lala");
 
     }
 
@@ -304,6 +304,12 @@ class Indexer {
         assert docDictionary_fw.get() != null;
         BufferedWriter docDictionary_bf = new BufferedWriter(docDictionary_fw.get());
         Iterator docIt = docs_dictionary.entrySet().iterator();
+        try {
+            docDictionary_bf.append(Parse.getAVL() + "##" + Parse.getDocNum() + "##" + Parse.getTotalTerms() + "\n"); // first row
+        }
+        catch (Exception e){
+
+        }
         int counter = 0;
         while (docIt.hasNext()) {
             Map.Entry pair = (Map.Entry) docIt.next();

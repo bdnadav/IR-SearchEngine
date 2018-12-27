@@ -13,7 +13,6 @@ import java.util.*;
 
 public class Ranker {
     private final int MAX_DOCS_TO_RETURN = 50;
-
     /* Ranking factors and their weight*/
     private final double BM25_TITLE_FACTOR_WEIGHT = 0.8;
     private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0.1;
@@ -35,7 +34,7 @@ public class Ranker {
 
     static {
         try {
-            results_bw = new BufferedWriter(new FileWriter("d:\\documents\\users\\Bardanad\\Downloads\\מנוע חיפוש\\מהמחשב שלי\\QueriesTests\\results\\results.txt"));
+            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\Nadav\\QueriesTests\\results\\results.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -27,6 +27,7 @@ public class Model extends Observable {
     TreeMap<String, String> docsDictionary = new TreeMap<>();
     HashMap<String, String> headersDictionary = new HashMap<>();
     HashMap<String, String> docEntities = new HashMap<>();
+    private double  AVL;
 
 
     /**
@@ -151,6 +152,10 @@ public class Model extends Observable {
             try {
                 BufferedReader br_dic = new BufferedReader(new FileReader(postingPath + "\\Postings" + ifStemming() + "\\docDictionary.txt"));
                 String line = "";
+                /** AVL **/
+                line = br_dic.readLine();
+                String[] split = line.split("##");
+                AVL = Double.parseDouble(split[0]);
                 while ((line = br_dic.readLine()) != null) {
 
                     String docNumber = "";
@@ -304,7 +309,7 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        readQueryFromFile("d:\\documents\\users\\Bardanad\\Downloads\\part2\\QueriesTests\\queries.txt");
+        readQueryFromFile("C:\\Users\\Nadav\\QueriesTests\\queries.txt");
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
        // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
 
@@ -373,7 +378,7 @@ public class Model extends Observable {
    //public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String,String> docEntities, boolean semantic) {
 
             String line = "" , query_id  ="" ,query = "" ;
-            Searcher searcher = new Searcher(postingPath,corpusPath, is_stemming, cities, termDictionary, docsDictionary, citiesDictionary, headersDictionary, docEntities, useSemantics);
+            Searcher searcher = new Searcher(postingPath,corpusPath, is_stemming, cities, termDictionary, docsDictionary, citiesDictionary, headersDictionary, docEntities, useSemantics , AVL);
             while ((line = br.readLine()) != null) {
                 while ((line = br.readLine()) != null) {
                     if (line.equals("<top>")) { // start of query
