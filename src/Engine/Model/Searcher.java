@@ -32,7 +32,7 @@ public class Searcher {
     private String posting;
 
 
-    public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String,String> docEntities, boolean semantic) {
+    public Searcher(String posting,String corpusPath ,Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String,String> docEntities, boolean semantic) {
         this.terms_dictionary = termsDic;
         this.synonymous_terms = new HashMap<>();
         //this.synonymous_and_pointers = new HashMap<>() ;
@@ -41,8 +41,8 @@ public class Searcher {
         this.headers_dictionary = headersDictionary;
         this.docs_entities = docEntities;
         this.ranker = new Ranker(docsDic.size(), 250);
-        this.queryParse = new Parse(posting, stemming);
-        this.descParse = new Parse(posting, stemming);
+        this.queryParse = new Parse(posting, stemming , corpusPath);
+        this.descParse = new Parse(posting, stemming , corpusPath);
         this.posting = posting;
         this.useSemantic = semantic ;
         Posting.initTermPosting(posting);
