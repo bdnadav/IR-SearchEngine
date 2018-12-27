@@ -88,8 +88,8 @@ public class Searcher {
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
         /** Handle Semantic **/
-        if ( this.useSemantic) {
-            //if ( this.useSemantic){
+        //if ( this.useSemantic) {
+
             getSemanticTerms(queryTitleTerms);
             if ( !synonymous_terms.isEmpty()){
                 for (String s :synonymous_terms
@@ -97,7 +97,7 @@ public class Searcher {
                     queryTitleTerms.add(s);
                 }
             }
-        }
+       // }
 
         if (extraTermsMayHelp(queryTitleTerms, queryDescTerms)){
             ArrayList<String> queryDescTermsToAdd = getExtraTerms(queryDescTerms, queryTitleTerms);
