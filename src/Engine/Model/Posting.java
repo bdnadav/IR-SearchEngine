@@ -107,7 +107,7 @@ public class Posting {
             int df = Integer.parseInt(termDetailsSplited[termDetailsSplited.length - 1]);
             int totalTf = Integer.parseInt(termDetailsSplited[termDetailsSplited.length - 2]);
             // Filtering low tf & df terms
-            if ((df == 1 && totalTf < 3)) {
+            if ((df < Math.round(Indexer.docs_dictionary.size()/1000 + 0.5) && totalTf < 3)) {
                 continue;
             }
 
@@ -207,7 +207,7 @@ public class Posting {
             }
             Indexer.addNewDocToDocDictionary(docNo, docsPointer);
             docsPointer++;
-            addHeadersToDictionary(docNo, headlines_terms);
+            //addHeadersToDictionary(docNo, headlines_terms);
             headlines_terms.clear();
 
         } catch (IOException e) {
