@@ -373,7 +373,7 @@ public class Model extends Observable {
    //public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String,String> docEntities, boolean semantic) {
 
             String line = "" , query_id  ="" ,query = "" ;
-            Searcher searcher = new Searcher(postingPath, is_stemming, cities, termDictionary, docsDictionary, citiesDictionary, headersDictionary, docEntities, useSemantics);
+            Searcher searcher = new Searcher(postingPath,corpusPath, is_stemming, cities, termDictionary, docsDictionary, citiesDictionary, headersDictionary, docEntities, useSemantics);
             while ((line = br.readLine()) != null) {
                 while ((line = br.readLine()) != null) {
                     if (line.equals("<top>")) { // start of query

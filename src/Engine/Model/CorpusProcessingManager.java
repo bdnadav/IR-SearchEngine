@@ -39,7 +39,7 @@ public class CorpusProcessingManager {
         this.corpusPath = corpusPath;
         this.postingPath =  postingPath + "\\Postings" + ifStemming(stemming);
 
-        this.reader = new ReadFile(postingPath , stemming);
+        this.reader = new ReadFile(postingPath , stemming , corpusPath);
         createDirs(this.postingPath);
         Posting.initPosting(this.postingPath + "\\Docs");
         inverter = new Indexer(new Posting(this.postingPath));

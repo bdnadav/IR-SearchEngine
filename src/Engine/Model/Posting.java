@@ -68,7 +68,7 @@ public class Posting {
 
     public static HashSet<String> getChunkOfEntitiesLines() {
         HashSet<String> chunk = new HashSet<>();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 500; i++) {
             try {
                 String entityLine = documentsTmpEntities_buffer_reader.readLine();
                 if (entityLine == null){
@@ -107,9 +107,9 @@ public class Posting {
             int df = Integer.parseInt(termDetailsSplited[termDetailsSplited.length - 1]);
             int totalTf = Integer.parseInt(termDetailsSplited[termDetailsSplited.length - 2]);
             // Filtering low tf & df terms
-            if ((df == 1 && totalTf < 3)) {
-                continue;
-            }
+//            if ((df == 1 && totalTf < 3)) {
+//                continue;
+//            }
 
             if (ifTermStartsWithCapital.containsKey(key) && ifTermStartsWithCapital.get(key))
                 key = key.toUpperCase();

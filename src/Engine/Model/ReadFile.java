@@ -24,6 +24,7 @@ import static java.util.stream.Collectors.joining;
 public class ReadFile {
     private final String postingPath;
     private final boolean stemming;
+    private final String corpusPath;
     ExecutorService executor;
 
     int counterToFullChunk = 0 ;
@@ -33,7 +34,8 @@ public class ReadFile {
     ConcurrentHashMap< String ,City> cities = new ConcurrentHashMap<>() ; // save all the doc info cities
     ConcurrentSkipListSet< String  > languages = new ConcurrentSkipListSet<>(); // save all docs lang
 
-    public ReadFile(String postingPath, boolean stemming ) {
+    public ReadFile(String postingPath, boolean stemming , String corpusPath ) {
+        this.corpusPath = corpusPath ;
         //parser =new Parse(postingPath , stemming ) ;
         this.postingPath = postingPath ;
         this.stemming = stemming ;
@@ -47,7 +49,7 @@ public class ReadFile {
     public void readAndParseLineByLine(ArrayList<String> paths_list , int chunk  ) {
         int y = 0 ;
         String filePathName = "" ;
-        Parse parser = new Parse(postingPath , stemming) ;
+        Parse parser = new Parse(postingPath , stemming , corpusPath) ;
         boolean write = false ;
         while ( y < paths_list.size()) {
             filePathName = paths_list.get(y) ;

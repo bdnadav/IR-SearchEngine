@@ -21,7 +21,8 @@ import static Engine.Model.CorpusProcessingManager.ifStemming;
  */
 public class Parse {
 
-
+    private static int DOC_NUM =0;
+    private static int TOTOAL_TERMS =0 ;
     private static final int CHUNK_SIZE = 50;
     // enums
     private static double THOUSAND = Math.pow(10, 3);
@@ -89,9 +90,10 @@ public class Parse {
     private static Pattern BETWEEN = Pattern.compile("\\d+" + "and" + "\\d+");
 
 
-    public Parse(String path, boolean stemming) {
+    public Parse(String path, boolean stemming , String corpusPath) {
         try {
-            stopwords_fr = new FileReader(path + "\\stop_words.txt");
+
+            stopwords_fr = new FileReader(corpusPath + "\\stop_words.txt");
             this.posting_path = path + "\\Postings" + ifStemming(stemming);
             this.path = path;
             this.stemming = stemming;
@@ -484,9 +486,20 @@ public class Parse {
             if (!is_joint_term)
                 i++;
         }//end for
-        if ( type.equals("DocText"))
+        if ( type.equals("DocText")) {
+            updateAVL();
             writeToDocsFiles(currDoc.docNo, currDoc.getParentFileName(), mostFreqTerm, tf_mft, num_unique_term, currDoc.getCity());
+        }
         return null;
+    }
+
+    public static double getAVL ( ){
+        return TOTOAL_TERMS/DOC_NUM ;
+    }
+
+    synchronized private void updateAVL() {
+        TOTOAL_TERMS += doc_length;
+        DOC_NUM++;
     }
 
     private void writeToDocsFiles(String docNo, String parentFileName, String mostFreqTerm, int tf_mft, int numOfUniqueTerms, String city) {
