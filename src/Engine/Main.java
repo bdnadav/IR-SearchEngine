@@ -20,7 +20,9 @@ public class Main extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("View/viewf.fxml"));
         Parent root = fxmlLoader.load();
         primaryStage.setTitle("SearchEngine Builder");
-        Scene scene = new Scene(root, 600, 600) ;
+        Scene scene = new Scene(root, 926, 615) ;
+        String css = this.getClass().getResource("View/ViewStyle.css").toExternalForm();
+        scene.getStylesheets().add(css);
         primaryStage.setScene(scene);
         Controller controller = new Controller();
         //view notify controller

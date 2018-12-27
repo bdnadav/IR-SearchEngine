@@ -109,7 +109,7 @@ public class Posting {
             int df = Integer.parseInt(termDetailsSplited[termDetailsSplited.length - 1]);
             int totalTf = Integer.parseInt(termDetailsSplited[termDetailsSplited.length - 2]);
             // Filtering low tf & df terms
-            if ((df < Math.round(Indexer.docs_dictionary.size()/1000 + 0.5) && totalTf < 3)) {
+            if ((df < Math.round(Indexer.docs_dictionary.size()/100000 + 0.5) && totalTf < 3)) {
                 continue;
             }
 

@@ -346,8 +346,8 @@ public class Parse {
                         String doc_num = "" ;
                         if ( currDoc!= null )
                             doc_num  = currDoc.docNo ;
-//                        if (cleanToken(long_term.toString()).contains(" "))
-//                        addTermFunc(cleanToken(long_term.toString()), doc_num,type); //add part of long term
+                        if (cleanToken(long_term.toString()).contains(" "))
+                        addTermFunc(cleanToken(long_term.toString()), doc_num,type); //add part of long term
                         what_to_add = temp_token;
                         if (specialchars.contains(tokensArray[j].charAt(tokensArray[j].length() - 1))) // end
                             insert_and_stop = true;
