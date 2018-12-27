@@ -28,10 +28,15 @@ public class View extends Observable {
     public javafx.scene.control.Button reset_btn;
     public javafx.scene.control.TextArea txtArea_dictionary;
     public javafx.scene.control.Button btn_test;
+    public javafx.scene.control.ScrollPane pane_for_cities;
+
+    public javafx.scene.control.cell.CheckBoxListCell<String> cell_choice;
     @FXML
 
     private Scene scene;
     private Stage parent;
+
+
 
     public void browseCorpus() {
 
@@ -199,5 +204,11 @@ public class View extends Observable {
     public void printTests(ActionEvent actionEvent) {
         setChanged();
         notifyObservers("showTests");
+    }
+
+    public void setCitiesFilter() {
+       //pane_for_cities.se
+
+
     }
 }

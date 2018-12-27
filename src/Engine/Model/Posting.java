@@ -10,7 +10,6 @@ package Engine.Model;
  * by a line number of the relevant information in posting file.
  */
 
-import com.sun.java.util.jar.pack.ConstantPool;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,7 +29,6 @@ public class Posting {
     private static BufferedReader documents_buffer_reader;
     private static BufferedReader documentsTmpEntities_buffer_reader;
     private static String postingPath;
-    private static int entitiesCounter;
 
 
     public Posting(String postingsPath) {
@@ -113,10 +111,8 @@ public class Posting {
                 continue;
             }
 
-            if (ifTermStartsWithCapital.containsKey(key) && ifTermStartsWithCapital.get(key)) {
+            if (ifTermStartsWithCapital.containsKey(key) && ifTermStartsWithCapital.get(key))
                 key = key.toUpperCase();
-                Indexer.en
-            }
             Indexer.terms_dictionary.put(key, termDetails + "," + termsPointer);
             termsPointer += 2;
             if (CorpusProcessingManager.cities.containsKey(key.toLowerCase()) && !key.toLowerCase().equals("china")) {
@@ -202,20 +198,16 @@ public class Posting {
         try {
 
             documents_buffer_writer.append(docNo + "," + parentFileName + "," + mostFreqTerm + "," + tf_mft + "," + numOfUniqueTerms + "," + city +","+ doclength+"," +headlines_terms.toString() +"\n");
-            //documentsTmpEntities_buffer_writer.append(docNo).append("|").append(potentialEntities.toString() + "\n");
+            documentsTmpEntities_buffer_writer.append(docNo).append("|").append(potentialEntities.toString() + "\n");
             docsCounter++;
-            //entitiesCounter++;
             if (docsCounter > 400) {
                 documents_buffer_writer.flush();
+                documentsTmpEntities_buffer_writer.flush();
                 docsCounter = 0;
             }
-//            if (entitiesCounter > 5){
-//                documentsTmpEntities_buffer_writer.flush();
-//                entitiesCounter = 0;
-//            }
             Indexer.addNewDocToDocDictionary(docNo, docsPointer);
             docsPointer++;
-            addHeadersToDictionary(docNo, headlines_terms);
+            //addHeadersToDictionary(docNo, headlines_terms);
             headlines_terms.clear();
 
         } catch (IOException e) {
@@ -231,8 +223,8 @@ public class Posting {
                 header = StringUtils.substring(header, 1);
             if (!Character.isLetter(header.charAt(0)))
                 continue;
-            String currValue;
-            if ((currValue = Indexer.headers_dictionary.get(header)) != null){
+            if (Indexer.headers_dictionary.containsKey(header)){
+                String currValue = Indexer.headers_dictionary.get(header);
                 String newValue = currValue + "#" + docNo;
                 Indexer.headers_dictionary.put(header, newValue);
             }
@@ -264,7 +256,6 @@ public class Posting {
             documents_buffer_writer.flush();
             //documents_buffer_writer.close();
             terms_buffer_writer.flush();
-            documentsTmpEntities_buffer_writer.flush();
             //terms_buffer_writer.close();
             //documents_buffer_reader.close();
             //term_buffer_reader.close();

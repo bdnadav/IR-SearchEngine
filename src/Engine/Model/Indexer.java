@@ -19,12 +19,10 @@ class Indexer {
     static TreeMap<String, Integer> docs_dictionary;
     static HashMap<String, String> headers_dictionary;
     static HashMap<String, TreeMap<String, Integer>> docs_entities;
-    static TreeMap<Integer, String> entitiesPointers;
     private static String staticPostingsPath;
     private static BufferedWriter termDictionary_bf;
     private static BufferedWriter headersDictionary_bw;
     private static BufferedWriter docsEntities_bw;
-
 
 
     static void initIndexer(String postingPath) {
@@ -44,7 +42,6 @@ class Indexer {
         headers_dictionary = new HashMap<>();
         staticPostingsPath = postingPath;
         docs_entities = new HashMap<>();
-        entitiesPointers = new TreeMap<>();
     }
 
     private String[] chunksCurrLines;
@@ -113,44 +110,6 @@ class Indexer {
             }
         }
     }
-
-    private void buildDocsEntitiesFromTermDictionary(){
-        TreeMap<Integer, String > entitiesPointersFromDics = new TreeMap<>();
-        Iterator termIt = terms_dictionary.entrySet().iterator();
-        int counter = 0;
-        while (termIt.hasNext()) {
-            Map.Entry pair = (Map.Entry) termIt.next();
-            try {
-                String entity = (String)pair.getKey();
-                if (Character.isUpperCase(entity.charAt(0))) {
-                    String entityDetails = (String)pair.getValue();
-                    String[] split = StringUtils.split(entityDetails, ",");
-                    String strPointer = split[4];
-                    int intPointer = Integer.parseInt(strPointer);
-                    entitiesPointersFromDics.put(intPointer, entity);
-                }
-                termDictionary_bf.append(pair.getKey().toString()).append(",").append(pair.getValue().toString()).append("\n");
-                counter++;
-                if (counter > 400) {
-                    termDictionary_bf.flush();
-                    counter = 0;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            termDictionary_bf.flush();
-            termIt.remove(); // avoids a ConcurrentModificationException
-        }
-        termDictionary_bf.flush();
-        termDictionary_bf.close();
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-    AtomicReference<FileWriter> docDictionary_fw = new AtomicReference<>(null);
-
-
-
-}
 
     /**
      * This method is triggered by a number of threads as the number of Partitions we have divided into each Segment File.

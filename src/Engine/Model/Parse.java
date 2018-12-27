@@ -516,22 +516,8 @@ public class Parse {
             HeadLinesTerms.clear();
             return;
         }
-        remove1TfEntities();
         Posting.writeToDocumentsPosting(docNo, parentFileName, mostFreqTerm, tf_mft, numOfUniqueTerms, city , HeadLinesTerms ,doc_length, potentialEntities);
         HeadLinesTerms.clear();
-        potentialEntities.clear();
-    }
-
-    private void remove1TfEntities() {
-        if (potentialEntities.size() > 5){
-            Iterator termIt = potentialEntities.entrySet().iterator();
-            while (termIt.hasNext()) {
-                Map.Entry pair = (Map.Entry) termIt.next();
-                if ((int) pair.getValue() < 2) {
-                    termIt.remove();
-                }
-            }
-        }
     }
 
 

@@ -1,7 +1,3 @@
-/***
- * This class is responsible for rating all documents suspected to be relevant to a particular query.
- * The rating is based on various factors that can be determined in the final fields defined at the beginning of the class.
- */
 package Engine.Model;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +30,7 @@ public class Ranker {
 
     static {
         try {
-            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\Nadav\\QueriesTests\\results\\results.txt"));
+            results_bw = new BufferedWriter(new FileWriter("d:\\documents\\users\\harelsa\\Downloads\\run\\results.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,10 +56,6 @@ public class Ranker {
         return ans;
     }
 
-    /**
-     * After we have stored the values ​​of the various documents according to a specific factor in a specific data structure
-     * We would like to sum these values ​​to a single value on which we will base the documents.
-     */
     private void mergeValues() {
         for (Object o : BM25_QueryTitleWeight.entrySet()){
             Map.Entry<String, Double> docWithValue = (Map.Entry<String, Double>) o;
