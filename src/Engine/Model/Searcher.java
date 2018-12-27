@@ -23,7 +23,7 @@ public class Searcher {
     private TreeMap<String, String> terms_dictionary;
     private TreeMap<String, Pair> cities_dictionary;
     private TreeMap<String, String> docs_dictionary;
-   // private HashMap<String , String> synonymous_terms;
+    // private HashMap<String , String> synonymous_terms;
     private ArrayList<String> synonymous_terms;
     public static HashMap<String, String> headers_dictionary;
     public static HashMap<String, String> docs_entities;
@@ -93,7 +93,7 @@ public class Searcher {
             getSemanticTerms(queryTitleTerms);
             if ( !synonymous_terms.isEmpty()){
                 for (String s :synonymous_terms
-                     ) {
+                        ) {
                     queryTitleTerms.add(s);
                 }
             }
@@ -132,7 +132,8 @@ public class Searcher {
             dfOfTerms.put(df, term);
         }
         for (int i = 0; i < termsExtra; i++) {
-            ans.add(dfOfTerms.pollFirstEntry().getValue());
+            if (dfOfTerms.size() > 0)
+                ans.add(dfOfTerms.pollFirstEntry().getValue());
         }
         return ans;
     }
@@ -149,8 +150,13 @@ public class Searcher {
         if (split.length < 5)
             return -1;
         String strDf = split[3];
-        int ans = Integer.parseInt(strDf);
-        return ans;
+        try{
+            int ans = Integer.parseInt(strDf);
+            return ans;
+        }catch (Exception e){
+            System.out.println(split[4] + ", " + split[5]);
+        }
+        return 1;
     }
 
     private boolean extraTermsMayHelp(ArrayList<String> queryTitleTerms, ArrayList<String> queryDescTerms) {
@@ -161,7 +167,7 @@ public class Searcher {
 
     private Map<String, List<Pair<String,String>>> getSemanticTerms(ArrayList<String> queryTerms) {
         for (String term :queryTerms
-             ) {
+                ) {
             try {
                 term = Parse.cleanToken(term) ; // clean *
                 useUrlSemantic(term); // insert to  synonymous map all the terms and their docs
@@ -203,7 +209,7 @@ public class Searcher {
             String termData ;
             termData = terms_dictionary.get(synonymous_term);
             if ( termData == null )  // try capital term
-               termData = terms_dictionary.get(synonymous_term.toUpperCase());
+                termData = terms_dictionary.get(synonymous_term.toUpperCase());
             if ( termData == null )// the term isnt in the corpus
                 continue;
             /** set a threshhold for term relavence by score !!! ***/
@@ -308,45 +314,45 @@ public class Searcher {
                 e.printStackTrace();
             }
         }
-            return queryTermsToDocsWithDetails;
-        }
-
-        /**
-         * The method returns the names of the documents that contain the term.
-         * It also returns the number of occurrences of the term in the document.
-         * @param term
-         * @return [FT932-8691|6, LA122589-0084|1, ....]
-         * @throws IOException
-         */
-        public ArrayList<String> getTermDocs (String term) throws IOException {
-            ArrayList<String> listTermDocs = new ArrayList<>();
-            if (term.charAt(0) == '*')
-                term = term.substring(1);
-            String dictionaryTermLine = terms_dictionary.get(term); // ancestor,FBIS3-40057,1,2,2,6376427
-            if (dictionaryTermLine == null)
-                dictionaryTermLine = terms_dictionary.get(term.toUpperCase());
-            String[] splitLine = StringUtils.split(dictionaryTermLine, ",");
-            if (splitLine == null)
-                return listTermDocs;
-            String strPointer = splitLine[splitLine.length - 1];
-            int intPointer = Integer.parseInt(strPointer);
-            String termPostingLine = Posting.getTermPostingLineByPointer(intPointer);
-            String[] docsWithTf = StringUtils.split(termPostingLine, "#"); // =
-            listTermDocs.addAll(Arrays.asList(docsWithTf));
-            return listTermDocs;
-        }
-
-        /**
-         * For the document received its identification number,
-         * The method will return the five most dominant entities in this document ranked in order of importance.
-         * An entity is defined as: an expression that is reserved as only uppercase letters.
-         * If the document has less than five entities, all will be returned.
-         * @param docId
-         * @return
-         */
-        public SortedSet<String> getDocDominantEntities (String docId){
-            return null;
-        }
-
-
+        return queryTermsToDocsWithDetails;
     }
+
+    /**
+     * The method returns the names of the documents that contain the term.
+     * It also returns the number of occurrences of the term in the document.
+     * @param term
+     * @return [FT932-8691|6, LA122589-0084|1, ....]
+     * @throws IOException
+     */
+    public ArrayList<String> getTermDocs (String term) throws IOException {
+        ArrayList<String> listTermDocs = new ArrayList<>();
+        if (term.charAt(0) == '*')
+            term = term.substring(1);
+        String dictionaryTermLine = terms_dictionary.get(term); // ancestor,FBIS3-40057,1,2,2,6376427
+        if (dictionaryTermLine == null)
+            dictionaryTermLine = terms_dictionary.get(term.toUpperCase());
+        String[] splitLine = StringUtils.split(dictionaryTermLine, ",");
+        if (splitLine == null)
+            return listTermDocs;
+        String strPointer = splitLine[splitLine.length - 1];
+        int intPointer = Integer.parseInt(strPointer);
+        String termPostingLine = Posting.getTermPostingLineByPointer(intPointer);
+        String[] docsWithTf = StringUtils.split(termPostingLine, "#"); // =
+        listTermDocs.addAll(Arrays.asList(docsWithTf));
+        return listTermDocs;
+    }
+
+    /**
+     * For the document received its identification number,
+     * The method will return the five most dominant entities in this document ranked in order of importance.
+     * An entity is defined as: an expression that is reserved as only uppercase letters.
+     * If the document has less than five entities, all will be returned.
+     * @param docId
+     * @return
+     */
+    public SortedSet<String> getDocDominantEntities (String docId){
+        return null;
+    }
+
+
+}

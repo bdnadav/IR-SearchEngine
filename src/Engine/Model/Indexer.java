@@ -3,10 +3,11 @@ package Engine.Model;
  * This class is responsible for creating the various indexes.
  * The methods in this class manage the creation of the Posting files for the terms index,
  * And the creation of dictionaries:
- *  1) Doc to Terms
- *  2) Term to Docs
- *  3) City to Docs
+ * 1) Doc to Terms
+ * 2) Term to Docs
+ * 3) City to Docs
  */
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -18,11 +19,13 @@ class Indexer {
     static TreeMap<String, String> cities_dictionary;
     static TreeMap<String, Integer> docs_dictionary;
     static HashMap<String, String> headers_dictionary;
-    static HashMap<String, TreeMap<String, Integer>> docs_entities;
+    static HashMap<String, TreeMap<Integer, String>> docs_entities;
+    static TreeMap<Integer, String> entitiesPointers;
     private static String staticPostingsPath;
     private static BufferedWriter termDictionary_bf;
     private static BufferedWriter headersDictionary_bw;
     private static BufferedWriter docsEntities_bw;
+
 
 
     static void initIndexer(String postingPath) {
@@ -42,6 +45,7 @@ class Indexer {
         headers_dictionary = new HashMap<>();
         staticPostingsPath = postingPath;
         docs_entities = new HashMap<>();
+        entitiesPointers = new TreeMap<>();
     }
 
     private String[] chunksCurrLines;
@@ -55,60 +59,123 @@ class Indexer {
         //docsPosting = docsPostingFile;
     }
 
-    void startIndexerOperations() throws FileNotFoundException{
+    void startIndexerOperations() throws FileNotFoundException {
         appendSegmentPartitionRangeToPostingAndIndexes();
-        buildDocsEntities();
-        //System.out.println("lala");
+        try {
+            buildDocsEntitiesFromTermDictionary();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("lala");
 
     }
 
-    private void buildDocsEntities() {
-        HashSet<String> getEntitiesChunkFromPosting;
-        while ((getEntitiesChunkFromPosting = Posting.getChunkOfEntitiesLines()) != null) {
-            for (String docEntityLine : getEntitiesChunkFromPosting) {
-                TreeMap<String, Integer> ansEntities = new TreeMap<>();
-                TreeMap<String, Integer> tmpEntitiesTm = new TreeMap();
-                String[] splitToDocNoAndTmpEntities = StringUtils.split(docEntityLine, "|");
-                String docNo = splitToDocNoAndTmpEntities[0];
-                if (splitToDocNoAndTmpEntities.length < 2){
-                    System.out.println("--FIRST BUG--");
-                    System.out.println(docEntityLine);
-                    System.out.println(docNo);
-                    System.out.println("--END FIRST BUG--");
-                    continue;
+//    private void buildDocsEntities() {
+//        HashSet<String> getEntitiesChunkFromPosting;
+//        while ((getEntitiesChunkFromPosting = Posting.getChunkOfEntitiesLines()) != null) {
+//            for (String docEntityLine : getEntitiesChunkFromPosting) {
+//                TreeMap<String, Integer> ansEntities = new TreeMap<>();
+//                TreeMap<String, Integer> tmpEntitiesTm = new TreeMap();
+//                String[] splitToDocNoAndTmpEntities = StringUtils.split(docEntityLine, "|");
+//                String docNo = splitToDocNoAndTmpEntities[0];
+//                if (splitToDocNoAndTmpEntities.length < 2){
+//                    System.out.println("--FIRST BUG--");
+//                    System.out.println(docEntityLine);
+//                    System.out.println(docNo);
+//                    System.out.println("--END FIRST BUG--");
+//                    continue;
+//                }
+//                String tmpEntities = splitToDocNoAndTmpEntities[1];
+//                tmpEntities = StringUtils.substring(tmpEntities, 1, tmpEntities.length()-1);
+//                String[] entities = StringUtils.split(tmpEntities, ",");
+//                for (String entity : entities) {
+//                    String[] splitEntityAndTf = StringUtils.split(entity, "=");
+//                    String currEntity = splitEntityAndTf[0];
+//                    try {
+//                        String strTf = splitEntityAndTf[1];
+//                        if (currEntity.charAt(0) == ' ')
+//                            currEntity = StringUtils.substring(currEntity, 1);
+//                        int tf = Integer.parseInt(strTf);
+//                        tmpEntitiesTm.put(currEntity, tf);
+//                    }
+//                    catch (ArrayIndexOutOfBoundsException a){
+//                        System.out.println("--SECOND BUG--");
+//                        System.out.println(currEntity);
+//                        System.out.println(docEntityLine);
+//                        System.out.println("--END SECOND BUG--");
+//                    }
+//                }
+//                TreeSet<Map.Entry<String, Integer>> sortedByValue = Ranker.entriesSortedByValues(tmpEntitiesTm);
+//                while (ansEntities.size() < 5 && sortedByValue.size() > 0) {
+//                    Map.Entry lastEntry = sortedByValue.pollLast();
+//                    String currEntityWithKohavit = (String)lastEntry.getKey();
+//                    int tf = (int)lastEntry.getValue();
+//                    String currEntity = StringUtils.substring(currEntityWithKohavit, 1).toUpperCase();
+//                    if (terms_dictionary.containsKey(currEntity))
+//                        ansEntities.put(currEntity.toUpperCase(), tf);
+//                }
+//                docs_entities.put(docNo, ansEntities);
+//            }
+//        }
+//    }
+
+//    int firstPointer = 0;
+//                for (Map.Entry<Integer, String> entry : linesInPostingFile.entrySet()) {
+//        int pointer = entry.getKey();
+//        String currDocWithTf = entry.getValue();
+//        String docPostingLine = Posting.getDocPostingLineByPointer(pointer - firstPointer);
+//        firstPointer = pointer;
+//        String[] splited = StringUtils.split(docPostingLine, "[");
+//        String docHeaders = "[" + splited[1];
+//        String[] firstPartSplited = StringUtils.split(splited[0], ",");
+//                    /* docDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength */
+//        if (firstPartSplited.length < 7 )
+//            continue;
+//
+
+    private void buildDocsEntitiesFromTermDictionary() throws IOException {
+        int lastPointer = 0;
+        for (Map.Entry<Integer, String> entry : entitiesPointers.entrySet()) {
+            int pointer = entry.getKey();
+            String entity = entry.getValue();
+            String termPostingLine = Posting.getTermPostingLineByPointer(pointer - lastPointer);
+            lastPointer = pointer + 1;
+            String[] docsArray = StringUtils.split(termPostingLine, "#"); // return: ["FT932-8691|6","FT9234-5513|5",....]
+            try{
+                for (int i = 0; i < docsArray.length; i++) {
+                    String[] splitToDocNoAndTf = StringUtils.split(docsArray[i], "|");
+                    String docNo = splitToDocNoAndTf[0];
+                    String strTf = splitToDocNoAndTf[1];
+                    int intTf = Integer.parseInt(strTf);
+                    addEntityToDoc(docNo, entity, intTf);
                 }
-                String tmpEntities = splitToDocNoAndTmpEntities[1];
-                tmpEntities = StringUtils.substring(tmpEntities, 1, tmpEntities.length()-1);
-                String[] entities = StringUtils.split(tmpEntities, ",");
-                for (String entity : entities) {
-                    String[] splitEntityAndTf = StringUtils.split(entity, "=");
-                    String currEntity = splitEntityAndTf[0];
-                    try {
-                        String strTf = splitEntityAndTf[1];
-                        if (currEntity.charAt(0) == ' ')
-                            currEntity = StringUtils.substring(currEntity, 1);
-                        int tf = Integer.parseInt(strTf);
-                        tmpEntitiesTm.put(currEntity, tf);
-                    }
-                    catch (ArrayIndexOutOfBoundsException a){
-                        System.out.println("--SECOND BUG--");
-                        System.out.println(currEntity);
-                        System.out.println(docEntityLine);
-                        System.out.println("--END SECOND BUG--");
-                    }
-                }
-                TreeSet<Map.Entry<String, Integer>> sortedByValue = Ranker.entriesSortedByValues(tmpEntitiesTm);
-                while (ansEntities.size() < 5 && sortedByValue.size() > 0) {
-                    Map.Entry lastEntry = sortedByValue.pollLast();
-                    String currEntityWithKohavit = (String)lastEntry.getKey();
-                    int tf = (int)lastEntry.getValue();
-                    String currEntity = StringUtils.substring(currEntityWithKohavit, 1).toUpperCase();
-                    if (terms_dictionary.containsKey(currEntity))
-                        ansEntities.put(currEntity.toUpperCase(), tf);
-                }
-                docs_entities.put(docNo, ansEntities);
+            }
+            catch(Exception e){
+                System.out.println(termPostingLine);
+            }
+
+        }
+    }
+
+    private void addEntityToDoc(String docNo, String entity, int intTf) {
+        TreeMap<Integer, String> docEntitiesTreeMap = docs_entities.get(docNo);
+        if (docEntitiesTreeMap != null && docEntitiesTreeMap.size() > 0) {
+            if (docEntitiesTreeMap.size() < 5){
+                docEntitiesTreeMap.put(intTf, entity);
+            }
+            else{
+                Map.Entry minEntity = docEntitiesTreeMap.pollFirstEntry();
+                if ((int) minEntity.getKey() < intTf)
+                    docEntitiesTreeMap.put(intTf, entity);
+                else
+                    docEntitiesTreeMap.put((int)minEntity.getKey(), (String)minEntity.getValue());
             }
         }
+        else {
+            docEntitiesTreeMap = new TreeMap<>();
+            docEntitiesTreeMap.put(intTf, entity);
+        }
+        docs_entities.put(docNo, docEntitiesTreeMap);
     }
 
     /**
@@ -265,8 +332,7 @@ class Indexer {
         Iterator docIt = docs_dictionary.entrySet().iterator();
         try {
             docDictionary_bf.append(Parse.getAVL() + "##" + Parse.getDocNum() + "##" + Parse.getTotalTerms() + "\n"); // first row
-        }
-        catch (Exception e){
+        } catch (Exception e) {
 
         }
         int counter = 0;

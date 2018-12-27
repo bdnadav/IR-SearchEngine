@@ -24,10 +24,8 @@ public class Posting {
     private static int docsCounter = 0;
     private static BufferedWriter terms_buffer_writer;
     private static BufferedWriter documents_buffer_writer;
-    private static BufferedWriter documentsTmpEntities_buffer_writer;
     private static BufferedReader term_buffer_reader;
     private static BufferedReader documents_buffer_reader;
-    private static BufferedReader documentsTmpEntities_buffer_reader;
     private static String postingPath;
 
 
@@ -46,8 +44,6 @@ public class Posting {
         try {
             documents_buffer_writer = new BufferedWriter(new FileWriter(postingPath + "\\docsPosting.txt"));
             documents_buffer_reader = new BufferedReader(new FileReader(postingPath + "\\docsPosting.txt"));
-            documentsTmpEntities_buffer_writer = new BufferedWriter(new FileWriter(postingPath + "\\tmpDocsEntities.txt"));
-            documentsTmpEntities_buffer_reader = new BufferedReader(new FileReader(postingPath + "\\tmpDocsEntities.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,32 +56,31 @@ public class Posting {
             //terms_buffer_writer = new BufferedWriter(new FileWriter(termsPostingPath));
             term_buffer_reader = new BufferedReader(new FileReader(termsPostingPath));
             documents_buffer_reader = new BufferedReader(new FileReader(docsPostingPath));
-            documentsTmpEntities_buffer_reader = new BufferedReader(new FileReader(postingPath + "\\Postings\\Docs\\tmpDocsEntities.txt"));
         } catch (IOException e1) {
             e1.printStackTrace();
         }
     }
 
-    public static HashSet<String> getChunkOfEntitiesLines() {
-        HashSet<String> chunk = new HashSet<>();
-        for (int i = 0; i < 500; i++) {
-            try {
-                String entityLine = documentsTmpEntities_buffer_reader.readLine();
-                if (entityLine == null){
-                    documentsTmpEntities_buffer_writer.close();
-                    //FileUtils.deleteQuietly(new File(postingPath + "\\Docs\\tmpDocsEntities.txt"));
-                    break;
-                }
-                chunk.add(entityLine);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (chunk.size() > 0)
-            return chunk;
-        else
-            return null;
-    }
+//    public static HashSet<String> getChunkOfEntitiesLines() {
+//        HashSet<String> chunk = new HashSet<>();
+//        for (int i = 0; i < 500; i++) {
+//            try {
+//                String entityLine = documentsTmpEntities_buffer_reader.readLine();
+//                if (entityLine == null){
+//                    documentsTmpEntities_buffer_writer.close();
+//                    //FileUtils.deleteQuietly(new File(postingPath + "\\Docs\\tmpDocsEntities.txt"));
+//                    break;
+//                }
+//                chunk.add(entityLine);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        if (chunk.size() > 0)
+//            return chunk;
+//        else
+//            return null;
+//    }
 
 
     /**
@@ -111,8 +106,10 @@ public class Posting {
                 continue;
             }
 
-            if (ifTermStartsWithCapital.containsKey(key) && ifTermStartsWithCapital.get(key))
+            if (ifTermStartsWithCapital.containsKey(key) && ifTermStartsWithCapital.get(key)){
                 key = key.toUpperCase();
+                Indexer.entitiesPointers.put(termsPointer, key);
+            }
             Indexer.terms_dictionary.put(key, termDetails + "," + termsPointer);
             termsPointer += 2;
             if (CorpusProcessingManager.cities.containsKey(key.toLowerCase()) && !key.toLowerCase().equals("china")) {
@@ -131,6 +128,11 @@ public class Posting {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        try {
+            terms_buffer_writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -194,20 +196,24 @@ public class Posting {
      * This method is responsible for writing to Docs,
      * it is synchronized because it is called a method that is run by a thread number at the same time.
      */
-    synchronized public static void writeToDocumentsPosting(String docNo, String parentFileName, String mostFreqTerm, int tf_mft, int numOfUniqueTerms, String city, TreeSet<String> headlines_terms, int doclength, TreeMap potentialEntities) {
+    synchronized public static void writeToDocumentsPosting(String docNo, String parentFileName, String mostFreqTerm, int tf_mft, int numOfUniqueTerms, String city, TreeSet<String> headlines_terms, int doclength) {
         try {
 
             documents_buffer_writer.append(docNo + "," + parentFileName + "," + mostFreqTerm + "," + tf_mft + "," + numOfUniqueTerms + "," + city +","+ doclength+"," +headlines_terms.toString() +"\n");
-            documentsTmpEntities_buffer_writer.append(docNo).append("|").append(potentialEntities.toString() + "\n");
+            //documentsTmpEntities_buffer_writer.append(docNo).append("|").append(potentialEntities.toString() + "\n");
             docsCounter++;
+            //entitiesCounter++;
             if (docsCounter > 400) {
                 documents_buffer_writer.flush();
-                documentsTmpEntities_buffer_writer.flush();
                 docsCounter = 0;
             }
+//            if (entitiesCounter > 5){
+//                documentsTmpEntities_buffer_writer.flush();
+//                entitiesCounter = 0;
+//            }
             Indexer.addNewDocToDocDictionary(docNo, docsPointer);
             docsPointer++;
-            //addHeadersToDictionary(docNo, headlines_terms);
+            addHeadersToDictionary(docNo, headlines_terms);
             headlines_terms.clear();
 
         } catch (IOException e) {
@@ -223,15 +229,15 @@ public class Posting {
                 header = StringUtils.substring(header, 1);
             if (!Character.isLetter(header.charAt(0)))
                 continue;
-            if (Indexer.headers_dictionary.containsKey(header)){
-                String currValue = Indexer.headers_dictionary.get(header);
+            String currValue;
+            if ((currValue = Indexer.headers_dictionary.get(header)) != null){
                 String newValue = currValue + "#" + docNo;
                 Indexer.headers_dictionary.put(header, newValue);
             }
             else
                 Indexer.headers_dictionary.put(header, docNo);
         }
-}
+    }
 
     public static String getTermPostingLineByPointer(int pointer) throws IOException {
         String ans;

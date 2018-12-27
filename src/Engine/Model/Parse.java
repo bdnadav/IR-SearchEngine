@@ -44,7 +44,6 @@ public class Parse {
     HashMap<String, StringBuilder> FilesTerms;
     TreeMap<String, Integer> FBIS3_Terms;
     TreeSet HeadLinesTerms;
-    TreeMap<String, Integer> potentialEntities;
     ArrayList <String> QueryTerms;
 
     String lastDoc = "";
@@ -104,7 +103,6 @@ public class Parse {
             FBIS3_Terms = new TreeMap<>();
             FilesTerms = new HashMap<>();
             HeadLinesTerms = new TreeSet() ;
-            potentialEntities = new TreeMap();
             TermsOnly = new TreeMap<String, String>((Comparator) (o1, o2) -> {
                 String s1 = ((String)(o1)).toLowerCase();
                 String s2 = ((String)(o2)).toLowerCase();
@@ -122,17 +120,17 @@ public class Parse {
             }
             String[] words = { "thousand","million","billion","trillion","percent","percentage","dollars","january","february","march","april","may","june","july","august","september","october","november","december","jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"} ;
             for (String s: words
-            ) {
+                    ) {
                 specialwords.add(s);
             }
             String[] chars = { ",","}","{","\\","/",">","<","(",")","'",":",";","\"","[","]","&",".","?","|","`","*","+","!","~","@","#","^","-"} ;
             for (String s: chars
-            ) {
+                    ) {
                 specialchars.add(s);
             }
             String[] months_arr = {"January","February","March","April","May","June","July","August","September","October","November","December","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"} ;
             for (String s: months_arr
-            ) {
+                    ) {
                 months.add(s);
             }
             //SegmentFile parserSegmentFile = new SegmentFile();
@@ -184,7 +182,6 @@ public class Parse {
      */
     public void parse(String text, Document currDoc ) {
         termPosition = 0;
-        potentialEntities = new TreeMap();
         //text = remove_stop_words(text);
         String[] tokens;
         tokens = StringUtils.split(text, "\\`:)?*(|+@#^;!&=}{[]'<> ");
@@ -347,7 +344,7 @@ public class Parse {
                         if ( currDoc!= null )
                             doc_num  = currDoc.docNo ;
                         if (cleanToken(long_term.toString()).contains(" "))
-                        addTermFunc(cleanToken(long_term.toString()), doc_num,type); //add part of long term
+                            addTermFunc(cleanToken(long_term.toString()), doc_num,type); //add part of long term
                         what_to_add = temp_token;
                         if (specialchars.contains(tokensArray[j].charAt(tokensArray[j].length() - 1))) // end
                             insert_and_stop = true;
@@ -516,7 +513,7 @@ public class Parse {
             HeadLinesTerms.clear();
             return;
         }
-        Posting.writeToDocumentsPosting(docNo, parentFileName, mostFreqTerm, tf_mft, numOfUniqueTerms, city , HeadLinesTerms ,doc_length, potentialEntities);
+        Posting.writeToDocumentsPosting(docNo, parentFileName, mostFreqTerm, tf_mft, numOfUniqueTerms, city , HeadLinesTerms ,doc_length);
         HeadLinesTerms.clear();
     }
 
@@ -599,15 +596,6 @@ public class Parse {
                 sb.append("#" + docNo + "|" + "1");
                 FilesTerms.put(addTerm, sb);
                 TermsOnly.put(addTerm, addTerm);
-            }
-            if (addTerm.charAt(0) == '*' && StringUtils.split(addTerm, " ") != null && StringUtils.split(addTerm, " ").length > 1 && !StringUtils.containsAny(addTerm, "=,")){
-                if (potentialEntities.containsKey(addTerm)) {
-                    int count = potentialEntities.get(addTerm);
-                    count += 1;
-                    potentialEntities.put(addTerm, count);
-                }
-                else
-                    potentialEntities.put(addTerm, 1);
             }
         }
 
