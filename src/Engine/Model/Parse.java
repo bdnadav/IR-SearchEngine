@@ -522,7 +522,7 @@ public class Parse {
         //help with testin for the word doc
 //        if (docNo.equals("FBIS3-3366"))
 //            addTo_FBIS3_Terms(addTerm);
-
+        boolean isUpper = Character.isUpperCase(addTerm.charAt(0)) ;
 
         if (stemming) {
             Stemmer stemmer = new Stemmer();
@@ -534,7 +534,7 @@ public class Parse {
         if (stopwords.contains(addTerm.toLowerCase()) || addTerm.toLowerCase().equals("xx") || addTerm.toLowerCase().equals("page"))
              return;
         StringBuilder sb = new StringBuilder();
-        if (Character.isUpperCase(addTerm.charAt(0))) {
+        if (isUpper) {
             addTerm = addTerm.toLowerCase();
             addTerm = "*" + addTerm;
         }
