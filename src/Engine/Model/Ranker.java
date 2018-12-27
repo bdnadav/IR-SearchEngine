@@ -1,3 +1,7 @@
+/***
+ * This class is responsible for rating all documents suspected to be relevant to a particular query.
+ * The rating is based on various factors that can be determined in the final fields defined at the beginning of the class.
+ */
 package Engine.Model;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,14 +14,14 @@ import java.util.*;
 public class Ranker {
     private final int MAX_DOCS_TO_RETURN = 50;
     /* Ranking factors and their weight*/
-    private final double BM25_TITLE_FACTOR_WEIGHT = 0.8;
-    private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0.1;
-    private final double TITLE_IN_HEADERS_FACTOR_WEIGHT = 0.05;
-    private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0.05;
+    private final double BM25_TITLE_FACTOR_WEIGHT = 1;
+    private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0.0;
+    private final double TITLE_IN_HEADERS_FACTOR_WEIGHT = 0.0;
+    private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0.0;
 
     /* BM25 Constants*/
-    private final double K = 1.75;
-    private final double B = 0.75;
+    private final double K = 2.5;
+    private final double B = 0.37;
     private final double AVG_LENGTH_OF_DOCS_IN_CORPUS;
     private final int NUM_OF_DOCS_IN_CORPUS;
 
@@ -30,7 +34,7 @@ public class Ranker {
 
     static {
         try {
-            results_bw = new BufferedWriter(new FileWriter("d:\\documents\\users\\harelsa\\Downloads\\run\\results.txt"));
+            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\harelsa\\QueriesTests\\results\\results.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -56,6 +60,10 @@ public class Ranker {
         return ans;
     }
 
+    /**
+     * After we have stored the values ​​of the various documents according to a specific factor in a specific data structure
+     * We would like to sum these values ​​to a single value on which we will base the documents.
+     */
     private void mergeValues() {
         for (Object o : BM25_QueryTitleWeight.entrySet()){
             Map.Entry<String, Double> docWithValue = (Map.Entry<String, Double>) o;
@@ -157,8 +165,8 @@ public class Ranker {
         for (String docNum : relevantDocsWithHeaders){
             ArrayList<String> docHeaders = allDocsHeaders.get(docNum);
             calculateHeadersWeight(docNum, docHeaders, queryDescTerms, queryOtherTerms);
-    }
         }
+    }
 
     private Set<String> getRelevantDocsWithHeaders(Set<String> queryDescTerms, ArrayList<String> queryTitleTerms) {
         HashSet<String> docsNum = new HashSet<>();
@@ -240,7 +248,7 @@ public class Ranker {
         int counter = 0;
         int headersSize = headers.size();
         if (headers.contains(term))
-                counter++;
+            counter++;
         double value = 0;
         if (headersSize != 0)
             value = (counter/headersSize)*10;
@@ -319,12 +327,12 @@ public class Ranker {
 
 
     public static <K,V extends Comparable<? super V>> TreeSet<Map.Entry<K,V>> entriesSortedByValues(Map<K,V> map) {
-    TreeSet<Map.Entry<K,V>> sortedEntries = new TreeSet<>(
-            (e1, e2) -> {
-                int res = e1.getValue().compareTo(e2.getValue());
-                return res != 0 ? res : 1;
-            }
-    );
+        TreeSet<Map.Entry<K,V>> sortedEntries = new TreeSet<>(
+                (e1, e2) -> {
+                    int res = e1.getValue().compareTo(e2.getValue());
+                    return res != 0 ? res : 1;
+                }
+        );
         sortedEntries.addAll(map.entrySet());
         return sortedEntries;
     }

@@ -310,9 +310,9 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        readQueryFromFile("d:\\documents\\users\\harelsa\\Downloads\\run\\queries.txt");
+        readQueryFromFile("d:\\documents\\users\\harelsa\\Downloads\\QueriesTests\\queries.txt");
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
-       // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
+        // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
 
 //        printAnswer5();
 //        printAnswer6();
@@ -376,22 +376,22 @@ public class Model extends Observable {
 //            cities.add("BUENOS");
             cities = null;
 
-   //public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String,String> docEntities, boolean semantic) {
+            //public Searcher(String posting, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String,String> docEntities, boolean semantic) {
 
             String line = "" , query_id  ="" ,query = "" ;
             Searcher searcher = new Searcher(postingPath,corpusPath, is_stemming, cities, termDictionary, docsDictionary, citiesDictionary, headersDictionary, docEntities, useSemantics , AVL);
             while ((line = br.readLine()) != null) {
                 while ((line = br.readLine()) != null) {
                     if (line.equals("<top>")) { // start of query
-                            continue ;
+                        continue ;
                     }
                     if (line.equals("</top>")) { // start of query
-                            break ;
+                        break ;
                     }
 
                     if (line.startsWith("<num>")) {
-                       String[] temp = line.split(" ");
-                       query_id = temp[2];
+                        String[] temp = line.split(" ");
+                        query_id = temp[2];
                     }
                     if ( line.startsWith("<title>")){
                         query = line.split("> ")[1];
@@ -412,7 +412,6 @@ public class Model extends Observable {
                     }
 
                 }
-                System.out.println(query_id);
                 searcher.handleQuery(query_id, query, sb_desc.toString(), sb_narr.toString());
                 sb_desc.delete(0, sb_desc.length());
                 sb_desc.setLength(0);
@@ -423,10 +422,6 @@ public class Model extends Observable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-
-
 
 
     }
