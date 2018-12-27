@@ -234,14 +234,14 @@ public class Parse {
             //String key = (String)it.next();
             String term = (String) it.next();
             StringBuilder value = FilesTerms.get(term);
-            if (stemming) {
-                Stemmer stemmer = new Stemmer();
-                stemmer.add(term.toCharArray(), term.length());
-                String stemmed = "";
-                stemmer.stem();
-                term = stemmer.toString();
-
-            }
+//            if (stemming) {
+//                Stemmer stemmer = new Stemmer();
+//                stemmer.add(term.toCharArray(), term.length());
+//                String stemmed = "";
+//                stemmer.stem();
+//                term = stemmer.toString();
+//
+//            }
             sfp.signNewTerm(term, value);
             value.delete(0, value.length());
             value.setLength(0);
@@ -523,19 +523,21 @@ public class Parse {
 //        if (docNo.equals("FBIS3-3366"))
 //            addTo_FBIS3_Terms(addTerm);
 
+
+        if (stemming) {
+            Stemmer stemmer = new Stemmer();
+            stemmer.add(addTerm.toCharArray(), addTerm.length());
+            stemmer.stem();
+            addTerm = stemmer.toString();
+
+        }
         if (stopwords.contains(addTerm.toLowerCase()) || addTerm.toLowerCase().equals("xx") || addTerm.toLowerCase().equals("page"))
-            return;
+             return;
         StringBuilder sb = new StringBuilder();
         if (Character.isUpperCase(addTerm.charAt(0))) {
             addTerm = addTerm.toLowerCase();
             addTerm = "*" + addTerm;
         }
-
-//        if ( FilesTerms == null ||FilesTerms.isEmpty()  )
-//            return;
-        // System.out.println( addTerm + " , " + docNo);
-
-
 
 
         if ( type.equals("DocHeadline") ) {
@@ -547,10 +549,6 @@ public class Parse {
             QueryTerms.add(addTerm);
             return;
         }
-
-
-
-
 
 
         if ( type.equals("DocText") ) {

@@ -39,7 +39,7 @@ public class View extends Observable {
     public javafx.scene.control.ScrollPane pane_for_cities1;
 
 
-    public javafx.scene.control.cell.CheckBoxListCell<String> cell_choice;
+
     @FXML
 
     private Scene scene;
