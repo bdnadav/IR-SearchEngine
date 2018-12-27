@@ -10,6 +10,7 @@ package Engine.Model;
  * by a line number of the relevant information in posting file.
  */
 
+import com.sun.java.util.jar.pack.ConstantPool;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -112,8 +113,10 @@ public class Posting {
                 continue;
             }
 
-            if (ifTermStartsWithCapital.containsKey(key) && ifTermStartsWithCapital.get(key))
+            if (ifTermStartsWithCapital.containsKey(key) && ifTermStartsWithCapital.get(key)) {
                 key = key.toUpperCase();
+                Indexer.en
+            }
             Indexer.terms_dictionary.put(key, termDetails + "," + termsPointer);
             termsPointer += 2;
             if (CorpusProcessingManager.cities.containsKey(key.toLowerCase()) && !key.toLowerCase().equals("china")) {
