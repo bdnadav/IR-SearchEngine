@@ -29,6 +29,7 @@ public class Posting {
     private static BufferedReader documents_buffer_reader;
     private static BufferedReader documentsTmpEntities_buffer_reader;
     private static String postingPath;
+    private static int entitiesCounter;
 
 
     public Posting(String postingsPath) {
@@ -198,16 +199,20 @@ public class Posting {
         try {
 
             documents_buffer_writer.append(docNo + "," + parentFileName + "," + mostFreqTerm + "," + tf_mft + "," + numOfUniqueTerms + "," + city +","+ doclength+"," +headlines_terms.toString() +"\n");
-            documentsTmpEntities_buffer_writer.append(docNo).append("|").append(potentialEntities.toString() + "\n");
+            //documentsTmpEntities_buffer_writer.append(docNo).append("|").append(potentialEntities.toString() + "\n");
             docsCounter++;
+            //entitiesCounter++;
             if (docsCounter > 400) {
                 documents_buffer_writer.flush();
-                documentsTmpEntities_buffer_writer.flush();
                 docsCounter = 0;
             }
+//            if (entitiesCounter > 5){
+//                documentsTmpEntities_buffer_writer.flush();
+//                entitiesCounter = 0;
+//            }
             Indexer.addNewDocToDocDictionary(docNo, docsPointer);
             docsPointer++;
-            //addHeadersToDictionary(docNo, headlines_terms);
+            addHeadersToDictionary(docNo, headlines_terms);
             headlines_terms.clear();
 
         } catch (IOException e) {
@@ -223,8 +228,8 @@ public class Posting {
                 header = StringUtils.substring(header, 1);
             if (!Character.isLetter(header.charAt(0)))
                 continue;
-            if (Indexer.headers_dictionary.containsKey(header)){
-                String currValue = Indexer.headers_dictionary.get(header);
+            String currValue;
+            if ((currValue = Indexer.headers_dictionary.get(header)) != null){
                 String newValue = currValue + "#" + docNo;
                 Indexer.headers_dictionary.put(header, newValue);
             }
@@ -256,6 +261,7 @@ public class Posting {
             documents_buffer_writer.flush();
             //documents_buffer_writer.close();
             terms_buffer_writer.flush();
+            documentsTmpEntities_buffer_writer.flush();
             //terms_buffer_writer.close();
             //documents_buffer_reader.close();
             //term_buffer_reader.close();
