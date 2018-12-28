@@ -31,6 +31,7 @@ public class Ranker {
     private TreeMap<String, Double> QueryTitleTermInHeaders;
     private TreeMap<String, Double> QueryDescTermInHeaders;
     static private BufferedWriter results_bw;
+    static StringBuilder sb_queriesResults = new StringBuilder();
 
     static {
         try {
@@ -104,9 +105,11 @@ public class Ranker {
 
     private void printResultToFile(ArrayList<String> ans,String queryId) {
         try {
+            sb_queriesResults.append(queryId).append("\n");
             for (int i = 0; i < ans.size(); i++) {
                 results_bw.append(queryId).append(" ").append("0").append(" ").
                         append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
+                sb_queriesResults.append(ans.get(i));
             }
             results_bw.flush();
         } catch (IOException e) {

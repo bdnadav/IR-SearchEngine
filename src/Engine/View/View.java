@@ -15,6 +15,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,7 +38,7 @@ public class View extends Observable {
     public javafx.scene.control.ListView filter_city_view ;
     public javafx.scene.control.ScrollPane pane_for_cities;
     public javafx.scene.control.ScrollPane pane_for_cities1;
-
+    public AnchorPane ap_relevantDocs;
 
 
     @FXML
@@ -157,6 +158,7 @@ public class View extends Observable {
         return sb.toString();
     }
 
+
     public void reset_btn_pressed() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Reset");
@@ -244,5 +246,8 @@ public class View extends Observable {
 
         });
         list_view.setItems(items);
+    }
+
+    public void showQueriesResults(String queriesResults) {
     }
 }

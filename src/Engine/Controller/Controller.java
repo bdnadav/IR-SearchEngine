@@ -37,6 +37,8 @@ public class Controller extends Observable implements Observer {
                     break;
                 case "showTests":
                     model.printTests();
+                    String queriesResults = model.getQueriesResults();
+                    view.showQueriesResults(queriesResults);
                     break;
 
                 default:

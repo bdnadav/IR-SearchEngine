@@ -505,6 +505,10 @@ public class Model extends Observable {
 
     }
 
+    public String getQueriesResults() {
+        return null;
+    }
+
 
     public static class TermMaxTFComparator implements Comparator<Object> {
         @Override
