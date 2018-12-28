@@ -122,7 +122,7 @@ public class View extends Observable {
         secondryStage.setScene(scene);
         txtArea_dictionary = (javafx.scene.control.TextArea) scene.lookup("#txtArea_dictionary");
         try {
-            txtArea_dictionary.setText(getDicDisplay(postingPath));
+            getDicDisplay(postingPath);
         }
         catch(IOException ioe){
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -152,9 +152,11 @@ public class View extends Observable {
                 if (splited.length > 4){
                     tf = splited[splited.length-3];
                 }
-                sb.append(term).append(",").append(tf).append("\n");
+                sb.append(term).append(" , tf :  ").append(tf).append("\n");
+
             }
-        return sb.toString();
+            txtArea_dictionary.setText(sb.toString());
+            return null ;
     }
 
     public void reset_btn_pressed() {
