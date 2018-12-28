@@ -35,7 +35,7 @@ public class Ranker {
 
     static {
         try {
-            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\harelsa\\QueriesTests\\results\\results.txt"));
+            results_bw = new BufferedWriter(new FileWriter("d:\\documents\\users\\bardanad\\Downloads\\results.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -323,6 +323,8 @@ public class Ranker {
             if (i > sortedSet.size())
                 break;
             Map.Entry pair = sortedSet.pollLast();
+            if (pair == null)
+                continue;
             ans.add((String)pair.getKey());
         }
         return ans;
