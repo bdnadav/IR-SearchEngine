@@ -91,15 +91,15 @@ public class Searcher {
         /** Handle Semantic **/
         if ( this.useSemantic) {
 
-        getSemanticTerms(queryTitleTerms);
-        if ( !synonymous_terms.isEmpty()){
-            for (String s :synonymous_terms
-                    ) {
-                if (!queryTitleTerms.contains(s))
-                queryTitleTerms.add(s);
+            getSemanticTerms(queryTitleTerms);
+            if ( !synonymous_terms.isEmpty()){
+                for (String s :synonymous_terms
+                        ) {
+                    if (!queryTitleTerms.contains(s)) // join syn and title
+                        queryTitleTerms.add(s);
+                }
             }
         }
-         }
 
         if (extraTermsMayHelp(queryTitleTerms, queryDescTerms)){
             ArrayList<String> queryDescTermsToAdd = getExtraTerms(queryDescTerms, queryTitleTerms);
