@@ -49,38 +49,25 @@ public class Posting {
         }
     }
 
-    public static void initTermPosting(String postingPath) {
-        String termsPostingPath = postingPath + "\\Postings\\Terms\\termsPosting.txt";
-        String docsPostingPath = postingPath + "\\Postings\\Docs\\docsPosting.txt";
+    public static void initTermPosting(String postingPath, boolean stemming) {
+        String termsPostingPath = postingPath + "\\Postings";
+        String docsPostingPath = postingPath + "\\Postings";
+        if (!stemming){
+            termsPostingPath += "\\Terms\\termsPosting.txt";
+            docsPostingPath += "\\Docs\\docsPosting.txt";
+        }
+        else{
+            termsPostingPath += "withStemming\\Terms\\termsPosting.txt";
+            docsPostingPath += "withStemming\\Docs\\docsPosting.txt";
+        }
+
         try {
-            //terms_buffer_writer = new BufferedWriter(new FileWriter(termsPostingPath));
             term_buffer_reader = new BufferedReader(new FileReader(termsPostingPath));
             documents_buffer_reader = new BufferedReader(new FileReader(docsPostingPath));
         } catch (IOException e1) {
             e1.printStackTrace();
         }
     }
-
-//    public static HashSet<String> getChunkOfEntitiesLines() {
-//        HashSet<String> chunk = new HashSet<>();
-//        for (int i = 0; i < 500; i++) {
-//            try {
-//                String entityLine = documentsTmpEntities_buffer_reader.readLine();
-//                if (entityLine == null){
-//                    documentsTmpEntities_buffer_writer.close();
-//                    //FileUtils.deleteQuietly(new File(postingPath + "\\Docs\\tmpDocsEntities.txt"));
-//                    break;
-//                }
-//                chunk.add(entityLine);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        if (chunk.size() > 0)
-//            return chunk;
-//        else
-//            return null;
-//    }
 
 
     /**
@@ -102,7 +89,7 @@ public class Posting {
             int df = Integer.parseInt(termDetailsSplited[termDetailsSplited.length - 1]);
             int totalTf = Integer.parseInt(termDetailsSplited[termDetailsSplited.length - 2]);
             // Filtering low tf & df terms
-            if ((df < Math.round(Indexer.docs_dictionary.size()/100000 + 0.5) && totalTf < 3)) {
+            if ((df < Math.round(Indexer.docs_dictionary.size()/100000 + 0.5) && totalTf < 5)) {
                 continue;
             }
 
@@ -260,11 +247,7 @@ public class Posting {
     public static void flushAndClose() {
         try {
             documents_buffer_writer.flush();
-            //documents_buffer_writer.close();
             terms_buffer_writer.flush();
-            //terms_buffer_writer.close();
-            //documents_buffer_reader.close();
-            //term_buffer_reader.close();
         }
         catch (Exception e ){}
 

@@ -339,7 +339,7 @@ public class Model extends Observable {
                 String docNo = split[2];
                 String strRelevant = split[3];
                 if (strRelevant.equals("1")){
-                    Posting.initTermPosting(postingPath);
+                    Posting.initTermPosting(postingPath, is_stemming);
                     String strPointer = docsDictionary.get(docNo);
                     if (strPointer == null){
                         System.out.println("Not exist: " + docNo);

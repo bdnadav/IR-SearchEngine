@@ -17,7 +17,7 @@ public class Searcher {
     private final int MAX_DOCS_TO_RETURN = 50;
     private final int MAX_SYN_TERMS_FROM_API = 5 ;
     private final boolean useSemantic;
-
+    private final Boolean stemming;
     private Parse queryParse;
     private Parse descParse;
     private TreeMap<String, String> terms_dictionary;
@@ -39,6 +39,7 @@ public class Searcher {
         this.terms_dictionary = termsDic;
         this.AVL = AVL ;
         this.synonymous_terms = new ArrayList<>();
+        this.stemming = stemming;
         //this.synonymous_and_pointers = new HashMap<>() ;
         this.cities_dictionary = citiesDic;
         this.docs_dictionary = docsDic;
@@ -49,7 +50,7 @@ public class Searcher {
         this.descParse = new Parse(posting, stemming , corpusPath);
         this.posting = posting;
         this.useSemantic = semantic ;
-        Posting.initTermPosting(posting);
+        Posting.initTermPosting(posting, stemming);
         if (specificCities != null && !specificCities.isEmpty()) {
             citiesConstraint = true;
             this.speceficCities = specificCities;
@@ -89,14 +90,14 @@ public class Searcher {
 
         /** Handle Semantic **/
         //if ( this.useSemantic) {
-
-            getSemanticTerms(queryTitleTerms);
-            if ( !synonymous_terms.isEmpty()){
-                for (String s :synonymous_terms
-                        ) {
-                    queryTitleTerms.add(s);
-                }
-            }
+//
+//            getSemanticTerms(queryTitleTerms);
+//            if ( !synonymous_terms.isEmpty()){
+//                for (String s :synonymous_terms
+//                        ) {
+//                        queryTitleTerms.add(s);
+//                }
+//            }
        // }
 
         if (extraTermsMayHelp(queryTitleTerms, queryDescTerms)){
@@ -267,7 +268,7 @@ public class Searcher {
     private HashMap<String, HashMap<String, ArrayList<String>>> getRelevantDocs(ArrayList<String> queryTerms) {
         HashMap<String, HashMap<String, ArrayList<String>>> queryTermsToDocsWithDetails = new HashMap<>();
         for (int i = 0; i < queryTerms.size(); i++) {
-            Posting.initTermPosting(posting);
+            Posting.initTermPosting(posting, stemming);
             String queryTerm = queryTerms.get(i);
             HashMap<String, ArrayList<String>> specificQueryTermDocs = new HashMap<>();
             try {
