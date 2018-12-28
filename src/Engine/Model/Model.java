@@ -522,6 +522,10 @@ public class Model extends Observable {
         return sb.toString();
     }
 
+    public String getResultsTrecFormat() {
+        return Ranker.getTrecFormatResults();
+    }
+
 
     public static class TermMaxTFComparator implements Comparator<Object> {
         @Override

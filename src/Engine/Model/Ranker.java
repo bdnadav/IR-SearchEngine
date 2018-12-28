@@ -32,6 +32,7 @@ public class Ranker {
     private TreeMap<String, Double> QueryDescTermInHeaders;
     static private BufferedWriter results_bw;
     static StringBuilder sb_queriesResults = new StringBuilder();
+    static StringBuilder sb_trecResults = new StringBuilder();
 
     static {
         try {
@@ -54,6 +55,13 @@ public class Ranker {
 
     public static String getQueriesResults() {
         return sb_queriesResults.toString();
+    }
+
+    public static String getTrecFormatResults() {
+        String results = sb_trecResults.toString();
+        sb_trecResults = new StringBuilder();
+        sb_queriesResults = new StringBuilder();
+        return results;
     }
 
     public ArrayList<String> getRankDocs(String queryId, HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByTitle, ArrayList<String> queryOtherTerms){ // queryOtherTerms is title/desc.
@@ -114,8 +122,8 @@ public class Ranker {
                 results_bw.append(queryId).append(" ").append("0").append(" ").
                         append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
                 sb_queriesResults.append(i+1).append(". ").append(ans.get(i)).append("\n");
-//                sb_queriesResults.append(queryId).append(" ").append("0").append(" ").
-//                        append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
+               sb_trecResults.append(queryId).append(" ").append("0").append(" ").
+                        append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
             }
             //sb_queriesResults.append(" ").append("\n");
             results_bw.flush();

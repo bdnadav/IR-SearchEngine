@@ -39,6 +39,7 @@ public class View extends Observable {
     public javafx.scene.control.ScrollPane pane_for_cities1;
     public ListView lv_relevantDocs;
     public javafx.scene.control.TextArea txtArea_entities;
+    public Button btn_saveResults;
 
 
     @FXML
@@ -47,6 +48,7 @@ public class View extends Observable {
     private Stage parent;
     public String selectedDocNo;
     public Stage secondryStage;
+    public File resultsDirectory;
 
 
     public void browseCorpus() {
@@ -282,6 +284,36 @@ public class View extends Observable {
         txtArea_entities = (javafx.scene.control.TextArea)secondryStage.getScene().lookup("#txtArea_entities");
         txtArea_entities.setText(entities);
         secondryStage.show();
+    }
+
+    public void saveResultsBtnPushed(ActionEvent actionEvent) {
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Save Query results");
+        fc.setApproveButtonText("Save");
+        fc.setCurrentDirectory(new File(System.getProperty("user.home")));
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fc.setAcceptAllFileFilterUsed(false);
+        int result = fc.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            corpus_txt_field.clear();
+            resultsDirectory = fc.getSelectedFile();
+            //System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+            //corpus_txt_field.appendText(selectedFile.getAbsolutePath());
+            setChanged();
+            notifyObservers("saveResultsBtnPushed");
+        }
+    }
+
+    public void saveResults(String results) {
+        try {
+            FileWriter fw = new FileWriter(resultsDirectory.getAbsoluteFile() + "\\results.txt");
+            fw.write(results);
+            fw.flush();
+            JOptionPane.showMessageDialog(null, "The results been saved in path: " + resultsDirectory.getAbsoluteFile(), "Confirmation", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 //txtArea_dictionary.setText(getDicDisplay("C:\\Users\\Nadav\\Desktop\\Engine Project\\resources"));

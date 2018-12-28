@@ -77,7 +77,7 @@
               </content>
             </ScrollPane>
             <Label layoutX="586.0" layoutY="176.0" prefHeight="31.0" prefWidth="185.0" text="Query Relevent Docs Results : " />
-            <Button fx:id="search_query1" layoutX="583.0" layoutY="521.0" mnemonicParsing="false" onAction="#browseCorpus" prefHeight="36.0" prefWidth="140.0" text="Save Results" />
+            <Button fx:id="btn_saveResults" layoutX="583.0" layoutY="521.0" mnemonicParsing="false" onAction="#saveResultsBtnPushed" prefHeight="36.0" prefWidth="140.0" text="Save Results" />
             <ImageView fitHeight="51.0" fitWidth="239.0" layoutX="653.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@logo.png" />

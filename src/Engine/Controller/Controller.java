@@ -47,6 +47,12 @@ public class Controller extends Observable implements Observer {
                         docNo = StringUtils.substring(docNo, 1);
                     String entities = model.getEntities(docNo);
                     view.showEntities(entities);
+                    break;
+                case "saveResultsBtnPushed":
+                    String results = model.getResultsTrecFormat();
+                    view.saveResults(results);
+                    break;
+
 
                 default:
                     System.out.println("no match");
