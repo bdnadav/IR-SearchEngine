@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Engine.View.View">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Engine.View.View">
     <children>
         <Pane layoutY="1.0" prefHeight="615.0" prefWidth="926.0">
             <children>
@@ -103,7 +103,7 @@
                </content>
             </ScrollPane>
             <Label layoutX="43.0" layoutY="299.0" text="Filter Search By :" />
-            <Button fx:id="btn_showEntities" layoutX="735.0" layoutY="521.0" mnemonicParsing="false" onAction="#browseCorpus" prefHeight="36.0" prefWidth="140.0" text="Show doc entities" />
+            <Button fx:id="btn_showEntities" layoutX="735.0" layoutY="521.0" mnemonicParsing="false" onAction="#showDocsEntities" prefHeight="36.0" prefWidth="140.0" text="Show doc entities" />
             </children>
         </Pane>
     </children>

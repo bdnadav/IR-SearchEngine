@@ -10,10 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -25,7 +22,7 @@ import java.util.*;
 
 public class View extends Observable {
     @FXML
-    public javafx.scene.control.TextField corpus_txt_field ;
+    public javafx.scene.control.TextField corpus_txt_field;
     public javafx.scene.control.TextField posting_txt_field;
     public javafx.scene.control.CheckBox check_stemming;
     public javafx.scene.control.ChoiceBox lang_list;
@@ -35,11 +32,12 @@ public class View extends Observable {
     public javafx.scene.control.TextArea txtArea_dictionary;
     public javafx.scene.control.Button btn_test;
     public javafx.scene.control.ListView list_view;
-    public javafx.scene.control.ListView filter_doc_view ;
-    public javafx.scene.control.ListView filter_city_view ;
+    public javafx.scene.control.ListView filter_doc_view;
+    public javafx.scene.control.ListView filter_city_view;
     public javafx.scene.control.ScrollPane pane_for_cities;
     public javafx.scene.control.ScrollPane pane_for_cities1;
     public ListView lv_relevantDocs;
+    public javafx.scene.control.TextArea txtArea_entities;
 
 
     @FXML
@@ -48,13 +46,12 @@ public class View extends Observable {
     private Stage parent;
 
 
-
     public void browseCorpus() {
 
-        JFileChooser fc = new JFileChooser() ;
+        JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(System.getProperty("user.home")));
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fc.setAcceptAllFileFilterUsed(false );
+        fc.setAcceptAllFileFilterUsed(false);
         int result = fc.showOpenDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
             corpus_txt_field.clear();
@@ -65,10 +62,10 @@ public class View extends Observable {
     }
 
     public void browsePosting() {
-        JFileChooser fc = new JFileChooser() ;
+        JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(System.getProperty("user.home")));
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fc.setAcceptAllFileFilterUsed(false );
+        fc.setAcceptAllFileFilterUsed(false);
         int result = fc.showOpenDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
             posting_txt_field.clear();
@@ -78,33 +75,33 @@ public class View extends Observable {
         }
     }
 
-    public void  run_btn_pressed () {
+    public void run_btn_pressed() {
         //System.out.println("pressed");
-        if ( corpus_txt_field.getText().isEmpty() || posting_txt_field.getText().isEmpty()) {
+        if (corpus_txt_field.getText().isEmpty() || posting_txt_field.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "One or  more Paths is missing", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if ( !checkPaths() ) { // paths are not valid
+        if (!checkPaths()) { // paths are not valid
             JOptionPane.showMessageDialog(null, "Paths are Invalid", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-            setChanged();
-            notifyObservers("run");
-            load_dic_btn.setDisable(false );
-            show_dic_btn.setDisable(false );
-            reset_btn.setDisable(false);
-            lang_list.setDisable(false);
+        setChanged();
+        notifyObservers("run");
+        load_dic_btn.setDisable(false);
+        show_dic_btn.setDisable(false);
+        reset_btn.setDisable(false);
+        lang_list.setDisable(false);
 
 
     }
 
     public void setScene(Scene scene) {
-        this.scene = scene ;
+        this.scene = scene;
     }
 
     public void setParent(Stage primaryStage) {
-        this.parent = primaryStage ;
+        this.parent = primaryStage;
     }
 
     public void updateLangLIst(String[] list_lang) {
@@ -114,19 +111,18 @@ public class View extends Observable {
     }
 
 
-    public  void show_dic_pressed() throws Exception{
+    public void show_dic_pressed() throws Exception {
         String postingPath = posting_txt_field.getText();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("dic_view.fxml"));
         Parent root = fxmlLoader.load();
         Stage secondryStage = new Stage();
         secondryStage.setTitle("Dic View");
-        Scene scene = new Scene(root, 600, 600) ;
+        Scene scene = new Scene(root, 600, 600);
         secondryStage.setScene(scene);
         txtArea_dictionary = (javafx.scene.control.TextArea) scene.lookup("#txtArea_dictionary");
         try {
             getDicDisplay(postingPath);
-        }
-        catch(IOException ioe){
+        } catch (IOException ioe) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("File not found");
@@ -140,25 +136,25 @@ public class View extends Observable {
 
     private String getDicDisplay(String text) throws IOException {
         StringBuilder sb = new StringBuilder();
-            BufferedReader br_dic = new BufferedReader(new FileReader(text + "\\Postings\\termDictionary.txt"));
-            String line = null;
-            while ((line = br_dic.readLine()) != null){
-                String term = "";
-                String tf = "";
-                String[] splited = StringUtils.split(line,",");
-               // String[] termSplited = StringUtils.split(splited[0], "<D>");
+        BufferedReader br_dic = new BufferedReader(new FileReader(text + "\\Postings\\termDictionary.txt"));
+        String line = null;
+        while ((line = br_dic.readLine()) != null) {
+            String term = "";
+            String tf = "";
+            String[] splited = StringUtils.split(line, ",");
+            // String[] termSplited = StringUtils.split(splited[0], "<D>");
 
-                if (splited.length < 1)
-                    continue;
-                term =splited[0];
-                if (splited.length > 4){
-                    tf = splited[splited.length-3];
-                }
-                sb.append(term).append(" , tf :  ").append(tf).append("\n");
-
+            if (splited.length < 1)
+                continue;
+            term = splited[0];
+            if (splited.length > 4) {
+                tf = splited[splited.length - 3];
             }
-            txtArea_dictionary.setText(sb.toString());
-            return null ;
+            sb.append(term).append(" , tf :  ").append(tf).append("\n");
+
+        }
+        txtArea_dictionary.setText(sb.toString());
+        return null;
     }
 
 
@@ -166,46 +162,42 @@ public class View extends Observable {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Reset");
         alert.setHeaderText("Are you sure ? ");
-        alert.setContentText (" This will reset all the posting files and Dictionaries that saved . ");
+        alert.setContentText(" This will reset all the posting files and Dictionaries that saved . ");
         Optional<ButtonType> option = alert.showAndWait();
-        if ( ButtonType.OK.equals(option.get())){
+        if (ButtonType.OK.equals(option.get())) {
             setChanged();
             notifyObservers("reset");
-            load_dic_btn.setDisable(true );
-            show_dic_btn.setDisable(true );
-            reset_btn.setDisable (true);
+            load_dic_btn.setDisable(true);
+            show_dic_btn.setDisable(true);
+            reset_btn.setDisable(true);
             lang_list.setDisable(true);
-        }else {
+        } else {
 
         }
-
-
     }
 
-    public void updatePaths(){
+    public void updatePaths() {
         setChanged();
         notifyObservers("update_path");
-        if ( posting_txt_field.getText().length() > 0  ) {
-            load_dic_btn.setDisable(false );
-            show_dic_btn.setDisable(false );
-            reset_btn.setDisable (false);
+        if (posting_txt_field.getText().length() > 0) {
+            load_dic_btn.setDisable(false);
+            show_dic_btn.setDisable(false);
+            reset_btn.setDisable(false);
             lang_list.setDisable(false);
-        }else {
-            load_dic_btn.setDisable(true );
-            show_dic_btn.setDisable(true );
-            reset_btn.setDisable (true);
+        } else {
+            load_dic_btn.setDisable(true);
+            show_dic_btn.setDisable(true);
+            reset_btn.setDisable(true);
             lang_list.setDisable(true);
         }
-
-
     }
 
-    public void load_dic_mem(){
+    public void load_dic_mem() {
         setChanged();
         notifyObservers("load_to_memory");
     }
 
-    public boolean checkPaths ( ) {
+    public boolean checkPaths() {
         String corpus = corpus_txt_field.getText();
         String posting = posting_txt_field.getText();
         File dir = new File(corpus);
@@ -223,7 +215,7 @@ public class View extends Observable {
 
     public void setCitiesView(ArrayList<String> citiesView) {
 
-        ObservableList<String> items =FXCollections.observableArrayList (
+        ObservableList<String> items = FXCollections.observableArrayList(
                 "Single", "Double", "Suite", "Family App");
         list_view.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -232,15 +224,15 @@ public class View extends Observable {
 
             @Override
             public void handle(Event event) {
-                ObservableList<String> selectedItems =  list_view.getSelectionModel().getSelectedItems();
+                ObservableList<String> selectedItems = list_view.getSelectionModel().getSelectedItems();
 
 
                 //if (filter_city_view)
-                ObservableList<String> oldValues = filter_city_view.getItems() ;
+                ObservableList<String> oldValues = filter_city_view.getItems();
 
-                for (String s :selectedItems
-                     ) {
-                    if ( !oldValues.contains(s))
+                for (String s : selectedItems
+                        ) {
+                    if (!oldValues.contains(s))
                         oldValues.add(s);
                 }
                 filter_city_view.setItems(selectedItems);
@@ -253,30 +245,42 @@ public class View extends Observable {
 
     public void showQueriesResults(String queriesResults) {
         String[] split = StringUtils.split(queriesResults, "\n");
-        ObservableList<String> items =FXCollections.observableArrayList (
+        ObservableList<String> items = FXCollections.observableArrayList(
                 split);
-        lv_relevantDocs.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        lv_relevantDocs.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         lv_relevantDocs.setOnMouseClicked(new EventHandler<Event>() {
             @Override
             public void handle(Event event) {
-                ObservableList<String> selectedItems =  lv_relevantDocs.getSelectionModel().getSelectedItems();
-
-                ObservableList<String> oldValues = filter_doc_view.getItems() ;
-
-                for (String s :selectedItems
-                        ) {
-                    if ( !oldValues.contains(s))
-                        oldValues.add(s);
-                }
-                filter_doc_view.setItems(selectedItems);
+                String selectedItem = (String) lv_relevantDocs.getSelectionModel().getSelectedItem();
+                String docNo = StringUtils.substringAfter(selectedItem, ".");
 
             }
-
         });
-        lv_relevantDocs.setItems(items);
     }
 
-    public void showDocsEntities(){
+    public void showDocsEntities() {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("entities_view.fxml"));
+        Parent root = null;
+        try {
+            root = fxmlLoader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Stage secondryStage = new Stage();
+        secondryStage.setTitle("Entities view");
+        Scene scene = new Scene(root, 600, 600);
+        secondryStage.setScene(scene);
+        txtArea_entities = (javafx.scene.control.TextArea) scene.lookup("#txtArea_entities");
+
+
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("File not found");
+        alert.setContentText("Please check your posting path and try again");
+        alert.showAndWait();
+        secondryStage.show();
 
     }
 }
+//txtArea_dictionary.setText(getDicDisplay("C:\\Users\\Nadav\\Desktop\\Engine Project\\resources"));
+
