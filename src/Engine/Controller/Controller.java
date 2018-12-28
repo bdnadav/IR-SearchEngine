@@ -2,13 +2,14 @@ package Engine.Controller;
 
 import Engine.Model.Model;
 import Engine.View.View;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Observable;
 import java.util.Observer;
 
 public class Controller extends Observable implements Observer {
     private Model  model;
-    private View view ;
+    public View view ;
     @Override
     public void update(Observable o, Object arg) {
 
@@ -40,6 +41,12 @@ public class Controller extends Observable implements Observer {
                     String queriesResults = model.getQueriesResults();
                     view.showQueriesResults(queriesResults);
                     break;
+                case "showEntities":
+                    String docNo = view.selectedDocNo;
+                    if (docNo.charAt(0) == ' ')
+                        docNo = StringUtils.substring(docNo, 1);
+                    String entities = model.getEntities(docNo);
+                    view.showEntities(entities);
 
                 default:
                     System.out.println("no match");

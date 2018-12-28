@@ -17,7 +17,7 @@ public class Model extends Observable {
     private String corpusPath; //saved corpus path
     private String postingPath;// saved outpot posting path
     private boolean is_stemming; // using a stemmer on terms ot not
-    private boolean useSemantics;
+    private boolean useSemantics = true;
     public String[] list_lang; //list of lang returns from parsing the docs
     // will allow to load the term dic to prog memory -
     // will be used in project part 2
@@ -226,7 +226,7 @@ public class Model extends Observable {
                     int indexOfFirstComma = StringUtils.indexOf(line, ",");
                     docNum = StringUtils.substring(line, 0, indexOfFirstComma);
                     StringBuilder value = new StringBuilder();
-                    listOfEntities = StringUtils.substring(line, indexOfFirstComma + 3); // Triming the ", {"
+                    listOfEntities = StringUtils.substring(line, indexOfFirstComma + 2); // Triming the ", {"
                     listOfEntities = StringUtils.substring(listOfEntities, 0, listOfEntities.length()-1);
                     String[] entities = StringUtils.split(listOfEntities, ",");
                     for (String entity1 : entities) {
@@ -310,7 +310,7 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        readQueryFromFile("C:\\Users\\harelsa\\QueriesTests\\queries.txt");
+        readQueryFromFile("C:\\Users\\harelsa\\QueriesTests\\queries-358.txt");
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
         // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
 
@@ -507,6 +507,19 @@ public class Model extends Observable {
 
     public String getQueriesResults() {
         return Ranker.getQueriesResults();
+    }
+
+    public String getEntities(String selectedDocNo) {
+        StringBuilder sb = new StringBuilder();
+        String entities = docEntities.get(selectedDocNo);
+        String[] split = StringUtils.split(entities, ",");
+        for (int i = 0; i < split.length; i++) {
+            String[] split1 = StringUtils.split(split[i], "=");
+            String entity = split1[1];
+            String value = split1[0];
+            sb.append(entity).append("=").append(value).append("\n");
+        }
+        return sb.toString();
     }
 
 

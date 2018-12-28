@@ -1,6 +1,7 @@
 package Engine.View;
 
 
+import Engine.Controller.Controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -44,6 +45,8 @@ public class View extends Observable {
 
     private Scene scene;
     private Stage parent;
+    public String selectedDocNo;
+    public Stage secondryStage;
 
 
     public void browseCorpus() {
@@ -252,10 +255,11 @@ public class View extends Observable {
             @Override
             public void handle(Event event) {
                 String selectedItem = (String) lv_relevantDocs.getSelectionModel().getSelectedItem();
-                String docNo = StringUtils.substringAfter(selectedItem, ".");
+                selectedDocNo = StringUtils.substringAfter(selectedItem, ".");
 
             }
         });
+        lv_relevantDocs.setItems(items);
     }
 
     public void showDocsEntities() {
@@ -266,20 +270,18 @@ public class View extends Observable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Stage secondryStage = new Stage();
+        secondryStage = new Stage();
         secondryStage.setTitle("Entities view");
         Scene scene = new Scene(root, 600, 600);
         secondryStage.setScene(scene);
-        txtArea_entities = (javafx.scene.control.TextArea) scene.lookup("#txtArea_entities");
+        setChanged();
+        notifyObservers("showEntities");
+    }
 
-
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("File not found");
-        alert.setContentText("Please check your posting path and try again");
-        alert.showAndWait();
+    public void showEntities(String entities) {
+        txtArea_entities = (javafx.scene.control.TextArea)secondryStage.getScene().lookup("#txtArea_entities");
+        txtArea_entities.setText(entities);
         secondryStage.show();
-
     }
 }
 //txtArea_dictionary.setText(getDicDisplay("C:\\Users\\Nadav\\Desktop\\Engine Project\\resources"));

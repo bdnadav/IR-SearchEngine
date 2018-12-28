@@ -114,8 +114,10 @@ public class Ranker {
                 results_bw.append(queryId).append(" ").append("0").append(" ").
                         append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
                 sb_queriesResults.append(i+1).append(". ").append(ans.get(i)).append("\n");
+//                sb_queriesResults.append(queryId).append(" ").append("0").append(" ").
+//                        append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
             }
-            sb_queriesResults.append(" ").append("\n");
+            //sb_queriesResults.append(" ").append("\n");
             results_bw.flush();
         } catch (IOException e) {
             e.printStackTrace();
