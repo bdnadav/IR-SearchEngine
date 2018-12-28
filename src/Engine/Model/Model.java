@@ -310,7 +310,7 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        readQueryFromFile("d:\\documents\\users\\bardanad\\Downloads\\queries.txt");
+        readQueryFromFile("C:\\Users\\harelsa\\QueriesTests\\queries.txt");
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
         // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
 
@@ -506,7 +506,7 @@ public class Model extends Observable {
     }
 
     public String getQueriesResults() {
-        return null;
+        return Ranker.getQueriesResults();
     }
 
 

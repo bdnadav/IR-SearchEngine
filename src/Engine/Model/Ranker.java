@@ -35,7 +35,7 @@ public class Ranker {
 
     static {
         try {
-            results_bw = new BufferedWriter(new FileWriter("d:\\documents\\users\\bardanad\\Downloads\\results.txt"));
+            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\harelsa\\QueriesTests\\results.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -50,6 +50,10 @@ public class Ranker {
         BM25_QueryDescriptionWeight = new TreeMap<>();
         QueryTitleTermInHeaders = new TreeMap<>();
         QueryDescTermInHeaders = new TreeMap<>();
+    }
+
+    public static String getQueriesResults() {
+        return sb_queriesResults.toString();
     }
 
     public ArrayList<String> getRankDocs(String queryId, HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByTitle, ArrayList<String> queryOtherTerms){ // queryOtherTerms is title/desc.
@@ -105,12 +109,13 @@ public class Ranker {
 
     private void printResultToFile(ArrayList<String> ans,String queryId) {
         try {
-            sb_queriesResults.append(queryId).append("\n");
+            sb_queriesResults.append("----QUERY ID: ").append(queryId).append("----").append("\n");
             for (int i = 0; i < ans.size(); i++) {
                 results_bw.append(queryId).append(" ").append("0").append(" ").
                         append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
-                sb_queriesResults.append(ans.get(i));
+                sb_queriesResults.append(i+1).append(". ").append(ans.get(i)).append("\n");
             }
+            sb_queriesResults.append(" ").append("\n");
             results_bw.flush();
         } catch (IOException e) {
             e.printStackTrace();

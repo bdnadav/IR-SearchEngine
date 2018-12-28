@@ -35,10 +35,11 @@ public class View extends Observable {
     public javafx.scene.control.TextArea txtArea_dictionary;
     public javafx.scene.control.Button btn_test;
     public javafx.scene.control.ListView list_view;
+    public javafx.scene.control.ListView filter_doc_view ;
     public javafx.scene.control.ListView filter_city_view ;
     public javafx.scene.control.ScrollPane pane_for_cities;
     public javafx.scene.control.ScrollPane pane_for_cities1;
-    public AnchorPane ap_relevantDocs;
+    public ListView lv_relevantDocs;
 
 
     @FXML
@@ -249,5 +250,31 @@ public class View extends Observable {
     }
 
     public void showQueriesResults(String queriesResults) {
+        String[] split = StringUtils.split(queriesResults, "\n");
+        ObservableList<String> items =FXCollections.observableArrayList (
+                split);
+        lv_relevantDocs.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        lv_relevantDocs.setOnMouseClicked(new EventHandler<Event>() {
+            @Override
+            public void handle(Event event) {
+                ObservableList<String> selectedItems =  lv_relevantDocs.getSelectionModel().getSelectedItems();
+
+                ObservableList<String> oldValues = filter_doc_view.getItems() ;
+
+                for (String s :selectedItems
+                        ) {
+                    if ( !oldValues.contains(s))
+                        oldValues.add(s);
+                }
+                filter_doc_view.setItems(selectedItems);
+
+            }
+
+        });
+        lv_relevantDocs.setItems(items);
+    }
+
+    public void showDocsEntities(){
+
     }
 }
