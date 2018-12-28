@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -14,6 +15,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Engine.View.View">
     <children>
@@ -67,7 +69,10 @@
             <Label layoutX="31.0" layoutY="406.0" prefHeight="31.0" prefWidth="150.0" text="Search For Relevant Docs: " />
             <Label layoutX="29.0" layoutY="455.0" text="Corpus Path:" />
             <Label layoutX="29.0" layoutY="516.0" text="Upload query file:" />
-            <Label layoutX="21.0" layoutY="22.0" prefHeight="31.0" prefWidth="150.0" text="Build Corpus :" />
+            <Label layoutX="21.0" layoutY="22.0" prefHeight="31.0" prefWidth="150.0" text="Build Corpus :">
+               <font>
+                  <Font size="18.0" />
+               </font></Label>
             <ScrollPane layoutX="585.0" layoutY="203.0" prefHeight="304.0" prefWidth="299.0">
               <content>
                 <AnchorPane fx:id="ap_relevantDocs" minHeight="0.0" minWidth="0.0" prefHeight="307.0" prefWidth="297.0">
@@ -78,7 +83,7 @@
             </ScrollPane>
             <Label layoutX="586.0" layoutY="176.0" prefHeight="31.0" prefWidth="185.0" text="Query Relevent Docs Results : " />
             <Button fx:id="btn_saveResults" layoutX="583.0" layoutY="521.0" mnemonicParsing="false" onAction="#saveResultsBtnPushed" prefHeight="36.0" prefWidth="140.0" text="Save Results" />
-            <ImageView fitHeight="51.0" fitWidth="239.0" layoutX="653.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="67.0" fitWidth="313.0" layoutX="607.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@logo.png" />
                </image>
@@ -86,6 +91,13 @@
             <Label layoutX="264.0" layoutY="301.0" text="Choose Search By Cities:" />
             <Label layoutX="43.0" layoutY="299.0" text="Filter Search By :" />
             <Button fx:id="btn_showEntities" layoutX="735.0" layoutY="521.0" mnemonicParsing="false" onAction="#showDocsEntities" prefHeight="36.0" prefWidth="140.0" text="Show doc entities" />
+            <Label layoutX="21.0" layoutY="268.0" prefHeight="31.0" prefWidth="150.0" text="Search Corpus :">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Separator layoutX="18.0" layoutY="259.0" prefHeight="1.0" prefWidth="532.0" />
+            <Separator layoutX="558.0" layoutY="21.0" orientation="VERTICAL" prefHeight="571.0" prefWidth="3.0" />
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="274.0" />
             <ListView fx:id="list_view" layoutX="264.0" layoutY="328.0" prefHeight="80.0" prefWidth="277.0" />
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="89.0" prefWidth="196.0" />
