@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Engine.View.View">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Engine.View.View">
     <children>
         <Pane layoutY="1.0" prefHeight="615.0" prefWidth="926.0">
             <children>
@@ -83,27 +83,13 @@
                   <Image url="@logo.png" />
                </image>
             </ImageView>
-            <ScrollPane fx:id="pane_for_cities" layoutX="255.0" layoutY="322.0" prefHeight="91.0" prefWidth="277.0">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="274.0">
-                     <children>
-                        <ListView fx:id="list_view" layoutX="-3.0" layoutY="1.0" prefHeight="80.0" prefWidth="277.0" />
-                     </children>
-                  </AnchorPane>
-              </content>
-            </ScrollPane>
             <Label layoutX="264.0" layoutY="301.0" text="Choose Search By Cities:" />
-            <ScrollPane fx:id="pane_for_cities1" layoutX="46.0" layoutY="322.0" prefHeight="91.0" prefWidth="197.0">
-               <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="89.0" prefWidth="196.0">
-                     <children>
-                        <ListView fx:id="filter_city_view" layoutX="-3.0" layoutY="1.0" prefHeight="80.0" prefWidth="185.0" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </ScrollPane>
             <Label layoutX="43.0" layoutY="299.0" text="Filter Search By :" />
             <Button fx:id="btn_showEntities" layoutX="735.0" layoutY="521.0" mnemonicParsing="false" onAction="#showDocsEntities" prefHeight="36.0" prefWidth="140.0" text="Show doc entities" />
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="274.0" />
+            <ListView fx:id="list_view" layoutX="264.0" layoutY="328.0" prefHeight="80.0" prefWidth="277.0" />
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="89.0" prefWidth="196.0" />
+            <ListView fx:id="filter_city_view" layoutX="30.0" layoutY="328.0" prefHeight="80.0" prefWidth="185.0" />
             </children>
         </Pane>
     </children>

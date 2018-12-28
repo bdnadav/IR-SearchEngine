@@ -220,8 +220,7 @@ public class View extends Observable {
 
     public void setCitiesView(ArrayList<String> citiesView) {
 
-        ObservableList<String> items = FXCollections.observableArrayList(
-                "Single", "Double", "Suite", "Family App");
+        ObservableList<String> items = FXCollections.observableArrayList();
         list_view.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 
@@ -240,11 +239,27 @@ public class View extends Observable {
                     if (!oldValues.contains(s))
                         oldValues.add(s);
                 }
-                filter_city_view.setItems(selectedItems);
 
+                filter_city_view.setItems(oldValues);
             }
-
         });
+
+        filter_city_view.setOnMouseClicked(new EventHandler<Event>() {
+            @Override
+            public void handle(Event event) {
+
+                //if (filter_city_view)
+                ObservableList<String> oldValues = filter_city_view.getItems();
+                ObservableList<String> selectedItems = filter_city_view.getSelectionModel().getSelectedItems();
+                oldValues.remove(selectedItems.get(0));
+
+                filter_city_view.setItems(oldValues);
+            }
+        });
+        for (String s : citiesView
+                ) {
+            items.add(s);
+        }
         list_view.setItems(items);
     }
 
@@ -314,6 +329,10 @@ public class View extends Observable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void  search_query() {
+
     }
 }
 

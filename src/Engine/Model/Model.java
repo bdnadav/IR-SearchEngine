@@ -28,7 +28,7 @@ public class Model extends Observable {
     HashMap<String, String> headersDictionary = new HashMap<>();
     HashMap<String, String> docEntities = new HashMap<>();
     private double  AVL;
-    private ArrayList citiesView;
+    private ArrayList<String> citiesView;
 
 
     /**
@@ -43,6 +43,7 @@ public class Model extends Observable {
     public void run(String corpusPath, String postingPath, boolean stemming) {
         long startTime = System.currentTimeMillis();
         this.corpusPath = corpusPath;
+        //this.citiesView = new ArrayList();
         this.postingPath = postingPath;
         this.is_stemming = stemming;
         CorpusProcessingManager corpusProcessingManager = new CorpusProcessingManager(corpusPath, postingPath, stemming);
@@ -85,6 +86,7 @@ public class Model extends Observable {
      * @param stemming
      */
     public void loadDicToMemory(String stemming) {
+        citiesView = new ArrayList<>();
         File dir = new File(postingPath + "\\Postings" + ifStemming());
         if (dir != null && dir.exists()) {
             StringBuilder sb = new StringBuilder();
@@ -132,7 +134,7 @@ public class Model extends Observable {
                     if (info.equals(","))
                         info = "NULL";
                     docsList = StringUtils.substring(line, lastIndexOfComma + 1);
-                    //citiesView.add( city) ;
+                    citiesView.add(city) ;
                     citiesDictionary.put(city, new Pair<String, String>(info, docsList));
                 }
                 br_dic.close();
