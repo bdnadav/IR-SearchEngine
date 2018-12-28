@@ -17,7 +17,7 @@ public class Model extends Observable {
     private String corpusPath; //saved corpus path
     private String postingPath;// saved outpot posting path
     private boolean is_stemming; // using a stemmer on terms ot not
-    private boolean useSemantics = true;
+    private boolean useSemantics = false;
     public String[] list_lang; //list of lang returns from parsing the docs
     // will allow to load the term dic to prog memory -
     // will be used in project part 2
@@ -310,7 +310,7 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        readQueryFromFile("C:\\Users\\harelsa\\QueriesTests\\queries-358.txt");
+        readQueryFromFile("C:\\Users\\harelsa\\QueriesTests\\queries.txt");
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
         // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
 

@@ -15,7 +15,7 @@ import org.json.JSONObject;
 
 public class Searcher {
     private final int MAX_DOCS_TO_RETURN = 50;
-    private final int MAX_SYN_TERMS_FROM_API = 5 ;
+    private final int MAX_SYN_TERMS_FROM_API = 3 ;
     private final boolean useSemantic;
     private final Boolean stemming;
     private Parse queryParse;
@@ -89,7 +89,7 @@ public class Searcher {
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
         /** Handle Semantic **/
-      //  if ( this.useSemantic) {
+        if ( this.useSemantic) {
 
             getSemanticTerms(queryTitleTerms);
             if ( !synonymous_terms.isEmpty()){
@@ -99,7 +99,7 @@ public class Searcher {
                         queryTitleTerms.add(s);
                 }
             }
-      //  }
+        }
 
         if (extraTermsMayHelp(queryTitleTerms, queryDescTerms)){
             ArrayList<String> queryDescTermsToAdd = getExtraTerms(queryDescTerms, queryTitleTerms);

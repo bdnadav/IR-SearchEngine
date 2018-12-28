@@ -316,5 +316,4 @@ public class View extends Observable {
         }
     }
 }
-//txtArea_dictionary.setText(getDicDisplay("C:\\Users\\Nadav\\Desktop\\Engine Project\\resources"));
 
