@@ -89,7 +89,7 @@ public class Searcher {
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
         /** Handle Semantic **/
-        if ( this.useSemantic) {
+      //  if ( this.useSemantic) {
 
             getSemanticTerms(queryTitleTerms);
             if ( !synonymous_terms.isEmpty()){
@@ -99,7 +99,7 @@ public class Searcher {
                         queryTitleTerms.add(s);
                 }
             }
-        }
+      //  }
 
         if (extraTermsMayHelp(queryTitleTerms, queryDescTerms)){
             ArrayList<String> queryDescTermsToAdd = getExtraTerms(queryDescTerms, queryTitleTerms);
@@ -189,7 +189,9 @@ public class Searcher {
      * @throws Exception
      */
     private void useUrlSemantic(String term) throws Exception {
-        URL url = new URL("https://api.datamuse.com/words?rel_trg=" + term +"&max=20"); //only from the top 20 results
+
+        //URL url = new URL("https://api.datamuse.com/words?rel_trg=" + term +"&max=20"); //only from the top 20 results
+        URL url = new URL("https://api.datamuse.com/words?ml=" + term +"&max=20"); //only from the top 20 results
         //URLConnection connection = website.openConnection();
         HttpURLConnection con  = ( HttpURLConnection)  url.openConnection();
         con.setRequestMethod("GET");
