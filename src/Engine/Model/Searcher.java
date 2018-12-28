@@ -89,16 +89,17 @@ public class Searcher {
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
         /** Handle Semantic **/
-        //if ( this.useSemantic) {
-//
-//            getSemanticTerms(queryTitleTerms);
-//            if ( !synonymous_terms.isEmpty()){
-//                for (String s :synonymous_terms
-//                        ) {
-//                        queryTitleTerms.add(s);
-//                }
-//            }
-       // }
+        if ( this.useSemantic) {
+
+        getSemanticTerms(queryTitleTerms);
+        if ( !synonymous_terms.isEmpty()){
+            for (String s :synonymous_terms
+                    ) {
+                if (!queryTitleTerms.contains(s))
+                queryTitleTerms.add(s);
+            }
+        }
+         }
 
         if (extraTermsMayHelp(queryTitleTerms, queryDescTerms)){
             ArrayList<String> queryDescTermsToAdd = getExtraTerms(queryDescTerms, queryTitleTerms);
@@ -206,7 +207,7 @@ public class Searcher {
         for (int k = 0 ; k < jsonArray.length() ; k++) {
             JSONObject obj = (JSONObject) jsonArray.get(k);
             String synonymous_term= (String) obj.get("word");
-            String synonymous_score= (String) obj.get("score");
+            //String synonymous_score= (String) obj.get("score");
             String termData ;
             termData = terms_dictionary.get(synonymous_term);
             if ( termData == null )  // try capital term
