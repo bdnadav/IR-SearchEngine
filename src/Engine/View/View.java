@@ -206,6 +206,7 @@ public class View extends Observable {
     public void load_dic_mem() {
         setChanged();
         notifyObservers("load_to_memory");
+
     }
 
     public boolean checkPathsProccese() {
@@ -393,11 +394,11 @@ public class View extends Observable {
         } else return false;
     }
 
-    private void enableSearchBtns(){
+    public void enableSearchBtns(){
         search_query_btn.setDisable(false);
     }
 
-    private void enableAfterSearchBtns(){
+    public void enableAfterSearchBtns(){
         btn_saveResults.setDisable(false);
         btn_showEntities.setDisable(false);
         btn_saveResults.setDisable(false);

@@ -27,7 +27,9 @@ public class Controller extends Observable implements Observer {
                     String stemming = "";
                     if ( view.check_stemming.isSelected())
                         stemming = "Stemming" ;
-                    model.loadDicToMemory(stemming);
+                    boolean success = model.loadDicToMemory(stemming);
+                    if (success)
+                    view.enableSearchBtns();
                     view.setCitiesView(model.getCitiesView());
                     break;
                 case "reset":

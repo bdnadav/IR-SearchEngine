@@ -86,7 +86,8 @@ public class Model extends Observable {
      *
      * @param stemming
      */
-    public void loadDicToMemory(String stemming) {
+    public boolean loadDicToMemory(String stemming) {
+        boolean ans = true;
         citiesView = new ArrayList<>();
         File dir = new File(postingPath + "\\Postings" + ifStemming());
         if (dir != null && dir.exists()) {
@@ -115,6 +116,7 @@ public class Model extends Observable {
             JOptionPane.showMessageDialog(null, "Term dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
+            ans = false ;
         }
 
         File cityDir = new File(postingPath + "\\Postings" + ifStemming());
@@ -147,6 +149,7 @@ public class Model extends Observable {
 
             JOptionPane.showMessageDialog(null, "Cities dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
         } else {
+            ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -193,6 +196,7 @@ public class Model extends Observable {
 
             JOptionPane.showMessageDialog(null, "Docs dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
         } else {
+            ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -215,6 +219,7 @@ public class Model extends Observable {
 
             JOptionPane.showMessageDialog(null, "Headers dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
         } else {
+            ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -246,8 +251,10 @@ public class Model extends Observable {
 
             JOptionPane.showMessageDialog(null, "Docs Entities loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
         } else {
+            ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
         }
+        return ans;
     }
 
 
