@@ -1,5 +1,6 @@
 package Engine.Model;
 
+import javafx.collections.ObservableList;
 import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -312,7 +313,7 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        readQueryFromFile("C:\\Users\\harelsa\\QueriesTests\\queries.txt");
+        //readQueryFromFile("C:\\Users\\harelsa\\QueriesTests\\queries.txt");
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
         // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
 
@@ -365,7 +366,7 @@ public class Model extends Observable {
      *
      * @param path
      */
-    public void readQueryFromFile(String path) {
+    public void readQueryFromFile(String path , ObservableList items) {
         BufferedReader br;
         try {
             br = new BufferedReader(new FileReader(path));
@@ -375,6 +376,8 @@ public class Model extends Observable {
             //loadDicToMemory(ifStemming());
 
             ArrayList<String> cities = new ArrayList<>();
+            cities.addAll(items);
+
 //            cities.add("BUENOS");
 //            cities.add("MOSCOW");
             //cities = null;
@@ -526,6 +529,14 @@ public class Model extends Observable {
 
     public String getResultsTrecFormat() {
         return Ranker.getTrecFormatResults();
+    }
+
+    public void handleSingleQuery(String query, ObservableList items) {
+        ArrayList<String> cities = new ArrayList<>();
+        cities.addAll(items);
+        Searcher searcher = new Searcher(postingPath,corpusPath, is_stemming, cities, termDictionary, docsDictionary, citiesDictionary, headersDictionary, docEntities, useSemantics , AVL);
+        searcher.handleQuery( "0" , query, "null", "null");
+
     }
 
 

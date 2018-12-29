@@ -52,6 +52,12 @@ public class Controller extends Observable implements Observer {
                     String results = model.getResultsTrecFormat();
                     view.saveResults(results);
                     break;
+                case "search_query_file":
+                    String file_path_query = view.query_file_path.getText();
+                    model.readQueryFromFile(file_path_query  ,view.filter_city_view.getItems());
+                case "search_query":
+                    String query = view.query_path_txtfield.getText();
+                    model.handleSingleQuery(query , view.filter_city_view.getItems()) ;
 
 
                 default:

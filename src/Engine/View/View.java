@@ -1,7 +1,6 @@
 package Engine.View;
 
 
-import Engine.Controller.Controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -12,8 +11,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxListCell;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,6 +20,7 @@ import java.util.*;
 
 public class View extends Observable {
     @FXML
+    //create part **********************************
     public javafx.scene.control.TextField corpus_txt_field;
     public javafx.scene.control.TextField posting_txt_field;
     public javafx.scene.control.CheckBox check_stemming;
@@ -37,8 +35,16 @@ public class View extends Observable {
     public javafx.scene.control.ListView filter_city_view;
     public javafx.scene.control.ScrollPane pane_for_cities;
     public javafx.scene.control.ScrollPane pane_for_cities1;
+    //Search part ******************************
+    public javafx.scene.control.Button btn_showEntities;
+    public javafx.scene.control.Button search_query_btn;
+    public javafx.scene.control.Button search_file_query_btn;
+    public javafx.scene.control.Button btn_file_query_search;
+    public javafx.scene.control.CheckBox check_semmantics;
     public ListView lv_relevantDocs;
     public javafx.scene.control.TextArea txtArea_entities;
+    public javafx.scene.control.TextField query_path_txtfield;
+    public javafx.scene.control.TextField query_file_path;
     public Button btn_saveResults;
 
 
@@ -50,7 +56,7 @@ public class View extends Observable {
     public Stage secondryStage;
     public File resultsDirectory;
 
-
+    /***********Procces corpos  PART ****************************/
     public void browseCorpus() {
 
         JFileChooser fc = new JFileChooser();
@@ -86,7 +92,7 @@ public class View extends Observable {
             JOptionPane.showMessageDialog(null, "One or  more Paths is missing", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (!checkPaths()) { // paths are not valid
+        if (!checkPathsProccese()) { // paths are not valid
             JOptionPane.showMessageDialog(null, "Paths are Invalid", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -202,7 +208,7 @@ public class View extends Observable {
         notifyObservers("load_to_memory");
     }
 
-    public boolean checkPaths() {
+    public boolean checkPathsProccese() {
         String corpus = corpus_txt_field.getText();
         String posting = posting_txt_field.getText();
         File dir = new File(corpus);
@@ -217,6 +223,9 @@ public class View extends Observable {
         notifyObservers("showTests");
     }
 
+
+
+    /**********************Search FUNCS ***************************/
 
     public void setCitiesView(ArrayList<String> citiesView) {
 
@@ -332,7 +341,66 @@ public class View extends Observable {
     }
 
     public void  search_query() {
+        if ( query_path_txtfield.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Query is empty!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
+
+        setChanged();
+        notifyObservers("search_query");
+
+        enableAfterSearchBtns();
+    }
+    public void  search_query_file() {
+        if ( query_file_path.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Path is missing!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!checkPathsSearch()) { // paths are not valid
+            JOptionPane.showMessageDialog(null, "Paths are Invalid", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        setChanged();
+        notifyObservers("search_query_file");
+
+        enableAfterSearchBtns();
+
+
+    }
+
+    public void browse_query_file() {
+        JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File(System.getProperty("user.home")));
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fc.setAcceptAllFileFilterUsed(false);
+        int result = fc.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            query_file_path.clear();
+            File selectedFile = fc.getSelectedFile();
+            System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+            query_file_path.appendText(selectedFile.getAbsolutePath());
+        }
+        enableSearchBtns();
+
+    }
+    public boolean checkPathsSearch() {
+        String queries = corpus_txt_field.getText();
+ posting_txt_field.getText();
+        File dir = new File(queries);
+        if (dir != null && dir.exists()) {
+            return true;
+        } else return false;
+    }
+
+    private void enableSearchBtns(){
+        search_query_btn.setDisable(false);
+    }
+
+    private void enableAfterSearchBtns(){
+        btn_saveResults.setDisable(false);
+        btn_showEntities.setDisable(false);
+        btn_saveResults.setDisable(false);
     }
 }
 

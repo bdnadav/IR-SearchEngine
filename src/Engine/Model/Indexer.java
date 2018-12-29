@@ -66,7 +66,7 @@ class Indexer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("lala");
+       // System.out.println("lala");
 
     }
 
@@ -231,6 +231,7 @@ class Indexer {
             termToDocs.clear();
             termToDocs = new HashMap<>();
         }
+        Posting.flushAll();
         for (BufferedReader segsReader : segsReaders) {
             try {
                 segsReader.close();

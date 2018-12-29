@@ -185,7 +185,6 @@ public class Parse {
         //text = remove_stop_words(text);
         String[] tokens;
         tokens = StringUtils.split(text, "\\`:)?*(|+@#^;!&=}{[]'<> ");
-
         getTerms(tokens, currDoc ,"DocText");
 //        if ( currDoc.docNo.equals("FBIS3-3366"))
 //        printFBIS3ToFile() ;
@@ -280,11 +279,12 @@ public class Parse {
 
             // catch point joint terms
             String temp_char = cleanToken(tokensArray[i]);
-            if ((tokensArray[i].length() > 5 && Character.isUpperCase(temp_char.charAt(0)) || Character.isLowerCase(temp_char.charAt(0)))
+            if ((tokensArray[i].length() > 5 && (Character.isUpperCase(temp_char.charAt(0)) || Character.isLowerCase(temp_char.charAt(0))))
                     && StringUtils.containsAny(temp_char, "?/\"\\':)(`*[}|{=&@~%+^;]#!,.<>")) {
                 // break it to single words
                 String[] arr = StringUtils.split(temp_char, "/\"\\`:)?*(|@;&%!=~+^}{#[],'.<>");
-
+                if (check_for_init(arr))
+                    arr = StringUtils.split(temp_char, "/\"\\`:)?*(|@;&%!=~+^}{#[],'<>");
                 tokensArray[i] = StringUtils.join(arr, ".", 1, arr.length);
                 if (arr[0].length() > 2)
                     addTerm = cleanToken(arr[0]);
@@ -498,6 +498,15 @@ public class Parse {
         return null;
     }
 
+    private boolean check_for_init(String[] arr) {
+        for (String s :arr
+             ) {
+            if ( s.length() == 1 && StringUtils.isAllUpperCase(s))
+                return true ;
+        }
+        return false   ;
+    }
+
     public static double getAVL ( ){
         return TOTOAL_TERMS/DOC_NUM ;
         //return  250 ;
@@ -525,11 +534,16 @@ public class Parse {
         boolean isUpper = Character.isUpperCase(addTerm.charAt(0)) ;
 
         if (stemming) {
-            Stemmer stemmer = new Stemmer();
-            stemmer.add(addTerm.toCharArray(), addTerm.length());
-            stemmer.stem();
-            addTerm = stemmer.toString();
-
+            String final_term = "";
+            String[] split = addTerm.split(" ");
+            for ( String s :split
+                 ) {
+                Stemmer stemmer = new Stemmer();
+                stemmer.add(s.toCharArray(), s.length());
+                stemmer.stem();
+                final_term+= stemmer.toString() +" ";
+            }
+            addTerm = final_term.substring(0 , final_term.length()-1) ;
         }
         if (stopwords.contains(addTerm.toLowerCase()) || addTerm.toLowerCase().equals("xx") || addTerm.toLowerCase().equals("page"))
              return;
@@ -1152,7 +1166,7 @@ public class Parse {
     }
 
     public void cleanAll() {
-        Posting.flushAndClose();
+        Posting.flushAll();
         this.FBIS3_Terms.clear();
         this.FilesTerms.clear();
         this.TermsOnly.clear();

@@ -79,9 +79,11 @@ public class Searcher {
         this.ranker = new Ranker(docs_dictionary.size(), this.AVL);
         queryParse.parseQuery(queryTitle);
         ArrayList<String> queryTitleTerms = queryParse.getQueryTerms();
-        descParse.parseQuery(queryDescription);
-        ArrayList<String> queryDescTerms = descParse.getQueryTerms();
-
+        ArrayList<String> queryDescTerms  ;
+        if ( !queryDescription.equals("null")) {
+            descParse.parseQuery(queryDescription);
+            queryDescTerms = descParse.getQueryTerms();
+        }else   queryDescTerms = new ArrayList<>(); // there is no DEsc to single query
         //queryDescTerms = filterDescTerms(queryDescTerms);
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTitleTerms; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryDescTerm; // <DescTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
