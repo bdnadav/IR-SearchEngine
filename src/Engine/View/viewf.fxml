@@ -83,9 +83,9 @@
             </ScrollPane>
             <Label layoutX="586.0" layoutY="176.0" prefHeight="31.0" prefWidth="185.0" text="Query Relevent Docs Results : " />
             <Button fx:id="btn_saveResults" disable="true" layoutX="583.0" layoutY="521.0" mnemonicParsing="false" onAction="#saveResultsBtnPushed" prefHeight="36.0" prefWidth="140.0" text="Save Results" />
-            <ImageView fitHeight="80.0" fitWidth="299.0" layoutX="631.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="80.0" fitWidth="299.0" layoutX="585.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@logo2.png" />
+                  <Image url="@logo.png" />
                </image>
             </ImageView>
             <Label layoutX="264.0" layoutY="301.0" prefHeight="17.0" prefWidth="253.0" text="Choose Search By Cities: (click to add to filter)" />

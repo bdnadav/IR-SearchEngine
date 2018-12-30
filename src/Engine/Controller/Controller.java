@@ -16,7 +16,6 @@ public class Controller extends Observable implements Observer {
         if ( o == view) {
             switch ((String) arg) {
                 case "run":
-                    System.out.println("good");
                     /* The next two lines in comment only for test 8/12/18 10:45*/
                     model.run(view.corpus_txt_field.getText(), view.posting_txt_field.getText(), view.check_stemming.isSelected());
                     break;
@@ -54,14 +53,16 @@ public class Controller extends Observable implements Observer {
                     String results = model.getResultsTrecFormat();
                     view.saveResults(results);
                     break;
-                case "search_query_file":
-                    String file_path_query = view.query_file_path.getText();
+                case "file_search_query":
+                    String file_path_query = view.query_file_path.getText().toString();
                     model.readQueryFromFile(file_path_query  ,view.filter_city_view.getItems());
+                    view.showQueriesResults(model.getQueriesResults());
+                    break;
                 case "search_query":
-                    String query = view.query_path_txtfield.getText();
+                    String query = view.query_path_txtfield.getText().toString();
                     model.handleSingleQuery(query , view.filter_city_view.getItems()) ;
-
-
+                    view.showQueriesResults(model.getQueriesResults());
+                    break;
                 default:
                     System.out.println("no match");
             }
