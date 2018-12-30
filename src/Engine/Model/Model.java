@@ -320,7 +320,7 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        readQueryFromFile("C:\\Users\\bardanad\\queriesTests\\queries.txt", null);
+        //readQueryFromFile("C:\\Users\\bardanad\\queriesTests\\queries.txt", null);
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
         // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
 
@@ -373,7 +373,7 @@ public class Model extends Observable {
      *
      * @param path
      */
-    public void readQueryFromFile(String path , ObservableList items) {
+    public void readQueryFromFile(String path , ObservableList items , boolean useSemantics) {
         BufferedReader br;
         try {
             br = new BufferedReader(new FileReader(path));
@@ -426,7 +426,7 @@ public class Model extends Observable {
                     }
 
                 }
-                searcher.handleQuery(query_id, query, sb_desc.toString(), sb_narr.toString());
+                searcher.handleQuery(query_id, query, sb_desc.toString(), sb_narr.toString() , useSemantics);
                 sb_desc.delete(0, sb_desc.length());
                 sb_desc.setLength(0);
                 sb_narr.delete(0, sb_narr.length());
@@ -539,11 +539,11 @@ public class Model extends Observable {
         return Ranker.getTrecFormatResults();
     }
 
-    public void handleSingleQuery(String query, ObservableList items) {
+    public void handleSingleQuery(String query, ObservableList items, boolean useSemantics) {
         ArrayList<String> cities = new ArrayList<>();
         cities.addAll(items);
         Searcher searcher = new Searcher(postingPath,corpusPath, is_stemming, cities, termDictionary, docsDictionary, citiesDictionary, headersDictionary, docEntities, useSemantics , AVL);
-        searcher.handleQuery( "0" , query, "null", "null");
+        searcher.handleQuery( "0" , query, "null", "null", useSemantics);
 
     }
 

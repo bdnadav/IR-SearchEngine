@@ -55,12 +55,12 @@ public class Controller extends Observable implements Observer {
                     break;
                 case "file_search_query":
                     String file_path_query = view.query_file_path.getText().toString();
-                    model.readQueryFromFile(file_path_query  ,view.filter_city_view.getItems());
+                    model.readQueryFromFile(file_path_query  ,view.filter_city_view.getItems() , view.check_semmantics.isSelected());
                     view.showQueriesResults(model.getQueriesResults());
                     break;
                 case "search_query":
                     String query = view.query_path_txtfield.getText().toString();
-                    model.handleSingleQuery(query , view.filter_city_view.getItems()) ;
+                    model.handleSingleQuery(query , view.filter_city_view.getItems() , view.check_semmantics.isSelected()) ;
                     view.showQueriesResults(model.getQueriesResults());
                     break;
                 default:

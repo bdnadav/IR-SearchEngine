@@ -77,7 +77,7 @@ public class Searcher {
 
 
 
-    public ArrayList<String> handleQuery(String query_id, String queryTitle, String queryDescription, String queryNarrative) {
+    public ArrayList<String> handleQuery(String query_id, String queryTitle, String queryDescription, String queryNarrative, boolean useSemantic) {
         resetAllDataStructures() ; //a new query has arrived - cleanall
         queryParse.parseQuery(queryTitle);
         ArrayList<String> queryTitleTerms = queryParse.getQueryTerms();
@@ -97,7 +97,7 @@ public class Searcher {
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
         /** Handle Semantic **/
-        if ( this.useSemantic) {
+        if ( useSemantic) {
 
             getSemanticTerms(queryTitleTerms);
             if ( !synonymous_terms.isEmpty()){
