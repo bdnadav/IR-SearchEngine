@@ -42,6 +42,9 @@ public class Ranker {
         }
     }
 
+    private ArrayList<String> originalTitleTerms;
+    private ArrayList<String> originalDescTerm;
+
 
     Ranker(int numberOfDocsInCorpus, double avgDocsLength) {
         this.NUM_OF_DOCS_IN_CORPUS = numberOfDocsInCorpus;
@@ -64,7 +67,9 @@ public class Ranker {
         return results;
     }
 
-    public ArrayList<String> getRankDocs(String queryId, HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByTitle, ArrayList<String> queryOtherTerms){ // queryOtherTerms is title/desc.
+    public ArrayList<String> getRankDocs(String queryId, HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByTitle, ArrayList<String> queryOtherTerms, ArrayList<String> originalTitleTerms, ArrayList<String> queryDescTerms){ // queryOtherTerms is title/desc.
+        this.originalTitleTerms = originalTitleTerms;
+        this.originalDescTerm = queryDescTerms;
         calculateWeights(relevantDocsByTitle, queryOtherTerms);
         mergeValues();
         ArrayList<String> ans = getSortedDocs();
@@ -174,7 +179,7 @@ public class Ranker {
                 if (queryOtherTerms.contains(queryTitleTerm)) {
                     mode = "BOTH"; // The description term is title term as well.
                 }
-                addBM25ValueToDoc(docNo, tf, docLength, termDf, mode);
+                addBM25ValueToDoc(docNo, tf, docLength, termDf, mode, queryTitleTerm);
             }
         }
         /* Handle headers weight calculates */
@@ -286,9 +291,11 @@ public class Ranker {
     }
 
 
-    private void addBM25ValueToDoc(String docNo, int tf, int docLength, int df, String mode) {
+    private void addBM25ValueToDoc(String docNo, int tf, int docLength, int df, String mode, String queryTitleTerm) {
         double bm25Value = ( ( ( (K + 1) * tf ) / ( tf + K * (1 - B + B * docLength/AVG_LENGTH_OF_DOCS_IN_CORPUS) ) )
                 * Math.log((NUM_OF_DOCS_IN_CORPUS + 1) / df));
+        if (originalTitleTerms.contains(queryTitleTerm))
+            bm25Value *= 1.5;
 
         if (BM25_QueryTitleWeight.get(docNo) != null){
             double currValue = BM25_QueryTitleWeight.get(docNo);

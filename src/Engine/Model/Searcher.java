@@ -15,7 +15,6 @@ import org.json.JSONObject;
 
 public class Searcher {
     private static final int MAX_TRG_TERMS_FROM_API = 2;
-    private final int MAX_DOCS_TO_RETURN = 50;
     private final int MAX_SYN_TERMS_FROM_API = 3 ;
     private final boolean useSemantic;
     private final Boolean stemming;
@@ -44,7 +43,6 @@ public class Searcher {
         this.synonymous_terms = new ArrayList<>();
         this.trigers_terms = new ArrayList<>();
         this.stemming = stemming;
-        //this.synonymous_and_pointers = new HashMap<>() ;
         this.cities_dictionary = citiesDic;
         this.docs_dictionary = docsDic;
         this.headers_dictionary = headersDictionary;
@@ -114,7 +112,7 @@ public class Searcher {
             queryTitleTerms.addAll(queryDescTermsToAdd);
         }
         relevantDocsByQueryTitleTerms = getRelevantDocs(queryTitleTerms);
-        ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryTitleTerms, queryDescTerms);
+        ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryTitleTerms, queryDescTerms, originalTitleTerms, queryDescTerms);
         return rankedDocs;
     }
 
