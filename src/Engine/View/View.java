@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.util.*;
 
@@ -373,7 +374,9 @@ public class View extends Observable {
     public void browse_query_file() {
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(System.getProperty("user.home")));
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("TEXT FILES", "txt", "text");
+        fc.setFileFilter(filter);
         fc.setAcceptAllFileFilterUsed(false);
         int result = fc.showOpenDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {

@@ -55,10 +55,10 @@ public class Controller extends Observable implements Observer {
                     view.saveResults(results);
                     break;
                 case "search_query_file":
-                    String file_path_query = view.query_file_path.getText();
+                    String file_path_query = view.query_file_path.getText().toString();
                     model.readQueryFromFile(file_path_query  ,view.filter_city_view.getItems());
                 case "search_query":
-                    String query = view.query_path_txtfield.getText();
+                    String query = view.query_path_txtfield.getText().toString();
                     model.handleSingleQuery(query , view.filter_city_view.getItems()) ;
 
 
