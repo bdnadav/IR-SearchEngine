@@ -163,6 +163,7 @@ public class Parse {
     }
 
     public void parseQuery(String text ) {
+        cleanAll();
         QueryTerms = new ArrayList<>();
         termPosition = 0;
         //text = remove_stop_words(text);
@@ -1167,9 +1168,12 @@ public class Parse {
 
     public void cleanAll() {
         Posting.flushAll();
-        this.FBIS3_Terms.clear();
-        this.FilesTerms.clear();
-        this.TermsOnly.clear();
+        if (FBIS3_Terms != null)
+            this.FBIS3_Terms.clear();
+        if (FilesTerms != null)
+            this.FilesTerms.clear();
+        if (TermsOnly != null)
+            this.TermsOnly.clear();
     }
 
     public ArrayList<String> getQueryTerms() {

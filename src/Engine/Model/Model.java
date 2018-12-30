@@ -18,7 +18,7 @@ public class Model extends Observable {
     private String corpusPath; //saved corpus path
     private String postingPath;// saved outpot posting path
     private boolean is_stemming; // using a stemmer on terms ot not
-    private boolean useSemantics = false;
+    private boolean useSemantics = true;
     public String[] list_lang; //list of lang returns from parsing the docs
     // will allow to load the term dic to prog memory -
     // will be used in project part 2
@@ -320,7 +320,7 @@ public class Model extends Observable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        //readQueryFromFile("C:\\Users\\harelsa\\QueriesTests\\queries.txt");
+        readQueryFromFile("C:\\Users\\bardanad\\queriesTests\\queries.txt", null);
         //Searcher searcher = new Searcher(postingPath, is_stemming, null, termDictionary, docsDictionary, citiesDictionary);
         // searcher.handleQuery(query_id, sb_query.toString(), sb_desc.toString(), "British Chunnel impact");
 
@@ -383,7 +383,8 @@ public class Model extends Observable {
             //loadDicToMemory(ifStemming());
 
             ArrayList<String> cities = new ArrayList<>();
-            cities.addAll(items);
+            if (items != null)
+                cities.addAll(items);
 
 //            cities.add("BUENOS");
 //            cities.add("MOSCOW");

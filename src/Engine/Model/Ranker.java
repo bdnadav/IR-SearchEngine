@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class Ranker {
-    private final int MAX_DOCS_TO_RETURN = 50;
+    private final int MAX_DOCS_TO_RETURN = 50; // The require number of docs to return
     /* Ranking factors and their weight*/
     private final double BM25_TITLE_FACTOR_WEIGHT = 1;
     private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0.0;
@@ -20,7 +20,7 @@ public class Ranker {
     private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0.0;
 
     /* BM25 Constants*/
-    private final double K = 2.5;
+    private final double K = 1.5;
     private final double B = 0.37;
     private final double AVG_LENGTH_OF_DOCS_IN_CORPUS;
     private final int NUM_OF_DOCS_IN_CORPUS;
@@ -36,7 +36,7 @@ public class Ranker {
 
     static {
         try {
-            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\harelsa\\QueriesTests\\results\\results.txt"));
+            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\bardanad\\queriesTests\\results\\resultsWithStemming.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -105,8 +105,8 @@ public class Ranker {
 
             double bm25Classic = BM25_TITLE_FACTOR_WEIGHT * bm25ClassicWeight * 1.5;
             double bm25Description = BM25_DESCRIPTION_FACTOR_WEIGHT * bm25DescriptionWeight;
-            double titleTermInHeader = TITLE_IN_HEADERS_FACTOR_WEIGHT * titleTermInHeadersWeight*75;
-            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight*75;
+            double titleTermInHeader = TITLE_IN_HEADERS_FACTOR_WEIGHT * titleTermInHeadersWeight*50;
+            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight*50;
 
             double mergedValue = bm25Classic + bm25Description + titleTermInHeader + descTermInHeader;
 

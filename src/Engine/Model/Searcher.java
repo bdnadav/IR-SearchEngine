@@ -14,10 +14,12 @@ import org.json.JSONObject;
 
 
 public class Searcher {
+    private static final int MAX_TRG_TERMS_FROM_API = 2;
     private final int MAX_DOCS_TO_RETURN = 50;
     private final int MAX_SYN_TERMS_FROM_API = 3 ;
     private final boolean useSemantic;
     private final Boolean stemming;
+    private final String corpusPath;
     private Parse queryParse;
     private Parse descParse;
     private TreeMap<String, String> terms_dictionary;
@@ -33,23 +35,24 @@ public class Searcher {
     private boolean citiesConstraint;
     private String posting;
     private double AVL;
+    private ArrayList<String> trigers_terms;
 
 
     public Searcher(String posting, String corpusPath, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String, String> docEntities, boolean semantic, double AVL) {
         this.terms_dictionary = termsDic;
         this.AVL = AVL ;
         this.synonymous_terms = new ArrayList<>();
+        this.trigers_terms = new ArrayList<>();
         this.stemming = stemming;
         //this.synonymous_and_pointers = new HashMap<>() ;
         this.cities_dictionary = citiesDic;
         this.docs_dictionary = docsDic;
         this.headers_dictionary = headersDictionary;
         this.docs_entities = docEntities;
-        this.ranker = new Ranker(docsDic.size(), AVL);
-        this.queryParse = new Parse(posting, stemming , corpusPath);
-        this.descParse = new Parse(posting, stemming , corpusPath);
+        this.AVL = AVL;
+        this.corpusPath = corpusPath;
         this.posting = posting;
-        this.useSemantic = semantic ;
+        this.useSemantic = semantic;
         Posting.initTermPosting(posting, stemming);
         if (specificCities != null && !specificCities.isEmpty()) {
             citiesConstraint = true;
@@ -75,10 +78,13 @@ public class Searcher {
 
 
     public ArrayList<String> handleQuery(String query_id, String queryTitle, String queryDescription, String queryNarrative) {
-        resetAllDateStructures() ; //a new query has arrived - cleanall
-        this.ranker = new Ranker(docs_dictionary.size(), this.AVL);
+        resetAllDataStructures() ; //a new query has arrived - cleanall
         queryParse.parseQuery(queryTitle);
         ArrayList<String> queryTitleTerms = queryParse.getQueryTerms();
+        ArrayList<String> originalTitleTerms = new ArrayList<>(queryTitleTerms);
+        Set<String> set = new HashSet<>(queryTitleTerms);
+        queryTitleTerms.clear();
+        queryTitleTerms.addAll(set);
         ArrayList<String> queryDescTerms  ;
         if ( !queryDescription.equals("null")) {
             descParse.parseQuery(queryDescription);
@@ -119,10 +125,15 @@ public class Searcher {
         return rankedDocs;
     }
 
-    private void resetAllDateStructures() {
+    private void resetAllDataStructures() {
+        this.ranker = new Ranker(docs_dictionary.size(), AVL);
         this.synonymous_terms.clear();
         this.synonymous_terms = new ArrayList<>();
-
+        this.trigers_terms.clear();
+        this.trigers_terms = new ArrayList<>();
+        this.queryParse = new Parse(posting, stemming , corpusPath);
+        this.descParse = new Parse(posting, stemming , corpusPath);
+        Posting.initTermPosting(posting, stemming);
     }
 
     private ArrayList<String> getExtraTerms(ArrayList<String> queryDescTerms, ArrayList<String> queryTitleTerms) {
@@ -174,12 +185,16 @@ public class Searcher {
                 ) {
             try {
                 term = Parse.cleanToken(term) ; // clean *
+                if (term.charAt(0) == '*')
+                    term = StringUtils.substring(term, 1);
                 useUrlSemantic(term); // insert to  synonymous map all the terms and their docs
 
                 /** do somthing **/
 
             }
-            catch (Exception e ){}
+            catch (Exception e ){
+                e.printStackTrace();
+            }
         }
         return  null ;
     }
@@ -191,9 +206,18 @@ public class Searcher {
      * @throws Exception
      */
     private void useUrlSemantic(String term) throws Exception {
+        String[] splitedTerm = StringUtils.split(term, " ");
+        if (splitedTerm != null && splitedTerm.length > 1){
+            term = splitedTerm[0];
+            for (int i = 1; i < splitedTerm.length-1; i++) {
+                term += "+";
+                term += splitedTerm[i];
+            }
+            term += "+" + splitedTerm[splitedTerm.length-1];
+        }
 
         //URL url = new URL("https://api.datamuse.com/words?rel_trg=" + term +"&max=20"); //only from the top 20 results
-        URL url = new URL("https://api.datamuse.com/words?ml=" + term +"&max=20"); //only from the top 20 results
+        URL url = new URL("https://api.datamuse.com/words?ml=" + term);
         //URLConnection connection = website.openConnection();
         HttpURLConnection con  = ( HttpURLConnection)  url.openConnection();
         con.setRequestMethod("GET");
@@ -223,12 +247,42 @@ public class Searcher {
             synonymous_terms.add(synonymous_term) ;
             count_legit_terms++ ;
 
-            if (count_legit_terms == MAX_SYN_TERMS_FROM_API ) //save only the 5 top terms
+            if (count_legit_terms == MAX_SYN_TERMS_FROM_API ) //save only the MAX_SYN_TERMS top terms
                 break;
         }
+        url = new URL("https://api.datamuse.com/words?rel_trg=" + term);
+        //URLConnection connection = website.openConnection();
+        con  = ( HttpURLConnection)  url.openConnection();
+        con.setRequestMethod("GET");
+        in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        response = new StringBuilder();
 
+        json_str = "";
+        line ="";
+        while ((line = in.readLine()) != null) {
+            json_str = json_str + line;
+        }
+        in.close();
+        jsonArray = new JSONArray(json_str);
+        count_legit_terms = 0 ;
+        for (int k = 0 ; k < jsonArray.length() ; k++) {
+            JSONObject obj = (JSONObject) jsonArray.get(k);
+            String trg_term= (String) obj.get("word");
+            //String synonymous_score= (String) obj.get("score");
+            String termData ;
+            termData = terms_dictionary.get(trg_term);
+            if ( termData == null )  // try capital term
+                termData = terms_dictionary.get(trg_term.toUpperCase());
+            if ( termData == null )// the term isnt in the corpus
+                continue;
+            /** set a threshhold for term relavence by score !!! ***/
+            //synonymous_terms.put(synonymous_term, synonymous_score);
+            trigers_terms.add(trg_term) ;
+            count_legit_terms++ ;
 
-        //return null ;
+            if (count_legit_terms == MAX_TRG_TERMS_FROM_API ) //save only the MAX_SYN_TERMS top terms
+                break;
+        }
     }
 
     private ArrayList<String> filterDescTerms(ArrayList<String> descTerms) {
@@ -317,6 +371,7 @@ public class Searcher {
                 }
                 queryTermsToDocsWithDetails.put(queryTerm, specificQueryTermDocs);
             } catch (Exception e) {
+                System.out.println("Problematic term: " + queryTerm);
                 e.printStackTrace();
             }
         }
