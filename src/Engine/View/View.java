@@ -364,7 +364,7 @@ public class View extends Observable {
             return;
         }
         setChanged();
-        notifyObservers("search_query_file");
+        notifyObservers("file_search_query");
 
         enableAfterSearchBtns();
 
