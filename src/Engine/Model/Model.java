@@ -18,7 +18,7 @@ public class Model extends Observable {
     private String corpusPath; //saved corpus path
     private String postingPath;// saved outpot posting path
     private boolean is_stemming; // using a stemmer on terms ot not
-    private boolean useSemantics = true;
+    private boolean useSemantics;
     public String[] list_lang; //list of lang returns from parsing the docs
     // will allow to load the term dic to prog memory -
     // will be used in project part 2
