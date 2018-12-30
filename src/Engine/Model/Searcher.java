@@ -239,7 +239,7 @@ public class Searcher {
             if (count_legit_terms == MAX_SYN_TERMS_FROM_API ) //save only the MAX_SYN_TERMS top terms
                 break;
         }
-        url = new URL("https://api.datamuse.com/words?rel_trg=" + term);
+        url = new URL("https://api.datamuse.com/words?ml=" + term);
         //URLConnection connection = website.openConnection();
         con  = ( HttpURLConnection)  url.openConnection();
         con.setRequestMethod("GET");
