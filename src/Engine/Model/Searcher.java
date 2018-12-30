@@ -113,15 +113,8 @@ public class Searcher {
             ArrayList<String> queryDescTermsToAdd = getExtraTerms(queryDescTerms, queryTitleTerms);
             queryTitleTerms.addAll(queryDescTermsToAdd);
         }
-
         relevantDocsByQueryTitleTerms = getRelevantDocs(queryTitleTerms);
-        //Posting.initTermPosting(posting);
-        //relevantDocsByQueryDescTerm = getRelevantDocs(queryDescTerms);
-
-        //ArrayList<String> rankedDocs = ranker.getRankDocs(relevantDocsByQueryTitleTerm, relevantDocsByQueryDescTerm, queryId);
-        //ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryDescTerm, queryTitleTerms);
         ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryTitleTerms, queryDescTerms);
-        // NEED TO DO: Create SubSet of rankedDocs according to the final integer MAX_DOCS_TO_RETURN
         return rankedDocs;
     }
 
@@ -216,9 +209,7 @@ public class Searcher {
             term += "+" + splitedTerm[splitedTerm.length-1];
         }
 
-        //URL url = new URL("https://api.datamuse.com/words?rel_trg=" + term +"&max=20"); //only from the top 20 results
         URL url = new URL("https://api.datamuse.com/words?ml=" + term);
-        //URLConnection connection = website.openConnection();
         HttpURLConnection con  = ( HttpURLConnection)  url.openConnection();
         con.setRequestMethod("GET");
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -285,29 +276,6 @@ public class Searcher {
         }
     }
 
-    private ArrayList<String> filterDescTerms(ArrayList<String> descTerms) {
-        ArrayList<String> ans = new ArrayList<>();
-        TreeMap<Integer, String> termDfInCorpus = new TreeMap<>();
-        for (String term : descTerms) {
-            if (term.charAt(0) == '*')
-                term = StringUtils.substring(term, 1);
-            int df = getTermTf(term);
-            termDfInCorpus.put(df, term);
-        }
-        for (int i = 0; i < 3; i++) {
-            ans.add(termDfInCorpus.pollFirstEntry().getValue());
-        }
-
-//        for (Object o : termDfInCorpus.entrySet()){
-//            Map.Entry<Integer, String> dfWithTerm = (Map.Entry<Integer, String>) o;
-//            int df = dfWithTerm.getKey();
-//            if (df > 10 && df < docs_dictionary.size()/5)
-//                ans.add(dfWithTerm.getValue());
-//            if (ans.size() > 2)
-//                break;
-//        }
-        return ans;
-    }
 
     private int getTermTf(String term) {
         String dicTermLine = terms_dictionary.get(term);
@@ -363,7 +331,6 @@ public class Searcher {
                     if (length.equals("NULL"))
                         length = firstPartSplited[7];
                     String docDetails = firstPartSplited[2] + "," + firstPartSplited[3] + "," + firstPartSplited[4] + "," + length;
-//                    System.out.println(currDocWithTf + " " + firstPartSplited[6]);
                     ArrayList<String> currDocDetails = new ArrayList<>();
                     currDocDetails.add(docDetails);
                     currDocDetails.add(docHeaders);
@@ -402,18 +369,4 @@ public class Searcher {
         listTermDocs.addAll(Arrays.asList(docsWithTf));
         return listTermDocs;
     }
-
-    /**
-     * For the document received its identification number,
-     * The method will return the five most dominant entities in this document ranked in order of importance.
-     * An entity is defined as: an expression that is reserved as only uppercase letters.
-     * If the document has less than five entities, all will be returned.
-     * @param docId
-     * @return
-     */
-    public SortedSet<String> getDocDominantEntities (String docId){
-        return null;
-    }
-
-
 }

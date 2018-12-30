@@ -14,10 +14,10 @@ import java.util.*;
 public class Ranker {
     private final int MAX_DOCS_TO_RETURN = 50; // The require number of docs to return
     /* Ranking factors and their weight*/
-    private final double BM25_TITLE_FACTOR_WEIGHT = 1;
-    private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0.0;
-    private final double TITLE_IN_HEADERS_FACTOR_WEIGHT = 0.0;
-    private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0.0;
+    private final double BM25_TITLE_FACTOR_WEIGHT = 0.97;
+    private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0.01;
+    private final double TITLE_IN_HEADERS_FACTOR_WEIGHT = 0.01;
+    private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0.01;
 
     /* BM25 Constants*/
     private final double K = 1.5;
@@ -36,7 +36,7 @@ public class Ranker {
 
     static {
         try {
-            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\bardanad\\queriesTests\\results\\resultsWithStemming.txt"));
+            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\bardanad\\queriesTests\\results\\results.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -103,10 +103,10 @@ public class Ranker {
             }
 
 
-            double bm25Classic = BM25_TITLE_FACTOR_WEIGHT * bm25ClassicWeight * 1.5;
+            double bm25Classic = BM25_TITLE_FACTOR_WEIGHT * bm25ClassicWeight * 1.8;
             double bm25Description = BM25_DESCRIPTION_FACTOR_WEIGHT * bm25DescriptionWeight;
-            double titleTermInHeader = TITLE_IN_HEADERS_FACTOR_WEIGHT * titleTermInHeadersWeight*50;
-            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight*50;
+            double titleTermInHeader = TITLE_IN_HEADERS_FACTOR_WEIGHT * titleTermInHeadersWeight*37;
+            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight*37;
 
             double mergedValue = bm25Classic + bm25Description + titleTermInHeader + descTermInHeader;
 
@@ -115,6 +115,13 @@ public class Ranker {
 
     }
 
+    /**
+     * This function prints the results of the queries according to
+     * a format supported by the TREC EVAL software.
+     * It also prints the results to be displayed to the GUI user
+     * @param ans
+     * @param queryId
+     */
     private void printResultToFile(ArrayList<String> ans,String queryId) {
         try {
             sb_queriesResults.append("----QUERY ID: ").append(queryId).append("----").append("\n");
@@ -125,7 +132,6 @@ public class Ranker {
                sb_trecResults.append(queryId).append(" ").append("0").append(" ").
                         append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
             }
-            //sb_queriesResults.append(" ").append("\n");
             results_bw.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -261,33 +267,6 @@ public class Ranker {
         else
             QueryTitleTermInHeaders.put(docNum, queryDescInHeaderValue);
     }
-
-    private void calculateHeadersWeight(String docNo, String term, ArrayList<String> headers, String mode) {
-        int counter = 0;
-        int headersSize = headers.size();
-        if (headers.contains(term))
-            counter++;
-        double value = 0;
-        if (headersSize != 0)
-            value = (counter/headersSize)*10;
-        if (QueryDescTermInHeaders.containsKey(docNo)){
-            double currValue = QueryDescTermInHeaders.get(docNo);
-            double newValue = currValue + value;
-            QueryDescTermInHeaders.put(docNo, newValue);
-        }
-        else
-            QueryDescTermInHeaders.put(docNo, value);
-        if (mode.equals("BOTH")){
-            if (QueryTitleTermInHeaders.containsKey(docNo)){
-                double currValue = QueryTitleTermInHeaders.get(docNo);
-                double newValue = currValue + value;
-                QueryTitleTermInHeaders.put(docNo, newValue);
-            }
-            else
-                QueryTitleTermInHeaders.put(docNo, value);
-        }
-    }
-
 
     // DocHeaders = [headerTerm, headerTerm, ... ]
     private ArrayList<String> createHeaderArray(String docHeaders) {
