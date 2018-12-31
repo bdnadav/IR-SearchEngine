@@ -92,7 +92,8 @@ public class Parse {
     public Parse(String path, boolean stemming , String corpusPath) {
         try {
 
-            stopwords_fr = new FileReader(corpusPath + "\\stop_words.txt");
+            //stopwords_fr = new FileReader(corpusPath + "\\stop_words.txt");
+            stopwords_fr = new FileReader("C:\\Users\\ofek\\Desktop\\SearchEngine" + "\\stop_words.txt");
             this.posting_path = path + "\\Postings" + ifStemming(stemming);
             this.path = path;
             Parse.stemming = stemming;
@@ -377,7 +378,7 @@ public class Parse {
                 tokensArray[i] = cleanToken(tokensArray[i]);
             //tokensArray[i] = remove_stop_words(tokensArray[i]);
             // check stop word
-            if (addTerm.equals("") && !tokensArray[i].equals("may") && stopwords.contains(tokensArray[i])) {
+            if (addTerm.equals("") && !tokensArray[i].equals("may") && stopwords.contains(cleanToken(tokensArray[i]).toLowerCase())) {
                 i += 1;
                 continue;
             }

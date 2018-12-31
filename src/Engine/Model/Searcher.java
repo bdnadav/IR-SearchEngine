@@ -36,7 +36,20 @@ public class Searcher {
     private double AVL;
     private ArrayList<String> trigers_terms;
 
-
+    /**
+     * Gets a query and handle is by sending it to the ranker
+     * @param posting
+     * @param corpusPath
+     * @param stemming
+     * @param specificCities
+     * @param termsDic
+     * @param docsDic
+     * @param citiesDic
+     * @param headersDictionary
+     * @param docEntities
+     * @param semantic
+     * @param AVL
+     */
     public Searcher(String posting, String corpusPath, boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String, String> docEntities, boolean semantic, double AVL) {
         this.terms_dictionary = termsDic;
         System.out.println("stemming param to Searcher cons is: " + stemming);
@@ -61,6 +74,11 @@ public class Searcher {
         }
     }
 
+    /**
+     * get the docs fitted to certain cities
+     * @param specificCities
+     * @return
+     */
     private HashSet<String> getLegalDocs(ArrayList<String> specificCities) {
         HashSet<String> ans = new HashSet<>();
         for (String currCity : specificCities) {
@@ -76,7 +94,15 @@ public class Searcher {
     }
 
 
-
+    /**
+     * get a query , use api if needed and find the right docs by sending it to the ranker
+     * @param query_id
+     * @param queryTitle
+     * @param queryDescription
+     * @param queryNarrative
+     * @param useSemantic
+     * @return
+     */
     public ArrayList<String> handleQuery(String query_id, String queryTitle, String queryDescription, String queryNarrative, boolean useSemantic) {
         resetAllDataStructures() ; //a new query has arrived - cleanall
         queryParse.parseQuery(queryTitle);
@@ -91,6 +117,8 @@ public class Searcher {
             queryDescTerms = descParse.getQueryTerms();
         }else   queryDescTerms = new ArrayList<>(); // there is no DEsc to single query
         //queryDescTerms = filterDescTerms(queryDescTerms);
+        System.out.println("Query id: " + query_id + "\n" + "Query title: " + queryTitle + "\n" + "Query title terms (may after stemming): " + queryTitleTerms.toString() + "\n");
+        System.out.println("Query description: " + queryDescription + "\n" + "Query description terms (may after stemming): " + queryDescTerms.toString() + "\n");
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTitleTerms; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryDescTerm; // <DescTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
@@ -98,14 +126,23 @@ public class Searcher {
 
         /** Handle Semantic **/
         if ( useSemantic) {
-            System.out.println(queryTitleTerms.toString());
-            getSemanticTerms(queryTitleTerms);
+//            System.out.println(queryTitleTerms.toString());
+            if(stemming) {
+                Parse sem_parse = new Parse(posting, false, corpusPath);
+                sem_parse.parseQuery(queryTitle);
+                ArrayList<String> originalQueryTitleTerms = sem_parse.getQueryTerms();
+                getSemanticTerms(queryTitleTerms , originalQueryTitleTerms);
+                System.out.println("Stemming is ACTIVE" + "\n" + "The synonymous terms after stemming: " + "\n" +
+                        synonymous_terms.toString() + "\n");
+            }else getSemanticTerms(queryTitleTerms , null );
+
             if ( !synonymous_terms.isEmpty()){
                 for (String s :synonymous_terms
                         ) {
-                    System.out.println(s);
-                    if (!queryTitleTerms.contains(s)) // join syn and title
+                    if (!queryTitleTerms.contains(s)) {// join syn and title
                         queryTitleTerms.add(s);
+                        System.out.println("The synonymous term: " + s + " been added to queryTitleTerms");
+                    }
                 }
             }
         }
@@ -174,10 +211,11 @@ public class Searcher {
         return false;
     }
 
-    private Map<String, List<Pair<String,String>>> getSemanticTerms(ArrayList<String> queryTerms) {
-        for (String term :queryTerms
+    private Map<String, List<Pair<String,String>>> getSemanticTerms(ArrayList<String> queryTitleTerms, ArrayList<String> queryTitleOriginalTerms) {
+        for (String term :queryTitleTerms
                 ) {
             try {
+
                 term = Parse.cleanToken(term) ; // clean *
                 if (term.charAt(0) == '*')
                     term = StringUtils.substring(term, 1);
