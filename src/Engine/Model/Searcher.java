@@ -257,6 +257,7 @@ public class Searcher {
             String synonymous_term= (String) obj.get("word");
             //String synonymous_score= (String) obj.get("score");
             String termData ;
+            if ( stemming) synonymous_term = stem(synonymous_term); //
             termData = terms_dictionary.get(synonymous_term);
             if ( termData == null )  // try capital term
                 termData = terms_dictionary.get(synonymous_term.toUpperCase());
@@ -265,7 +266,6 @@ public class Searcher {
             /** set a threshhold for term relavence by score !!! ***/
             //synonymous_terms.put(synonymous_term, synonymous_score);
             if ( !synonymous_terms.contains(synonymous_term)) {
-                if ( stemming) synonymous_term = stem(synonymous_term);
                 synonymous_terms.add(synonymous_term);
                 count_legit_terms++;
             }else continue;
