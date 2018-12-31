@@ -36,7 +36,20 @@ public class Searcher {
     private double AVL;
     private ArrayList<String> trigers_terms;
 
-
+    /**
+     * Gets a query and handle is by sending it to the ranker
+     * @param posting
+     * @param corpusPath
+     * @param stemming
+     * @param specificCities
+     * @param termsDic
+     * @param docsDic
+     * @param citiesDic
+     * @param headersDictionary
+     * @param docEntities
+     * @param semantic
+     * @param AVL
+     */
     public Searcher(String posting, String corpusPath, boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String, String> docEntities, boolean semantic, double AVL) {
         this.terms_dictionary = termsDic;
         this.AVL = AVL ;
@@ -59,6 +72,11 @@ public class Searcher {
         }
     }
 
+    /**
+     * get the docs fitted to certain cities
+     * @param specificCities
+     * @return
+     */
     private HashSet<String> getLegalDocs(ArrayList<String> specificCities) {
         HashSet<String> ans = new HashSet<>();
         for (String currCity : specificCities) {
@@ -74,7 +92,15 @@ public class Searcher {
     }
 
 
-
+    /**
+     * get a query , use api if needed and find the right docs by sending it to the ranker
+     * @param query_id
+     * @param queryTitle
+     * @param queryDescription
+     * @param queryNarrative
+     * @param useSemantic
+     * @return
+     */
     public ArrayList<String> handleQuery(String query_id, String queryTitle, String queryDescription, String queryNarrative, boolean useSemantic) {
         resetAllDataStructures() ; //a new query has arrived - cleanall
         queryParse.parseQuery(queryTitle);
@@ -96,8 +122,13 @@ public class Searcher {
 
         /** Handle Semantic **/
         if ( useSemantic) {
+            if(stemming) {
+                Parse sem_parse = new Parse(posting, false, corpusPath);
+                sem_parse.parseQuery(queryTitle);
+                ArrayList<String> semantic_terms = sem_parse.getQueryTerms();
+                getSemanticTerms(semantic_terms);
+            }else getSemanticTerms(queryTitleTerms);
 
-            getSemanticTerms(queryTitleTerms);
             if ( !synonymous_terms.isEmpty()){
                 for (String s :synonymous_terms
                         ) {
