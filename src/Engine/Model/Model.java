@@ -28,8 +28,9 @@ public class Model extends Observable {
     TreeMap<String, String> docsDictionary = new TreeMap<>();
     HashMap<String, String> headersDictionary = new HashMap<>();
     HashMap<String, String> docEntities = new HashMap<>();
-    private double  AVL;
     private ArrayList<String> citiesView;
+    private double  AVL;
+
 
 
     /**
@@ -92,6 +93,7 @@ public class Model extends Observable {
         File dir = new File(postingPath + "\\Postings" + ifStemming());
         if (dir != null && dir.exists()) {
             StringBuilder sb = new StringBuilder();
+            this.cleanAllDictionaries(); // reset all
             try {
                 BufferedReader br_dic = new BufferedReader(new FileReader(postingPath + "\\Postings" + ifStemming() + "\\termDictionary.txt"));
                 String line = "";
@@ -257,6 +259,18 @@ public class Model extends Observable {
         return ans;
     }
 
+    /**
+     * clear all dic if loading again with stemming or not
+     */
+    private void cleanAllDictionaries() {
+       termDictionary.clear();
+        termDictionaryToShow.clear();
+        citiesDictionary.clear();
+        docsDictionary.clear();
+         headersDictionary.clear();
+        docEntities.clear();
+         citiesView.clear();
+    }
 
 
     /**

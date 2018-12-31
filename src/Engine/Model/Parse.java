@@ -337,7 +337,7 @@ public class Parse {
                             && !specialchars.contains(tokensArray[j].charAt(0))
                             && temp_token.length() > 1
                             && Character.isUpperCase(temp_token.charAt(0))
-                            && (j < tokensArray.length - 1
+                            && (j < tokensArray.length
                             && !(months.contains(tokensArray[j]) && isNumber(tokensArray[j + 1])))
                             ) {  // add one word term
                         long_term = long_term.append(temp_token + " ");
