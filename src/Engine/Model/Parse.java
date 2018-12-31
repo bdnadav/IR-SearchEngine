@@ -60,7 +60,7 @@ public class Parse {
     private static FileReader months_fr;
 
     String path;
-    boolean stemming = false;
+    public static boolean stemming;
 
     private int termPosition; // counts the term position inside the doc text
 
@@ -95,7 +95,7 @@ public class Parse {
             stopwords_fr = new FileReader(corpusPath + "\\stop_words.txt");
             this.posting_path = path + "\\Postings" + ifStemming(stemming);
             this.path = path;
-            this.stemming = stemming;
+            Parse.stemming = stemming;
             BufferedReader stopwords_br = new BufferedReader(stopwords_fr);
 //            BufferedReader specialwords_br = new BufferedReader(specialwords_fr);
 //            BufferedReader specialchars_br = new BufferedReader(specialchars_fr);

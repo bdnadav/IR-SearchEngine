@@ -17,7 +17,7 @@ public class Searcher {
     private static final int MAX_TRG_TERMS_FROM_API = 1;
     private final int MAX_SYN_TERMS_FROM_API = 2 ;
     private final boolean useSemantic;
-    private final Boolean stemming;
+    private final boolean stemming;
     private final String corpusPath;
     private Parse queryParse;
     private Parse descParse;
@@ -37,12 +37,14 @@ public class Searcher {
     private ArrayList<String> trigers_terms;
 
 
-    public Searcher(String posting, String corpusPath, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String, String> docEntities, boolean semantic, double AVL) {
+    public Searcher(String posting, String corpusPath, boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String, String> docEntities, boolean semantic, double AVL) {
         this.terms_dictionary = termsDic;
+        System.out.println("stemming param to Searcher cons is: " + stemming);
         this.AVL = AVL ;
         this.synonymous_terms = new ArrayList<>();
         this.trigers_terms = new ArrayList<>();
         this.stemming = stemming;
+        Parse.stemming = stemming;
         this.cities_dictionary = citiesDic;
         this.docs_dictionary = docsDic;
         this.headers_dictionary = headersDictionary;
