@@ -48,7 +48,7 @@
                 <Button fx:id="show_dic_btn" disable="true" layoutX="591.0" layoutY="135.0" mnemonicParsing="false" onAction="#show_dic_pressed" prefHeight="31.0" prefWidth="174.0" text="Show Dictionary " />
                 <Button fx:id="load_dic_btn" disable="true" layoutX="591.0" layoutY="90.0" mnemonicParsing="false" onAction="#load_dic_mem" prefHeight="31.0" prefWidth="174.0" text="Load Dic to Memory" />
             <Button fx:id="test_btn" layoutX="441.0" layoutY="167.0" mnemonicParsing="false" onAction="#printTests" prefHeight="41.0" prefWidth="76.0" text="Test" />
-            <GridPane layoutX="144.0" layoutY="448.0" prefHeight="91.0" prefWidth="426.0">
+            <GridPane layoutX="31.0" layoutY="476.0" prefHeight="91.0" prefWidth="426.0">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="312.00001220703126" minWidth="10.0" prefWidth="312.00001220703126" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="101.20001220703125" minWidth="0.0" prefWidth="45.79998779296875" />
@@ -62,13 +62,13 @@
                   <Button fx:id="search_query_btn" mnemonicParsing="false" onAction="#search_query" prefHeight="36.0" prefWidth="102.0" scaleX="0.9" text="Search" GridPane.columnIndex="1" />
                   <Button fx:id="search_file_query_btn" mnemonicParsing="false" onAction="#browse_query_file" prefHeight="35.0" prefWidth="105.0" scaleX="0.9" text="Browse" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <TextField fx:id="query_path_txtfield" prefWidth="266.0" />
-                  <TextField fx:id="query_file_path" onAction="#updatePaths" GridPane.rowIndex="2" />
+                  <TextField fx:id="query_file_path" onAction="#updatePaths" prefHeight="26.0" prefWidth="345.0" GridPane.rowIndex="2" />
+                  <Label text="Upload query file:" GridPane.rowIndex="1" />
                </children>
             </GridPane>
-            <CheckBox fx:id="check_semmantics" layoutX="194.0" layoutY="422.0" mnemonicParsing="false" text="Use Semmantics" />
-            <Label layoutX="31.0" layoutY="406.0" prefHeight="31.0" prefWidth="150.0" text="Search For Relevant Docs: " />
-            <Label layoutX="29.0" layoutY="455.0" text="Enter A Query: " />
-            <Label layoutX="29.0" layoutY="516.0" text="Upload query file:" />
+            <CheckBox fx:id="check_semmantics" layoutX="431.0" layoutY="430.0" mnemonicParsing="false" text="Use Semmantics" />
+            <Label layoutX="21.0" layoutY="407.0" prefHeight="31.0" prefWidth="150.0" text="Search For Relevant Docs: " />
+            <Label layoutX="35.0" layoutY="447.0" text="Enter A Query: " />
             <Label layoutX="21.0" layoutY="22.0" prefHeight="31.0" prefWidth="150.0" text="Build Corpus :">
                <font>
                   <Font size="18.0" />
@@ -83,9 +83,9 @@
             </ScrollPane>
             <Label layoutX="586.0" layoutY="176.0" prefHeight="31.0" prefWidth="185.0" text="Query Relevent Docs Results : " />
             <Button fx:id="btn_saveResults" disable="true" layoutX="583.0" layoutY="521.0" mnemonicParsing="false" onAction="#saveResultsBtnPushed" prefHeight="36.0" prefWidth="140.0" text="Save Results" />
-            <ImageView fitHeight="80.0" fitWidth="299.0" layoutX="585.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="80.0" fitWidth="299.0" layoutX="668.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@logo.png" />
+                  <Image url="@logo2.png" />
                </image>
             </ImageView>
             <Label layoutX="264.0" layoutY="301.0" prefHeight="17.0" prefWidth="253.0" text="Choose Search By Cities: (click to add to filter)" />
@@ -102,7 +102,7 @@
             <ListView fx:id="list_view" layoutX="264.0" layoutY="328.0" prefHeight="80.0" prefWidth="277.0" />
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="89.0" prefWidth="196.0" />
             <ListView fx:id="filter_city_view" layoutX="30.0" layoutY="328.0" prefHeight="80.0" prefWidth="214.0" />
-            <Button fx:id="btn_file_query_search" layoutX="433.0" layoutY="557.0" mnemonicParsing="false" onAction="#search_query_file" prefHeight="31.0" prefWidth="121.0" text="Search File" />
+            <Button fx:id="btn_file_query_search" layoutX="457.0" layoutY="536.0" mnemonicParsing="false" onAction="#search_query_file" prefHeight="31.0" prefWidth="99.0" text="Search File" />
             </children>
         </Pane>
     </children>
