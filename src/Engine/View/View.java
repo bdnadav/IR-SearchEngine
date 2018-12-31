@@ -148,7 +148,12 @@ public class View extends Observable {
 
     private String getDicDisplay(String text) throws IOException {
         StringBuilder sb = new StringBuilder();
-        BufferedReader br_dic = new BufferedReader(new FileReader(text + "\\Postings\\termDictionary.txt"));
+        String path = "\\Postings";
+        if (check_stemming.isSelected()){
+            path += "WithStemming";
+        }
+        path += "\\termDictionary.txt";
+        BufferedReader br_dic = new BufferedReader(new FileReader(text + path));
         String line = null;
         while ((line = br_dic.readLine()) != null) {
             String term = "";
@@ -389,8 +394,8 @@ public class View extends Observable {
 
     }
     public boolean checkPathsSearch() {
-        String queries = corpus_txt_field.getText();
- posting_txt_field.getText();
+        String queries = query_file_path.getText();
+        posting_txt_field.getText();
         File dir = new File(queries);
         if (dir != null && dir.exists()) {
             return true;
