@@ -533,7 +533,6 @@ public class Parse {
 //        if (docNo.equals("FBIS3-3366"))
 //            addTo_FBIS3_Terms(addTerm);
         boolean isUpper = Character.isUpperCase(addTerm.charAt(0)) ;
-
         if (stemming) {
             String final_term = "";
             String[] split = addTerm.split(" ");
