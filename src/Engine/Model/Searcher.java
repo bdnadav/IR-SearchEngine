@@ -235,8 +235,11 @@ public class Searcher {
                 continue;
             /** set a threshhold for term relavence by score !!! ***/
             //synonymous_terms.put(synonymous_term, synonymous_score);
-            synonymous_terms.add(synonymous_term) ;
-            count_legit_terms++ ;
+            if ( !synonymous_terms.contains(synonymous_term)) {
+                if ( stemming) synonymous_term = stem(synonymous_term);
+                synonymous_terms.add(synonymous_term);
+                count_legit_terms++;
+            }else continue;
 
             if (count_legit_terms == MAX_SYN_TERMS_FROM_API ) //save only the MAX_SYN_TERMS top terms
                 break;
@@ -258,22 +261,39 @@ public class Searcher {
         count_legit_terms = 0 ;
         for (int k = 0 ; k < jsonArray.length() ; k++) {
             JSONObject obj = (JSONObject) jsonArray.get(k);
-            String trg_term= (String) obj.get("word");
+            String trg_term = (String) obj.get("word");
             //String synonymous_score= (String) obj.get("score");
-            String termData ;
+            String termData;
             termData = terms_dictionary.get(trg_term);
-            if ( termData == null )  // try capital term
+            if (termData == null)  // try capital term
                 termData = terms_dictionary.get(trg_term.toUpperCase());
-            if ( termData == null )// the term isnt in the corpus
+            if (termData == null)// the term isnt in the corpus
                 continue;
             /** set a threshhold for term relavence by score !!! ***/
             //synonymous_terms.put(synonymous_term, synonymous_score);
-            trigers_terms.add(trg_term) ;
-            count_legit_terms++ ;
-
+            if (!synonymous_terms.contains(trg_term) && !trigers_terms.contains(trg_term)){
+                if ( stemming) trg_term = stem(trg_term);
+                trigers_terms.add(trg_term);
+            count_legit_terms++;
+        } else continue;
             if (count_legit_terms == MAX_TRG_TERMS_FROM_API ) //save only the MAX_SYN_TERMS top terms
                 break;
         }
+    }
+
+    private String stem(String synonymous_term) {
+
+            String final_term = "";
+            String[] split = synonymous_term.split(" ");
+            for ( String s :split
+            ) {
+                Stemmer stemmer = new Stemmer();
+                stemmer.add(s.toCharArray(), s.length());
+                stemmer.stem();
+                final_term+= stemmer.toString() +" ";
+            }
+            return final_term.substring(0 , final_term.length()-1) ;
+
     }
 
 
