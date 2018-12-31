@@ -14,8 +14,8 @@ import org.json.JSONObject;
 
 
 public class Searcher {
-    private static final int MAX_TRG_TERMS_FROM_API = 2;
-    private final int MAX_SYN_TERMS_FROM_API = 3 ;
+    private static final int MAX_TRG_TERMS_FROM_API = 1;
+    private final int MAX_SYN_TERMS_FROM_API = 2 ;
     private final boolean useSemantic;
     private final Boolean stemming;
     private final String corpusPath;
@@ -239,7 +239,39 @@ public class Searcher {
             if (count_legit_terms == MAX_SYN_TERMS_FROM_API ) //save only the MAX_SYN_TERMS top terms
                 break;
         }
+        url = new URL("https://api.datamuse.com/words?rel_trg=" + term);
+        //URLConnection connection = website.openConnection();
+        con  = ( HttpURLConnection)  url.openConnection();
+        con.setRequestMethod("GET");
+        in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        response = new StringBuilder();
 
+        json_str = "";
+        line ="";
+        while ((line = in.readLine()) != null) {
+            json_str = json_str + line;
+        }
+        in.close();
+        jsonArray = new JSONArray(json_str);
+        count_legit_terms = 0 ;
+        for (int k = 0 ; k < jsonArray.length() ; k++) {
+            JSONObject obj = (JSONObject) jsonArray.get(k);
+            String trg_term= (String) obj.get("word");
+            //String synonymous_score= (String) obj.get("score");
+            String termData ;
+            termData = terms_dictionary.get(trg_term);
+            if ( termData == null )  // try capital term
+                termData = terms_dictionary.get(trg_term.toUpperCase());
+            if ( termData == null )// the term isnt in the corpus
+                continue;
+            /** set a threshhold for term relavence by score !!! ***/
+            //synonymous_terms.put(synonymous_term, synonymous_score);
+            trigers_terms.add(trg_term) ;
+            count_legit_terms++ ;
+
+            if (count_legit_terms == MAX_TRG_TERMS_FROM_API ) //save only the MAX_SYN_TERMS top terms
+                break;
+        }
     }
 
 
