@@ -24,7 +24,6 @@ public class Searcher {
     private TreeMap<String, String> terms_dictionary;
     private TreeMap<String, Pair> cities_dictionary;
     private TreeMap<String, String> docs_dictionary;
-    // private HashMap<String , String> synonymous_terms;
     private ArrayList<String> synonymous_terms;
     public static HashMap<String, String> headers_dictionary;
     public static HashMap<String, String> docs_entities;
@@ -120,7 +119,6 @@ public class Searcher {
         System.out.println("Query id: " + query_id + "\n" + "Query title: " + queryTitle + "\n" + "Query title terms (may after stemming): " + queryTitleTerms.toString() + "\n");
         System.out.println("Query description: " + queryDescription + "\n" + "Query description terms (may after stemming): " + queryDescTerms.toString() + "\n");
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTitleTerms; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
-        HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryDescTerm; // <DescTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
@@ -275,10 +273,13 @@ public class Searcher {
             /** set a threshhold for term relavence by score !!! ***/
             //synonymous_terms.put(synonymous_term, synonymous_score);
             if ( !synonymous_terms.contains(synonymous_term)) {
-                if ( stemming) synonymous_term = stem(synonymous_term);
+                if ( stemming)
+                    synonymous_term = stem(synonymous_term);
                 synonymous_terms.add(synonymous_term);
                 count_legit_terms++;
-            }else continue;
+            }
+            else
+                continue;
 
             if (count_legit_terms == MAX_SYN_TERMS_FROM_API ) //save only the MAX_SYN_TERMS top terms
                 break;
@@ -333,21 +334,6 @@ public class Searcher {
             }
             return final_term.substring(0 , final_term.length()-1) ;
 
-    }
-
-
-    private int getTermTf(String term) {
-        String dicTermLine = terms_dictionary.get(term);
-        if (dicTermLine == null)
-            dicTermLine = terms_dictionary.get(term.toUpperCase());
-        if (dicTermLine == null)
-            return -1;
-        String[] split = StringUtils.split(dicTermLine, ",");
-        if (split.length < 5)
-            return -1;
-        String strDf = split[3];
-        int ans = Integer.parseInt(strDf);
-        return ans;
     }
 
 
