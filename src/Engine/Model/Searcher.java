@@ -17,7 +17,7 @@ public class Searcher {
     private static final int MAX_TRG_TERMS_FROM_API = 1;
     private final int MAX_SYN_TERMS_FROM_API = 2 ;
     private final boolean useSemantic;
-    private final Boolean stemming;
+    private final boolean stemming;
     private final String corpusPath;
     private Parse queryParse;
     private Parse descParse;
@@ -37,7 +37,7 @@ public class Searcher {
     private ArrayList<String> trigers_terms;
 
 
-    public Searcher(String posting, String corpusPath, Boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String, String> docEntities, boolean semantic, double AVL) {
+    public Searcher(String posting, String corpusPath, boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String, String> docEntities, boolean semantic, double AVL) {
         this.terms_dictionary = termsDic;
         this.AVL = AVL ;
         this.synonymous_terms = new ArrayList<>();
@@ -234,6 +234,7 @@ public class Searcher {
             /** set a threshhold for term relavence by score !!! ***/
             //synonymous_terms.put(synonymous_term, synonymous_score);
             if ( !synonymous_terms.contains(synonymous_term)) {
+                if ( stemming) synonymous_term = stem(synonymous_term);
                 synonymous_terms.add(synonymous_term);
                 count_legit_terms++;
             }else continue;
@@ -269,12 +270,28 @@ public class Searcher {
             /** set a threshhold for term relavence by score !!! ***/
             //synonymous_terms.put(synonymous_term, synonymous_score);
             if (!synonymous_terms.contains(trg_term) && !trigers_terms.contains(trg_term)){
+                if ( stemming) trg_term = stem(trg_term);
                 trigers_terms.add(trg_term);
             count_legit_terms++;
         } else continue;
             if (count_legit_terms == MAX_TRG_TERMS_FROM_API ) //save only the MAX_SYN_TERMS top terms
                 break;
         }
+    }
+
+    private String stem(String synonymous_term) {
+
+            String final_term = "";
+            String[] split = synonymous_term.split(" ");
+            for ( String s :split
+            ) {
+                Stemmer stemmer = new Stemmer();
+                stemmer.add(s.toCharArray(), s.length());
+                stemmer.stem();
+                final_term+= stemmer.toString() +" ";
+            }
+            return final_term.substring(0 , final_term.length()-1) ;
+
     }
 
 
