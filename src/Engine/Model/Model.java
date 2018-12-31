@@ -543,7 +543,7 @@ public class Model extends Observable {
         ArrayList<String> cities = new ArrayList<>();
         cities.addAll(items);
         Searcher searcher = new Searcher(postingPath,corpusPath, is_stemming, cities, termDictionary, docsDictionary, citiesDictionary, headersDictionary, docEntities, useSemantics , AVL);
-        searcher.handleQuery( "0" , query, "null", "null", useSemantics);
+        searcher.handleQuery( "single query" , query, "null", "null", useSemantics);
 
     }
 

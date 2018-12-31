@@ -28,7 +28,7 @@ public class Main extends Application {
         //view notify controller
         View view = fxmlLoader.getController();
         //view.setCitiesFilter() ;
-        view.posting_txt_field.appendText( "d:\\documents\\users\\bardanad\\Downloads\\Search Engine\\פלטים29.12\\Postings1Mgood" );
+        view.posting_txt_field.appendText( "C:\\Users\\harel_000\\Desktop\\res" );
         view.corpus_txt_field.appendText("C:\\Users\\harel_000\\Desktop\\Retrival\\corpus");
         view.setParent(primaryStage) ;
         view.setScene(scene) ;
