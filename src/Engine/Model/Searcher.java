@@ -98,11 +98,12 @@ public class Searcher {
 
         /** Handle Semantic **/
         if ( useSemantic) {
-
+            System.out.println(queryTitleTerms.toString());
             getSemanticTerms(queryTitleTerms);
             if ( !synonymous_terms.isEmpty()){
                 for (String s :synonymous_terms
                         ) {
+                    System.out.println(s);
                     if (!queryTitleTerms.contains(s)) // join syn and title
                         queryTitleTerms.add(s);
                 }
