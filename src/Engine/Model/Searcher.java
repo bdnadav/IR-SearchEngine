@@ -14,8 +14,8 @@ import org.json.JSONObject;
 
 
 public class Searcher {
-    private static final int MAX_TRG_TERMS_FROM_API = 2;
-    private final int MAX_SYN_TERMS_FROM_API = 3 ;
+    private static final int MAX_TRG_TERMS_FROM_API = 1;
+    private final int MAX_SYN_TERMS_FROM_API = 2 ;
     private final boolean useSemantic;
     private final Boolean stemming;
     private final String corpusPath;
@@ -239,7 +239,7 @@ public class Searcher {
             if (count_legit_terms == MAX_SYN_TERMS_FROM_API ) //save only the MAX_SYN_TERMS top terms
                 break;
         }
-        url = new URL("https://api.datamuse.com/words?ml=" + term);
+        url = new URL("https://api.datamuse.com/words?rel_trg=" + term);
         //URLConnection connection = website.openConnection();
         con  = ( HttpURLConnection)  url.openConnection();
         con.setRequestMethod("GET");
