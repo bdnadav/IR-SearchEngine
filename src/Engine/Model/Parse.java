@@ -92,8 +92,10 @@ public class Parse {
     public Parse(String path, boolean stemming , String corpusPath) {
         try {
 
-            stopwords_fr = new FileReader("C://Users//bardanad//stop_words.txt");
+//            stopwords_fr = new FileReader("C://Users//bardanad//stop_words.txt");
+            stopwords_fr = new FileReader(corpusPath + "\\stop_words.txt");
             this.posting_path = path + "\\Postings" + ifStemming(stemming);
+            System.out.println(corpusPath);
             this.path = path;
             Parse.stemming = stemming;
             BufferedReader stopwords_br = new BufferedReader(stopwords_fr);
