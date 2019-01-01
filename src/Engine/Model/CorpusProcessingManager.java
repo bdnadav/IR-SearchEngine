@@ -39,7 +39,7 @@ public class CorpusProcessingManager {
         this.corpusPath = corpusPath;
         this.postingPath =  postingPath + "\\Postings" + ifStemming(stemming);
 
-        this.reader = new ReadFile(postingPath , stemming , corpusPath);
+        this.reader = new ReadFile(this.postingPath , stemming , corpusPath);
         createDirs(this.postingPath);
         Posting.initPosting(this.postingPath + "\\Docs");
         inverter = new Indexer(new Posting(this.postingPath));
@@ -152,6 +152,42 @@ public class CorpusProcessingManager {
         while (!parseExecutor.isTerminated()) {
         }
         System.out.println("done files");
+        writeLangToDisc();
+    }
+
+    private void writeLangToDisc() {
+
+        String segmantPartitionFilePath = postingPath +"\\Languages"+  ".txt";
+        File newFile = new File(segmantPartitionFilePath );
+        try {
+            newFile.createNewFile();
+        }
+        catch (Exception e ){}
+
+        try {
+            BufferedWriter file_buffer_writer = new BufferedWriter(new FileWriter(segmantPartitionFilePath));
+            int counter = 0 ;
+            for (String s:reader.languages
+                    ) {
+                file_buffer_writer.append(s+ "\n");
+                counter++;
+                if (counter > 400) {
+                    file_buffer_writer.flush();
+                }
+            }
+
+            file_buffer_writer.flush();
+            file_buffer_writer.close();
+
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+
+
+
     }
 
 

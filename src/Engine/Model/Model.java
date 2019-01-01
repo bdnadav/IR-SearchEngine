@@ -258,6 +258,28 @@ public class Model extends Observable {
             ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
         }
+
+
+
+        if (dir != null && dir.exists()) {
+            ArrayList<String> list = new ArrayList<>();
+            try {
+                BufferedReader br_dic = new BufferedReader(new FileReader(postingPath + "\\Postings" + ifStemming() +  "\\Languages"+  ".txt"));
+                String line = "";
+
+                while ((line = br_dic.readLine()) != null) {
+                   list.add(line);
+                }
+                list_lang = list.toArray(new String[list.size()]);
+                br_dic.close();
+            } catch (Exception e) {
+            }
+
+            JOptionPane.showMessageDialog(null, "Langs dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            ans = false ;
+            JOptionPane.showMessageDialog(null, "Langs Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
+        }
         return ans;
     }
 

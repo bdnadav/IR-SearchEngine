@@ -206,8 +206,11 @@ public class ReadFile {
                 }
             }
         }
+
         parser.cleanAll();
     }
+
+
 
 
     private String getParentFileName(String filePathName) {
