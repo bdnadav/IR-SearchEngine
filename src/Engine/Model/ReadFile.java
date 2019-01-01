@@ -117,7 +117,7 @@ public class ReadFile {
                                 String[] temp = StringUtils.split(line, "><") ;
                                 if (  line.startsWith("<H3> <TI>"))
                                     sb_docHeadlines.append(" "+temp[3]);
-                                else if (  line.startsWith("<H5>") || line.startsWith("<H4>")||/**line.startsWith("<H1>")||**/ line.startsWith("<H2>") || line.startsWith("<H3>"))
+                                else if (  line.startsWith("<H5>") || line.startsWith("<H4>")||line.startsWith("<H1>")|| line.startsWith("<H2>") || line.startsWith("<H3>"))
                                     sb_docHeadlines.append(" "+temp[1]) ;
 
 

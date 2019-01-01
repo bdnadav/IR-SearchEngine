@@ -77,7 +77,8 @@ public class Ranker {
         calculateWeights(relevantDocsByTitle, queryOtherTerms);
         mergeValues();
         ArrayList<String> ans = getSortedDocs();
-        System.out.println("Finish query number: " + queryId);
+        if (Model.status)
+            System.out.println("Finish query number: " + queryId);
         printResultToFile(ans, queryId);
         return ans;
     }
