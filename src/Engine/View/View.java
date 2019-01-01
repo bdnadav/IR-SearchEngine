@@ -97,6 +97,15 @@ public class View extends Observable {
             JOptionPane.showMessageDialog(null, "Paths are Invalid", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        try {
+            boolean corpus_check = checkCorpusIsValid(corpus_txt_field.getText()) ;
+            if ( !corpus_check ) {
+                JOptionPane.showMessageDialog(null, "No Stop Word File Was Found ! ", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }catch (Exception e ){}
+
+
 
         setChanged();
         notifyObservers("run");
@@ -411,5 +420,19 @@ public class View extends Observable {
         btn_showEntities.setDisable(false);
         btn_saveResults.setDisable(false);
     }
+
+
+
+    public boolean checkCorpusIsValid(String curposPath)throws FileNotFoundException  {
+        final File folder = new File(curposPath);
+        for (final File fileEntry : folder.listFiles()) {
+                String t =  fileEntry.getName() ;
+                if ( t.equals("stop_words.txt"))
+                    return true ;
+
+            }
+            return false ;
+        }
+
 }
 
