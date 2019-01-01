@@ -29,6 +29,7 @@ public class Controller extends Observable implements Observer {
                     boolean success = model.loadDicToMemory(stemming);
                     if (success)
                     view.enableSearchBtns();
+                    view.updateLangLIst(model.list_lang);
                     view.setCitiesView(model.getCitiesView());
                     break;
                 case "reset":
