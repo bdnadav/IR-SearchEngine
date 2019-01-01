@@ -1,6 +1,7 @@
 package Engine.View;
 
 
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -12,6 +13,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
@@ -47,6 +49,8 @@ public class View extends Observable {
     public javafx.scene.control.TextField query_path_txtfield;
     public javafx.scene.control.TextField query_file_path;
     public Button btn_saveResults;
+    public ProgressIndicator pi_progressIndicator;
+//    public static ProgressIndicator pi_progressIndicator = new ProgressIndicator();
 
 
     @FXML
@@ -59,7 +63,6 @@ public class View extends Observable {
 
     /***********Procces corpos  PART ****************************/
     public void browseCorpus() {
-
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(System.getProperty("user.home")));
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -460,5 +463,17 @@ public class View extends Observable {
             return false ;
         }
 
+//    public void indicateQueryHandled(String query_id) {
+//        // can use an Alert, Dialog, or PopupWindow as needed...
+//        Stage popup = new Stage();
+//        // configure UI for popup etc...
+//
+//        // hide popup after 3 seconds:
+//        PauseTransition delay = new PauseTransition(Duration.seconds(3));
+//        delay.setOnFinished(e -> popup.hide());
+//
+//        popup.show();
+//        delay.play();
+//    }
 }
 

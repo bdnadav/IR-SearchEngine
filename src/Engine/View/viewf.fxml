@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -82,12 +83,12 @@
             <Label layoutX="272.0" layoutY="299.0" prefHeight="17.0" prefWidth="299.0" text="Choose Search By Cities: (click to add to filter)" />
             <Label layoutX="19.0" layoutY="299.0" prefHeight="17.0" prefWidth="244.0" text="Filter Search By City : ( click to remove)" />
             <Button fx:id="btn_showEntities" disable="true" layoutX="759.0" layoutY="521.0" mnemonicParsing="false" onAction="#showDocsEntities" prefHeight="36.0" prefWidth="140.0" text="Show doc entities" />
-            <Label layoutX="14.0" layoutY="262.0" prefHeight="31.0" prefWidth="150.0" text="Search Corpus :">
+            <Label layoutX="14.0" layoutY="267.0" prefHeight="31.0" prefWidth="150.0" text="Search Corpus :">
                <font>
                   <Font size="18.0" />
                </font>
             </Label>
-            <Separator layoutX="18.0" layoutY="259.0" prefHeight="2.0" prefWidth="565.0" />
+            <Separator layoutX="17.0" layoutY="265.0" prefHeight="2.0" prefWidth="565.0" />
             <Separator layoutX="585.0" layoutY="22.0" orientation="VERTICAL" prefHeight="571.0" prefWidth="3.0" />
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="274.0" />
             <ListView fx:id="list_view" layoutX="264.0" layoutY="328.0" prefHeight="80.0" prefWidth="277.0" />
@@ -99,6 +100,7 @@
                   <ListView fx:id="lv_relevantDocs" prefHeight="307.0" prefWidth="297.0" />
                </children>
             </AnchorPane>
+            <ProgressIndicator fx:id="pi_progressIndicator" layoutX="554.0" layoutY="537.0" prefHeight="41.0" prefWidth="35.0" progress="0.0" />
             </children>
         </Pane>
     </children>

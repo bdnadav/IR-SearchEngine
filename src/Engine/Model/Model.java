@@ -1,5 +1,6 @@
 package Engine.Model;
 
+import Engine.View.View;
 import javafx.collections.ObservableList;
 import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
@@ -123,6 +124,7 @@ public class Model extends Observable {
         } else {
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
             ans = false ;
+            return false;
         }
 
         File cityDir = new File(postingPath + "\\Postings" + ifStemming());
@@ -158,6 +160,8 @@ public class Model extends Observable {
         } else {
             ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+
         }
 
         File docsDir = new File(postingPath + "\\Postings" + ifStemming());
@@ -206,6 +210,8 @@ public class Model extends Observable {
         } else {
             ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+
         }
 
         if (dir != null && dir.exists()) {
@@ -230,6 +236,8 @@ public class Model extends Observable {
         } else {
             ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+
         }
 
         if (dir != null && dir.exists()) {
@@ -263,6 +271,7 @@ public class Model extends Observable {
         } else {
             ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
         }
         JOptionPane.showMessageDialog(null, informationMsg + " loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
         return ans;
@@ -400,8 +409,26 @@ public class Model extends Observable {
      * read queries from file one by one
      *
      * @param path
+     * @param view
      */
-    public void readQueryFromFile(String path , ObservableList items , boolean useSemantics) {
+    public void readQueryFromFile(String path, ObservableList items, boolean useSemantics, View view) {
+//        int queriesCounter = 0;
+//        int queriesHandles = 0;
+//        String line1;
+//        try {
+//
+//            BufferedReader br_queriesCounter = new BufferedReader(new FileReader(path));
+//            while ((line1 = br_queriesCounter.readLine()) != null) {
+//                if (line1.equals("<top>"))
+//                    queriesCounter++;
+//            }
+//        }
+//        catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        view.pi_progressIndicator.setProgress((double)queriesCounter/(double)queriesCounter);
         BufferedReader br;
         try {
             br = new BufferedReader(new FileReader(path));
@@ -455,6 +482,9 @@ public class Model extends Observable {
 
                 }
                 searcher.handleQuery(query_id, query, sb_desc.toString(), sb_narr.toString() , useSemantics);
+//                queriesHandles++;
+//                view.pi_progressIndicator.setProgress((double)queriesHandles/(double)queriesCounter);
+//                view.indicateQueryHandled(query_id);
                 sb_desc.delete(0, sb_desc.length());
                 sb_desc.setLength(0);
                 sb_narr.delete(0, sb_narr.length());
@@ -464,7 +494,6 @@ public class Model extends Observable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
 
     }
 
