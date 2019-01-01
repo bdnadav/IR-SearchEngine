@@ -10,10 +10,10 @@
 <BorderPane prefHeight="341.0" prefWidth="426.0" xmlns:fx="http://javafx.com/fxml" fx:controller="Engine.View.View" >
     <center>
         <Button fx:id="btn_test" ></Button>
-        <TextArea fx:id="txtArea_dictionary" prefWidth="200.0" wrapText="true">
+        <ListView fx:id="listView_dictionary" prefWidth="200.0">
             <BorderPane.margin>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
             </BorderPane.margin>
-        </TextArea>
+        </ListView>
     </center>
 </BorderPane>

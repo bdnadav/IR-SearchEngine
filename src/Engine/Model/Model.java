@@ -90,6 +90,7 @@ public class Model extends Observable {
      * @param stemming
      */
     public boolean loadDicToMemory(String stemming) {
+        String informationMsg = "";
         boolean ans = true;
         citiesView = new ArrayList<>();
         File dir = new File(postingPath + "\\Postings" + ifStemming());
@@ -117,7 +118,8 @@ public class Model extends Observable {
 
             String line = null;
 
-            JOptionPane.showMessageDialog(null, "Term dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+            informationMsg += "Term dictionary, ";
+//            JOptionPane.showMessageDialog(null, "Term dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
             ans = false ;
@@ -151,7 +153,8 @@ public class Model extends Observable {
             String line = null;
 
 
-            JOptionPane.showMessageDialog(null, "Cities dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+//            JOptionPane.showMessageDialog(null, "Cities dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+            informationMsg += "Cities dictionary, ";
         } else {
             ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
@@ -198,7 +201,8 @@ public class Model extends Observable {
 //
 //            String line = null;
 
-            JOptionPane.showMessageDialog(null, "Docs dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+//            JOptionPane.showMessageDialog(null, "Docs dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+            informationMsg += "Docs dictionary, ";
         } else {
             ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
@@ -221,7 +225,8 @@ public class Model extends Observable {
             } catch (Exception e) {
             }
 
-            JOptionPane.showMessageDialog(null, "Headers dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+//            JOptionPane.showMessageDialog(null, "Headers dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+            informationMsg += "Headers dictionary, ";
         } else {
             ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
@@ -253,11 +258,13 @@ public class Model extends Observable {
             } catch (Exception e) {
             }
 
-            JOptionPane.showMessageDialog(null, "Docs Entities loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+//            JOptionPane.showMessageDialog(null, "Docs Entities loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+            informationMsg += "Docs entities ";
         } else {
             ans = false ;
             JOptionPane.showMessageDialog(null, "Posting Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
         }
+        JOptionPane.showMessageDialog(null, informationMsg + " loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
         return ans;
     }
 

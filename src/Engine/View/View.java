@@ -29,7 +29,7 @@ public class View extends Observable {
     public javafx.scene.control.Button show_dic_btn;
     public javafx.scene.control.Button load_dic_btn;
     public javafx.scene.control.Button reset_btn;
-    public javafx.scene.control.TextArea txtArea_dictionary;
+    public javafx.scene.control.ListView listView_dictionary;
     public javafx.scene.control.Button btn_test;
     public javafx.scene.control.ListView list_view;
     public javafx.scene.control.ListView filter_doc_view;
@@ -131,7 +131,7 @@ public class View extends Observable {
         secondryStage.setTitle("Dic View");
         Scene scene = new Scene(root, 600, 600);
         secondryStage.setScene(scene);
-        txtArea_dictionary = (javafx.scene.control.TextArea) scene.lookup("#txtArea_dictionary");
+        listView_dictionary = (javafx.scene.control.ListView) scene.lookup("#listView_dictionary");
         try {
             getDicDisplay(postingPath);
         } catch (IOException ioe) {
@@ -142,7 +142,7 @@ public class View extends Observable {
             alert.showAndWait();
             return;
         }
-        //txtArea_dictionary.setText(getDicDisplay("C:\\Users\\Nadav\\Desktop\\Engine Project\\resources"));
+        //listView_dictionary.setText(getDicDisplay("C:\\Users\\Nadav\\Desktop\\Engine Project\\resources"));
         secondryStage.show();
     }
 
@@ -155,6 +155,7 @@ public class View extends Observable {
         path += "\\termDictionary.txt";
         BufferedReader br_dic = new BufferedReader(new FileReader(text + path));
         String line = null;
+        ObservableList<String> items = FXCollections.observableArrayList();
         while ((line = br_dic.readLine()) != null) {
             String term = "";
             String tf = "";
@@ -167,12 +168,35 @@ public class View extends Observable {
             if (splited.length > 4) {
                 tf = splited[splited.length - 3];
             }
-            sb.append(term).append(" , tf :  ").append(tf).append("\n");
+            items.add(term + " , tf : " + tf);
+            //sb.append(term).append(" , tf :  ").append(tf).append("\n");
 
         }
-        txtArea_dictionary.setText(sb.toString());
+//        lv_relevantDocs.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+//        lv_relevantDocs.setOnMouseClicked(new EventHandler<Event>() {
+//            @Override
+//            public void handle(Event event) {
+//                String selectedItem = (String) lv_relevantDocs.getSelectionModel().getSelectedItem();
+//                selectedDocNo = StringUtils.substringAfter(selectedItem, ".");
+//
+//            }
+        listView_dictionary.setItems(items);
         return null;
     }
+
+
+//    StyleClassedTextArea bigTextArea = new StyleClassedTextArea();
+//try (FileReader fileReader = new FileReader(file);
+//    BufferedReader reader = new BufferedReader(fileReader)) {
+//        StringBuilder sb = new StringBuilder();
+//        while ((haveRead = reader.read(buf)) != -1) {
+//            sb.append(buf);
+//        }
+//        bigTextArea.appendText(sb.toString());
+//    } catch (IOException e) {
+//        log.error("Error while reading file", e);
+//    }
+
 
 
     public void reset_btn_pressed() {
