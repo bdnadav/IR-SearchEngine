@@ -89,6 +89,8 @@ public class View extends Observable {
 
     public void run_btn_pressed() {
         //System.out.println("pressed");
+
+
         if (corpus_txt_field.getText().isEmpty() || posting_txt_field.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "One or  more Paths is missing", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -97,7 +99,16 @@ public class View extends Observable {
             JOptionPane.showMessageDialog(null, "Paths are Invalid", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        try {
+            boolean corpus_check = checkCorpusIsValid(corpus_txt_field.getText()) ;
+            if ( !corpus_check ) {
+                JOptionPane.showMessageDialog(null, "No Stop Word File Was Found ! ", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }catch (Exception e ){}
 
+
+        JOptionPane.showMessageDialog(null, "Corpus Processing has started !", "Info", JOptionPane.INFORMATION_MESSAGE);
         setChanged();
         notifyObservers("run");
         load_dic_btn.setDisable(false);
@@ -435,5 +446,19 @@ public class View extends Observable {
         btn_showEntities.setDisable(false);
         btn_saveResults.setDisable(false);
     }
+
+
+
+    public boolean checkCorpusIsValid(String curposPath)throws FileNotFoundException  {
+        final File folder = new File(curposPath);
+        for (final File fileEntry : folder.listFiles()) {
+                String t =  fileEntry.getName() ;
+                if ( t.equals("stop_words.txt"))
+                    return true ;
+
+            }
+            return false ;
+        }
+
 }
 
