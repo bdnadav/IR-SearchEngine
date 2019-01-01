@@ -12,6 +12,8 @@ import java.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.jws.WebParam;
+
 
 public class Searcher {
     private static final int MAX_TRG_TERMS_FROM_API = 1; // determine the number of terms strongly connected   with saved from the api
@@ -114,18 +116,18 @@ public class Searcher {
             descParse.parseQuery(queryDescription);
             queryDescTerms = descParse.getQueryTerms();
         }else   queryDescTerms = new ArrayList<>(); // there is no DEsc to single query
-        //queryDescTerms = filterDescTerms(queryDescTerms);
-        System.out.println("Query id: " + query_id + "\n" + "Query title: " + queryTitle + "\n" + "Query title terms (may after stemming): " + queryTitleTerms.toString() + "\n");
-        System.out.println("Query description: " + queryDescription + "\n" + "Query description terms (may after stemming): " + queryDescTerms.toString() + "\n");
+        if (Model.debug){
+            System.out.println("Query id: " + query_id + "\n" + "Query title: " + queryTitle + "\n" + "Query title terms (may after stemming): " + queryTitleTerms.toString() + "\n");
+            System.out.println("Query description: " + queryDescription + "\n" + "Query description terms (may after stemming): " + queryDescTerms.toString() + "\n");
+        }
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTitleTerms; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
         /** Handle Semantic **/
         if ( useSemantic) {
-//            System.out.println(queryTitleTerms.toString());
             if(stemming) {
-                ArrayList<String> noStemmingQueryTitleTerms = new ArrayList<>();
+                ArrayList<String> noStemmingQueryTitleTerms;
                 Parse.stemming = false;
                 Parse noStemmingParse = new Parse(posting, false, corpusPath);
                 noStemmingParse.parseQuery(queryTitle);
@@ -140,7 +142,8 @@ public class Searcher {
                 ) {
                     if (!queryTitleTerms.contains(s)) {// join syn and title
                         queryTitleTerms.add(s);
-                        System.out.println("The synonymous term: " + s + " been added to queryTitleTerms");
+                        if (Model.debug)
+                            System.out.println("The synonymous term: " + s + " been added to queryTitleTerms");
                     }
                 }
             }
@@ -157,12 +160,12 @@ public class Searcher {
         if (extraTermsMayHelp(originalTitleTerms, queryDescTerms)){
             ArrayList<String> queryDescTermsToAdd = getExtraTerms(queryDescTerms, queryTitleTerms);
             if (queryTitleTerms.size() < 6){
-                System.out.println("queryTitleTerms.size() < originalTitleTerms.size()*2");
-                if (queryDescTermsToAdd.size() > 2){
-//                    ArrayList<String> queryDescTermsToSendSemantic = new ArrayList<>(queryDescTermsToAdd.subList(0,2));
+                if (Model.debug)
+                    System.out.println("queryTitleTerms.size() < originalTitleTerms.size()*2");
+                if (queryDescTermsToAdd.size() > 2 && useSemantic){
                     ArrayList<String> queryDescTermsToSendSemantic = new ArrayList<>(queryDescTermsToAdd.subList(queryDescTermsToAdd.size()-3, queryDescTermsToAdd.size()));
-//                    System.out.println("queryDescTermsToSendSemantic: " + queryDescTermsToSendSemantic.toString());
-                    System.out.println("queryDescTermsToSendSemantic: " + queryDescTermsToSendSemantic.toString());
+                    if (Model.debug)
+                        System.out.println("queryDescTermsToSendSemantic: " + queryDescTermsToSendSemantic.toString());
                     getSemanticTerms(queryDescTermsToSendSemantic, queryDescTermsToSendSemantic, true);
                 }
 
@@ -170,11 +173,14 @@ public class Searcher {
 
             queryTitleTerms.addAll(queryDescTermsToAdd);
         }
-        System.out.println("Original title terms: " + originalTitleTerms.toString());
-        System.out.println("desc terms: " + queryDescTerms.toString());
-        System.out.println("Synonymous terms: " + synonymous_terms.toString());
-        System.out.println("All terms to get docs by: " + queryTitleTerms.toString());
+        if (Model.debug) {
+            System.out.println("Original title terms: " + originalTitleTerms.toString());
+            System.out.println("desc terms: " + queryDescTerms.toString());
+            System.out.println("Synonymous terms: " + synonymous_terms.toString());
+            System.out.println("All terms to get docs by: " + queryTitleTerms.toString());
+        }
         relevantDocsByQueryTitleTerms = getRelevantDocs(queryTitleTerms);
+
         ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryTitleTerms, queryDescTerms, originalTitleTerms, queryDescTerms);
         return rankedDocs;
     }

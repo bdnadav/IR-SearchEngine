@@ -15,6 +15,8 @@ import java.util.concurrent.TimeUnit;
  * Part of MVC Design pattern  , get called from controller after View events
  */
 public class Model extends Observable {
+    public static boolean debug = false;
+    public static boolean status = true;
     private String corpusPath; //saved corpus path
     private String postingPath;// saved outpot posting path
     private boolean is_stemming; // using a stemmer on terms ot not
