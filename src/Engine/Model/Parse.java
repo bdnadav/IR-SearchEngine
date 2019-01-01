@@ -94,7 +94,7 @@ public class Parse {
 
 //            stopwords_fr = new FileReader("C://Users//bardanad//stop_words.txt");
             stopwords_fr = new FileReader(corpusPath + "\\stop_words.txt");
-            this.posting_path = path + ifStemming(stemming);
+            this.posting_path = path /**+ ifStemming(stemming)**/;
             this.path = path;
             Parse.stemming = stemming;
             BufferedReader stopwords_br = new BufferedReader(stopwords_fr);
