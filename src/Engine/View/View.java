@@ -89,6 +89,8 @@ public class View extends Observable {
 
     public void run_btn_pressed() {
         //System.out.println("pressed");
+
+
         if (corpus_txt_field.getText().isEmpty() || posting_txt_field.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "One or  more Paths is missing", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -106,7 +108,7 @@ public class View extends Observable {
         }catch (Exception e ){}
 
 
-
+        JOptionPane.showMessageDialog(null, "Corpus Processing has started !", "Info", JOptionPane.INFORMATION_MESSAGE);
         setChanged();
         notifyObservers("run");
         load_dic_btn.setDisable(false);
