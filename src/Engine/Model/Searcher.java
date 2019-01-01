@@ -14,11 +14,12 @@ import org.json.JSONObject;
 
 
 public class Searcher {
-    private static final int MAX_TRG_TERMS_FROM_API = 1;
-    private final int MAX_SYN_TERMS_FROM_API = 2 ;
-    private final boolean useSemantic;
+    private static final int MAX_TRG_TERMS_FROM_API = 1; // determine the number of terms strongly connected   with saved from the api
+    private final int MAX_SYN_TERMS_FROM_API = 2 ; // determine the number of terms with meaning like  saved from the api
     private final boolean stemming;
+    private final boolean useSemantic;
     private final String corpusPath;
+    private ArrayList<String> speceficCities = null;
     private Parse queryParse;
     private Parse descParse;
     private TreeMap<String, String> terms_dictionary;
@@ -28,11 +29,10 @@ public class Searcher {
     public static HashMap<String, String> headers_dictionary;
     public static HashMap<String, String> docs_entities;
     private Ranker ranker;
-    private ArrayList<String> speceficCities;
     private HashSet<String> legalDocs; // If cities constraint, this data structure will hold all the docs whose can be return.
     private boolean citiesConstraint;
     private String posting;
-    private double AVL;
+    private double AVL; // use in the BM25 formula 
     private ArrayList<String> trigers_terms;
 
     /**
@@ -179,6 +179,9 @@ public class Searcher {
         return rankedDocs;
     }
 
+    /**
+     * help to clean all the data structures from query to query
+     */
     private void resetAllDataStructures() {
         this.ranker = new Ranker(docs_dictionary.size(), AVL);
         this.synonymous_terms.clear();
@@ -190,6 +193,12 @@ public class Searcher {
         Posting.initTermPosting(posting, stemming);
     }
 
+    /**
+     * get more terms from the Desc part in query file
+     * @param queryDescTerms
+     * @param queryTitleTerms
+     * @return
+     */
     private ArrayList<String> getExtraTerms(ArrayList<String> queryDescTerms, ArrayList<String> queryTitleTerms) {
         ArrayList<String> ans = new ArrayList<>();
         queryDescTerms.removeAll(queryTitleTerms);
@@ -210,6 +219,11 @@ public class Searcher {
         return ans;
     }
 
+    /**
+     * get a term Df from the term'sa data in  terms_dictionary
+     * @param term
+     * @return
+     */
     private int getTermDf(String term) {
         if (term.charAt(0) == '*')
             term = StringUtils.substring(term, 1);
@@ -237,6 +251,13 @@ public class Searcher {
         return false;
     }
 
+    /**
+     * send each term from query terms to UseUrlSemantic and insert the result from the api to synonymous_terms
+     * @param queryTerms
+     * @param originalQueryTerms
+     * @param stemming_semantic
+     * @return
+     */
     private Map<String, List<Pair<String,String>>> getSemanticTerms(ArrayList<String> queryTerms, ArrayList<String> originalQueryTerms, boolean stemming_semantic) {
         int termsFromApi = 0;
         for (int i = 0; i < queryTerms.size(); i++) {
@@ -360,6 +381,11 @@ public class Searcher {
         }
     }
 
+    /**
+     * stem only one word and return the stem word
+     * @param synonymous_term
+     * @return
+     */
     private String stem(String synonymous_term) {
 
         String final_term = "";
@@ -375,7 +401,11 @@ public class Searcher {
 
     }
 
-
+    /**
+     * return only the relevant docs to the given query terms
+     * @param queryTerms all the query terms including api results
+     * @return
+     */
     private HashMap<String, HashMap<String, ArrayList<String>>> getRelevantDocs(ArrayList<String> queryTerms) {
         HashMap<String, HashMap<String, ArrayList<String>>> queryTermsToDocsWithDetails = new HashMap<>();
         for (int i = 0; i < queryTerms.size(); i++) {

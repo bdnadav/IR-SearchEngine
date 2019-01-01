@@ -234,14 +234,6 @@ public class Parse {
             //String key = (String)it.next();
             String term = (String) it.next();
             StringBuilder value = FilesTerms.get(term);
-//            if (stemming) {
-//                Stemmer stemmer = new Stemmer();
-//                stemmer.add(term.toCharArray(), term.length());
-//                String stemmed = "";
-//                stemmer.stem();
-//                term = stemmer.toString();
-//
-//            }
             sfp.signNewTerm(term, value);
             value.delete(0, value.length());
             value.setLength(0);
@@ -375,7 +367,8 @@ public class Parse {
 
             if (addTerm.equals("") && !tokensArray[i].equals("") && tokensArray[i] != null)
                 tokensArray[i] = cleanToken(tokensArray[i]);
-            //tokensArray[i] = remove_stop_words(tokensArray[i]);
+
+
             // check stop word
             if (addTerm.equals("") && !tokensArray[i].toLowerCase().equals("may") && stopwords.contains(cleanToken(tokensArray[i]).toLowerCase())) {
                 i += 1;
@@ -1172,6 +1165,8 @@ public class Parse {
         if (FilesTerms != null)
             this.FilesTerms.clear();
         if (TermsOnly != null)
+            this.TermsOnly.clear();
+        if ( HeadLinesTerms != null )
             this.TermsOnly.clear();
     }
 

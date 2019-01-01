@@ -45,7 +45,11 @@ public class Ranker {
     private ArrayList<String> originalTitleTerms;
     private ArrayList<String> originalDescTerm;
 
-
+    /**
+     * Ranks the results for a query
+     * @param numberOfDocsInCorpus
+     * @param avgDocsLength
+     */
     Ranker(int numberOfDocsInCorpus, double avgDocsLength) {
         this.NUM_OF_DOCS_IN_CORPUS = numberOfDocsInCorpus;
         this.AVG_LENGTH_OF_DOCS_IN_CORPUS = avgDocsLength;
