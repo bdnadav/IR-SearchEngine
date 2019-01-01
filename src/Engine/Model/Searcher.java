@@ -118,7 +118,6 @@ public class Searcher {
         System.out.println("Query id: " + query_id + "\n" + "Query title: " + queryTitle + "\n" + "Query title terms (may after stemming): " + queryTitleTerms.toString() + "\n");
         System.out.println("Query description: " + queryDescription + "\n" + "Query description terms (may after stemming): " + queryDescTerms.toString() + "\n");
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTitleTerms; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
-        HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryDescTerm; // <DescTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
@@ -126,16 +125,13 @@ public class Searcher {
         if ( useSemantic) {
 //            System.out.println(queryTitleTerms.toString());
             if(stemming) {
-
-                getSemanticTerms(queryTitleTerms , originalTitleTerms, true );
-                if ( synonymous_terms.size() == 0 ) {
-                    Parse.stemming = false;
-                    Parse sem_parse = new Parse(posting, false, corpusPath);
-                    sem_parse.parseQuery(queryTitle);
-                    ArrayList<String> semantic_terms = sem_parse.getQueryTerms();
-                    getSemanticTerms(semantic_terms , originalTitleTerms,true );
-                    Parse.stemming = true;
-                }
+                ArrayList<String> noStemmingQueryTitleTerms = new ArrayList<>();
+                Parse.stemming = false;
+                Parse noStemmingParse = new Parse(posting, false, corpusPath);
+                noStemmingParse.parseQuery(queryTitle);
+                noStemmingQueryTitleTerms = noStemmingParse.getQueryTerms();
+                Parse.stemming = true;
+                getSemanticTerms(queryTitleTerms , noStemmingQueryTitleTerms, true );
             }
             else getSemanticTerms(queryTitleTerms ,originalTitleTerms, false );
 
@@ -148,10 +144,30 @@ public class Searcher {
                     }
                 }
             }
+//            if ( !trigers_terms.isEmpty()){
+//                for (String s :trigers_terms
+//                        ) {
+//                    if (!queryTitleTerms.contains(s)) {// join syn and title
+//                        queryTitleTerms.add(s);
+//                        System.out.println("The trigered term: " + s + " been added to queryTitleTerms");
+//                    }
+//                }
+//            }
         }
-
         if (extraTermsMayHelp(originalTitleTerms, queryDescTerms)){
             ArrayList<String> queryDescTermsToAdd = getExtraTerms(queryDescTerms, queryTitleTerms);
+            if (queryTitleTerms.size() < 6){
+                System.out.println("queryTitleTerms.size() < originalTitleTerms.size()*2");
+                if (queryDescTermsToAdd.size() > 2){
+//                    ArrayList<String> queryDescTermsToSendSemantic = new ArrayList<>(queryDescTermsToAdd.subList(0,2));
+                    ArrayList<String> queryDescTermsToSendSemantic = new ArrayList<>(queryDescTermsToAdd.subList(queryDescTermsToAdd.size()-3, queryDescTermsToAdd.size()));
+//                    System.out.println("queryDescTermsToSendSemantic: " + queryDescTermsToSendSemantic.toString());
+                    System.out.println("queryDescTermsToSendSemantic: " + queryDescTermsToSendSemantic.toString());
+                    getSemanticTerms(queryDescTermsToSendSemantic, queryDescTermsToSendSemantic, true);
+                }
+
+            }
+
             queryTitleTerms.addAll(queryDescTermsToAdd);
         }
         System.out.println("Original title terms: " + originalTitleTerms.toString());
@@ -185,8 +201,11 @@ public class Searcher {
             dfOfTerms.put(df, term);
         }
         for (int i = 0; i < termsExtra; i++) {
-            if (dfOfTerms.size() > 0)
-                ans.add(dfOfTerms.pollFirstEntry().getValue());
+            if (dfOfTerms.size() > 1) {
+//                ans.add(dfOfTerms.pollFirstEntry().getValue()); // add the terms with the lower df
+//                ans.add(dfOfTerms.pollFirstEntry().getValue()); // add the terms with the lower df
+                ans.add(dfOfTerms.pollLastEntry().getValue()); // add the terms with the higher df
+            }
         }
         return ans;
     }
@@ -227,7 +246,7 @@ public class Searcher {
                 if (term.charAt(0) == '*')
                     term = StringUtils.substring(term, 1);
                 useUrlSemantic(term, stemming_semantic); // insert to  synonymous map all the terms and their docs
-                if (termsFromApi == synonymous_terms.size()){
+                if (termsFromApi == synonymous_terms.size() && i < originalQueryTerms.size()){
                     String originalTerm = originalQueryTerms.get(i);
                     originalTerm = Parse.cleanToken(originalTerm); // clean *
                     if (originalTerm.charAt(0) == '*')
