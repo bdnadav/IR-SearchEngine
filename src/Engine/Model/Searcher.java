@@ -202,17 +202,16 @@ public class Searcher {
     private ArrayList<String> getExtraTerms(ArrayList<String> queryDescTerms, ArrayList<String> queryTitleTerms) {
         ArrayList<String> ans = new ArrayList<>();
         queryDescTerms.removeAll(queryTitleTerms);
-        int termsExtra = queryDescTerms.size()/2;
+        int termsExtra = (int)(queryDescTerms.size()/1.07) ;
         TreeMap<Integer, String> dfOfTerms = new TreeMap<>();
         for (int i = 0; i < queryDescTerms.size(); i++) {
             String term = queryDescTerms.get(i);
             int df = getTermDf(term);
             dfOfTerms.put(df, term);
         }
-        for (int i = 0; i < termsExtra; i++) {
+        for (int i = 0; i < termsExtra; i += 2) {
             if (dfOfTerms.size() > 1) {
-//                ans.add(dfOfTerms.pollFirstEntry().getValue()); // add the terms with the lower df
-//                ans.add(dfOfTerms.pollFirstEntry().getValue()); // add the terms with the lower df
+                ans.add(dfOfTerms.pollFirstEntry().getValue()); // add the terms with the lower df
                 ans.add(dfOfTerms.pollLastEntry().getValue()); // add the terms with the higher df
             }
         }
