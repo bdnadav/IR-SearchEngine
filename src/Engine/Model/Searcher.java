@@ -51,7 +51,6 @@ public class Searcher {
      */
     public Searcher(String posting, String corpusPath, boolean stemming, ArrayList<String> specificCities, TreeMap<String, String> termsDic, TreeMap<String, String> docsDic, TreeMap<String, Pair> citiesDic, HashMap<String, String> headersDictionary, HashMap<String, String> docEntities, boolean semantic, double AVL) {
         this.terms_dictionary = termsDic;
-        System.out.println("stemming param to Searcher cons is: " + stemming);
         this.AVL = AVL ;
         this.synonymous_terms = new ArrayList<>();
         this.trigers_terms = new ArrayList<>();
@@ -119,6 +118,7 @@ public class Searcher {
         System.out.println("Query id: " + query_id + "\n" + "Query title: " + queryTitle + "\n" + "Query title terms (may after stemming): " + queryTitleTerms.toString() + "\n");
         System.out.println("Query description: " + queryDescription + "\n" + "Query description terms (may after stemming): " + queryDescTerms.toString() + "\n");
         HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryTitleTerms; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
+        HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByQueryDescTerm; // <DescTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
 
@@ -126,17 +126,22 @@ public class Searcher {
         if ( useSemantic) {
 //            System.out.println(queryTitleTerms.toString());
             if(stemming) {
-                Parse sem_parse = new Parse(posting, false, corpusPath);
-                sem_parse.parseQuery(queryTitle);
-                ArrayList<String> originalQueryTitleTerms = sem_parse.getQueryTerms();
-                getSemanticTerms(queryTitleTerms , originalQueryTitleTerms);
-                System.out.println("Stemming is ACTIVE" + "\n" + "The synonymous terms after stemming: " + "\n" +
-                        synonymous_terms.toString() + "\n");
-            }else getSemanticTerms(queryTitleTerms , null );
+
+                getSemanticTerms(queryTitleTerms , originalTitleTerms, true );
+                if ( synonymous_terms.size() == 0 ) {
+                    Parse.stemming = false;
+                    Parse sem_parse = new Parse(posting, false, corpusPath);
+                    sem_parse.parseQuery(queryTitle);
+                    ArrayList<String> semantic_terms = sem_parse.getQueryTerms();
+                    getSemanticTerms(semantic_terms , originalTitleTerms,true );
+                    Parse.stemming = true;
+                }
+            }
+            else getSemanticTerms(queryTitleTerms ,originalTitleTerms, false );
 
             if ( !synonymous_terms.isEmpty()){
                 for (String s :synonymous_terms
-                        ) {
+                ) {
                     if (!queryTitleTerms.contains(s)) {// join syn and title
                         queryTitleTerms.add(s);
                         System.out.println("The synonymous term: " + s + " been added to queryTitleTerms");
@@ -145,10 +150,14 @@ public class Searcher {
             }
         }
 
-        if (extraTermsMayHelp(queryTitleTerms, queryDescTerms)){
+        if (extraTermsMayHelp(originalTitleTerms, queryDescTerms)){
             ArrayList<String> queryDescTermsToAdd = getExtraTerms(queryDescTerms, queryTitleTerms);
             queryTitleTerms.addAll(queryDescTermsToAdd);
         }
+        System.out.println("Original title terms: " + originalTitleTerms.toString());
+        System.out.println("desc terms: " + queryDescTerms.toString());
+        System.out.println("Synonymous terms: " + synonymous_terms.toString());
+        System.out.println("All terms to get docs by: " + queryTitleTerms.toString());
         relevantDocsByQueryTitleTerms = getRelevantDocs(queryTitleTerms);
         ArrayList<String> rankedDocs = ranker.getRankDocs(query_id, relevantDocsByQueryTitleTerms, queryDescTerms, originalTitleTerms, queryDescTerms);
         return rankedDocs;
@@ -203,26 +212,35 @@ public class Searcher {
         return 1;
     }
 
-    private boolean extraTermsMayHelp(ArrayList<String> queryTitleTerms, ArrayList<String> queryDescTerms) {
-        if (queryDescTerms.size() >= 2 * queryTitleTerms.size())
+    private boolean extraTermsMayHelp(ArrayList<String> queryTitleOriginalTerms, ArrayList<String> queryDescTerms) {
+        if (queryDescTerms.size() >= 2 * queryTitleOriginalTerms.size())
             return true;
         return false;
     }
 
-    private Map<String, List<Pair<String,String>>> getSemanticTerms(ArrayList<String> queryTitleTerms, ArrayList<String> queryTitleOriginalTerms) {
-        for (String term :queryTitleTerms
-                ) {
+    private Map<String, List<Pair<String,String>>> getSemanticTerms(ArrayList<String> queryTerms, ArrayList<String> originalQueryTerms, boolean stemming_semantic) {
+        int termsFromApi = 0;
+        for (int i = 0; i < queryTerms.size(); i++) {
+            String term = queryTerms.get(i);
             try {
-
-                term = Parse.cleanToken(term) ; // clean *
+                term = Parse.cleanToken(term); // clean *
                 if (term.charAt(0) == '*')
                     term = StringUtils.substring(term, 1);
-                useUrlSemantic(term); // insert to  synonymous map all the terms and their docs
+                useUrlSemantic(term, stemming_semantic); // insert to  synonymous map all the terms and their docs
+                if (termsFromApi == synonymous_terms.size()){
+                    String originalTerm = originalQueryTerms.get(i);
+                    originalTerm = Parse.cleanToken(originalTerm); // clean *
+                    if (originalTerm.charAt(0) == '*')
+                        originalTerm = StringUtils.substring(term, 1);
+                    useUrlSemantic(originalTerm, stemming_semantic); // insert to  synonymous map all the terms and their docs
+                }
+                termsFromApi = synonymous_terms.size();
 
-                /** do somthing **/
 
-            }
-            catch (Exception e ){
+
+                /** do something **/
+
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -233,10 +251,11 @@ public class Searcher {
      * check for each term in query if the is synonymouse terms in the api , check if any of them
      * in the dic terms , if they are in the func will save the pointer to the term's posting row
      * @param term
+     * @param stemming_semantic
      * @throws Exception
      */
-    private void useUrlSemantic(String term) throws Exception {
-        String[] splitedTerm = StringUtils.split(term, " ");
+    private void useUrlSemantic(String term, boolean stemming_semantic) throws Exception {
+        String[] splitedTerm = StringUtils.split(term, " -");
         if (splitedTerm != null && splitedTerm.length > 1){
             term = splitedTerm[0];
             for (int i = 1; i < splitedTerm.length-1; i++) {
@@ -260,11 +279,13 @@ public class Searcher {
         in.close();
         JSONArray jsonArray = new JSONArray(json_str);
         int count_legit_terms = 0 ;
+        //if (jsonArray)
         for (int k = 0 ; k < jsonArray.length() ; k++) {
             JSONObject obj = (JSONObject) jsonArray.get(k);
             String synonymous_term= (String) obj.get("word");
             //String synonymous_score= (String) obj.get("score");
             String termData ;
+            if (stemming_semantic) synonymous_term = stem(synonymous_term); //
             termData = terms_dictionary.get(synonymous_term);
             if ( termData == null )  // try capital term
                 termData = terms_dictionary.get(synonymous_term.toUpperCase());
@@ -273,8 +294,6 @@ public class Searcher {
             /** set a threshhold for term relavence by score !!! ***/
             //synonymous_terms.put(synonymous_term, synonymous_score);
             if ( !synonymous_terms.contains(synonymous_term)) {
-                if ( stemming)
-                    synonymous_term = stem(synonymous_term);
                 synonymous_terms.add(synonymous_term);
                 count_legit_terms++;
             }
@@ -304,6 +323,7 @@ public class Searcher {
             String trg_term = (String) obj.get("word");
             //String synonymous_score= (String) obj.get("score");
             String termData;
+            if ( stemming_semantic ) trg_term = stem(trg_term);
             termData = terms_dictionary.get(trg_term);
             if (termData == null)  // try capital term
                 termData = terms_dictionary.get(trg_term.toUpperCase());
@@ -312,10 +332,10 @@ public class Searcher {
             /** set a threshhold for term relavence by score !!! ***/
             //synonymous_terms.put(synonymous_term, synonymous_score);
             if (!synonymous_terms.contains(trg_term) && !trigers_terms.contains(trg_term)){
-                if ( stemming) trg_term = stem(trg_term);
+
                 trigers_terms.add(trg_term);
-            count_legit_terms++;
-        } else continue;
+                count_legit_terms++;
+            } else continue;
             if (count_legit_terms == MAX_TRG_TERMS_FROM_API ) //save only the MAX_SYN_TERMS top terms
                 break;
         }
@@ -323,16 +343,16 @@ public class Searcher {
 
     private String stem(String synonymous_term) {
 
-            String final_term = "";
-            String[] split = synonymous_term.split(" ");
-            for ( String s :split
-            ) {
-                Stemmer stemmer = new Stemmer();
-                stemmer.add(s.toCharArray(), s.length());
-                stemmer.stem();
-                final_term+= stemmer.toString() +" ";
-            }
-            return final_term.substring(0 , final_term.length()-1) ;
+        String final_term = "";
+        String[] split = synonymous_term.split(" ");
+        for ( String s :split
+        ) {
+            Stemmer stemmer = new Stemmer();
+            stemmer.add(s.toCharArray(), s.length());
+            stemmer.stem();
+            final_term+= stemmer.toString() +" ";
+        }
+        return final_term.substring(0 , final_term.length()-1) ;
 
     }
 

@@ -92,8 +92,7 @@ public class Parse {
     public Parse(String path, boolean stemming , String corpusPath) {
         try {
 
-            //stopwords_fr = new FileReader(corpusPath + "\\stop_words.txt");
-            stopwords_fr = new FileReader("C:\\Users\\ofek\\Desktop\\SearchEngine" + "\\stop_words.txt");
+            stopwords_fr = new FileReader(corpusPath + "\\stop_words.txt");
             this.posting_path = path + "\\Postings" + ifStemming(stemming);
             this.path = path;
             Parse.stemming = stemming;
@@ -121,17 +120,17 @@ public class Parse {
             }
             String[] words = { "thousand","million","billion","trillion","percent","percentage","dollars","january","february","march","april","may","june","july","august","september","october","november","december","jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"} ;
             for (String s: words
-                    ) {
+            ) {
                 specialwords.add(s);
             }
             String[] chars = { ",","}","{","\\","/",">","<","(",")","'",":",";","\"","[","]","&",".","?","|","`","*","+","!","~","@","#","^","-"} ;
             for (String s: chars
-                    ) {
+            ) {
                 specialchars.add(s);
             }
             String[] months_arr = {"January","February","March","April","May","June","July","August","September","October","November","December","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"} ;
             for (String s: months_arr
-                    ) {
+            ) {
                 months.add(s);
             }
             //SegmentFile parserSegmentFile = new SegmentFile();
@@ -324,7 +323,7 @@ public class Parse {
                     && !specialchars.contains(tokensArray[i + 1].charAt(0)) // check ,Cummins
                     && cleanToken(tokensArray[i + 1]).length() > 1
                     && Character.isUpperCase(cleanToken(tokensArray[i + 1]).charAt(0)) // check capital of the second word
-                    ) {
+            ) {
                 int j = i;
                 StringBuilder long_term = new StringBuilder();
                 //j++ ;
@@ -340,7 +339,7 @@ public class Parse {
                             && Character.isUpperCase(temp_token.charAt(0))
                             && ((j < tokensArray.length -1
                             && !(months.contains(tokensArray[j]) && isNumber(tokensArray[j + 1])))|| j == tokensArray.length-1)
-                            ) {  // add one word term
+                    ) {  // add one word term
                         long_term = long_term.append(temp_token + " ");
                         String doc_num = "" ;
                         if ( currDoc!= null )
@@ -378,7 +377,7 @@ public class Parse {
                 tokensArray[i] = cleanToken(tokensArray[i]);
             //tokensArray[i] = remove_stop_words(tokensArray[i]);
             // check stop word
-            if (addTerm.equals("") && !tokensArray[i].equals("may") && stopwords.contains(cleanToken(tokensArray[i]).toLowerCase())) {
+            if (addTerm.equals("") && !tokensArray[i].equals("may") && stopwords.contains(tokensArray[i])) {
                 i += 1;
                 continue;
             }
@@ -470,7 +469,7 @@ public class Parse {
             if (StringUtils.containsAny(addTerm, "-")) {
                 String[] term = StringUtils.split(addTerm, "-");
                 for (String s : term
-                        ) {
+                ) {
                     if (s.length() < 2) {
                         addTerm = "";
                         break;
@@ -502,7 +501,7 @@ public class Parse {
 
     private boolean check_for_init(String[] arr) {
         for (String s :arr
-             ) {
+        ) {
             if ( s.length() == 1 && StringUtils.isAllUpperCase(s))
                 return true ;
         }
@@ -538,7 +537,7 @@ public class Parse {
             String final_term = "";
             String[] split = addTerm.split(" ");
             for ( String s :split
-                 ) {
+            ) {
                 Stemmer stemmer = new Stemmer();
                 stemmer.add(s.toCharArray(), s.length());
                 stemmer.stem();
@@ -547,7 +546,7 @@ public class Parse {
             addTerm = final_term.substring(0 , final_term.length()-1) ;
         }
         if (stopwords.contains(addTerm.toLowerCase()) || addTerm.toLowerCase().equals("xx") || addTerm.toLowerCase().equals("page"))
-             return;
+            return;
         StringBuilder sb = new StringBuilder();
         if (isUpper) {
             addTerm = addTerm.toLowerCase();

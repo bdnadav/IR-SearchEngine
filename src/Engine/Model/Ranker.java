@@ -294,8 +294,9 @@ public class Ranker {
     private void addBM25ValueToDoc(String docNo, int tf, int docLength, int df, String mode, String queryTitleTerm) {
         double bm25Value = ( ( ( (K + 1) * tf ) / ( tf + K * (1 - B + B * docLength/AVG_LENGTH_OF_DOCS_IN_CORPUS) ) )
                 * Math.log((NUM_OF_DOCS_IN_CORPUS + 1) / df));
-        if (originalTitleTerms.contains(queryTitleTerm))
-            bm25Value *= 1.5;
+        if (originalTitleTerms.contains(queryTitleTerm)) {
+            bm25Value *= 2;
+        }
 
         if (BM25_QueryTitleWeight.get(docNo) != null){
             double currValue = BM25_QueryTitleWeight.get(docNo);
