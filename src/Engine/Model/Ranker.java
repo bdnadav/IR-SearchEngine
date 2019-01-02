@@ -144,17 +144,15 @@ public class Ranker {
      * @param queryId
      */
     private void printResultToFile(ArrayList<String> ans,String queryId) {
-        try {
+
             sb_queriesResults.append("----QUERY ID: ").append(queryId).append("----").append("\n");
             for (int i = 0; i < ans.size(); i++) {
                 sb_queriesResults.append(i+1).append(". ").append(ans.get(i)).append("\n");
                 sb_trecResults.append(queryId).append(" ").append("0").append(" ").
                         append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
             }
-            results_bw.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            //results_bw.flush();
+
 
     }
 
