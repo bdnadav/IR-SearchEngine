@@ -1,6 +1,7 @@
 package Engine.View;
 
 
+import Engine.Model.Ranker;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -419,6 +420,7 @@ public class View extends Observable {
         //this.lv_relevantDocs.getSelectionModel().clearSelection();
 
         this.lv_relevantDocs.getItems().clear(); // clean all
+        Ranker.clearSB() ;
         showDialog("Searching ... ");
         setChanged();
         notifyObservers("search_query");

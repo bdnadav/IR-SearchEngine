@@ -353,4 +353,11 @@ public class Ranker {
         sortedEntries.addAll(map.entrySet());
         return sortedEntries;
     }
+
+    public static void clearSB() {
+        sb_queriesResults.delete(0,sb_queriesResults.length());
+        sb_queriesResults.setLength(0);
+        sb_trecResults.delete(0 , sb_queriesResults.length());
+        sb_trecResults.setLength(0);
+    }
 }
