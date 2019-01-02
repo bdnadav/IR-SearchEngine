@@ -14,7 +14,9 @@ import org.json.JSONObject;
 
 import javax.jws.WebParam;
 
-
+/**
+ * Returns the most relavent docs to a Query
+ */
 public class Searcher {
     private static final int MAX_TRG_TERMS_FROM_API = 1; // determine the number of terms strongly connected   with saved from the api
     private final int MAX_SYN_TERMS_FROM_API = 2 ; // determine the number of terms with meaning like  saved from the api
@@ -188,7 +190,7 @@ public class Searcher {
     /**
      * help to clean all the data structures from query to query
      */
-    private void resetAllDataStructures() {
+    protected void resetAllDataStructures() {
         this.ranker = new Ranker(docs_dictionary.size(), AVL);
         this.synonymous_terms.clear();
         this.synonymous_terms = new ArrayList<>();

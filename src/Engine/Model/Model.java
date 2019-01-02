@@ -444,6 +444,7 @@ public class Model extends Observable {
      * @param
      */
     public void readQueryFromFile(String path, ObservableList items, boolean useSemantics) {
+
 //        int queriesCounter = 0;
 //        int queriesHandles = 0;
 //        String line1;
