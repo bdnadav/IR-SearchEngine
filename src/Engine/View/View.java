@@ -441,7 +441,7 @@ public class View extends Observable {
         //this.lv_relevantDocs.getSelectionModel().clearSelection();
 
         this.lv_relevantDocs.getItems().clear(); // clean all
-        Ranker.clearSB() ;
+        //Ranker.clearSB() ;
         showDialog("Searching ... ");
         setChanged();
         notifyObservers("search_query");
