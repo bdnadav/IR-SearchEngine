@@ -69,6 +69,7 @@ public class View extends Observable {
     private JDialog dialog;
 
     private Thread thread_dialog;
+    private boolean memory_loaded = false ;
 
     /***********Procces corpos  PART ****************************/
     public void browseCorpus() {
@@ -125,14 +126,8 @@ public class View extends Observable {
         //JOptionPane.showMessageDialog(null, "Corpus Processing has started !", "Info", JOptionPane.INFORMATION_MESSAGE);
         setChanged();
         notifyObservers("run");
-        load_dic_btn.setDisable(false);
-        show_dic_btn.setDisable(false);
-        reset_btn.setDisable(false);
-        lang_list.setDisable(false);
+
         this.closeDialog();
-
-
-
     }
 
     public void setScene(Scene scene) {
@@ -147,6 +142,11 @@ public class View extends Observable {
         ArrayList<String> lang = new ArrayList<>(Arrays.asList(list_lang));
         ObservableList<String> list = FXCollections.observableArrayList(lang);
         lang_list.setItems(list);
+        memory_loaded = true ;
+        load_dic_btn.setDisable(false);
+        show_dic_btn.setDisable(false);
+        reset_btn.setDisable(false);
+        lang_list.setDisable(false);
     }
 
 
@@ -392,6 +392,7 @@ public class View extends Observable {
             fw.write(results);
             fw.flush();
             JOptionPane.showMessageDialog(null, "The results been saved in path: " + resultsDirectory.getAbsoluteFile(), "Confirmation", JOptionPane.INFORMATION_MESSAGE);
+            fw.close();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -403,7 +404,21 @@ public class View extends Observable {
             JOptionPane.showMessageDialog(null, "Query is empty!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        if (!memory_loaded) {
+            JOptionPane.showMessageDialog(null, "You need to load Dictionaries to memory first ! ", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            boolean corpus_check = checkCorpusIsValid(corpus_txt_field.getText());
+            if (!corpus_check) {
+                JOptionPane.showMessageDialog(null, "No Stop Word File Was Found ! ", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (Exception e) {
+        }
+        //this.lv_relevantDocs.getSelectionModel().clearSelection();
 
+        this.lv_relevantDocs.getItems().clear(); // clean all
         showDialog("Searching ... ");
         setChanged();
         notifyObservers("search_query");
@@ -421,6 +436,19 @@ public class View extends Observable {
             JOptionPane.showMessageDialog(null, "Paths are Invalid", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        if (!memory_loaded) {
+            JOptionPane.showMessageDialog(null, "You need to load Dictionaries to memory first ! ", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            boolean corpus_check = checkCorpusIsValid(corpus_txt_field.getText());
+            if (!corpus_check) {
+                JOptionPane.showMessageDialog(null, "No Stop Word File Was Found ! ", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (Exception e) {
+        }
+       this.lv_relevantDocs.getItems().clear();
         showDialog("Searching ...");
         setChanged();
         notifyObservers("file_search_query");
@@ -459,6 +487,7 @@ public class View extends Observable {
 
     public void enableSearchBtns() {
         search_query_btn.setDisable(false);
+        memory_loaded = true ;
     }
 
     public void enableAfterSearchBtns() {
@@ -490,9 +519,11 @@ public class View extends Observable {
         dialog.setContentPane(optionPane);
         final Toolkit toolkit = Toolkit.getDefaultToolkit();
         final Dimension screenSize = toolkit.getScreenSize();
-        final int x = (screenSize.width + dialog.getWidth()) / 2;
-        final int y = (screenSize.height + dialog.getHeight()) / 2;
+
+        final int x = (screenSize.width -  dialog.getWidth()) / 2 ;
+        final int y = (screenSize.height  - dialog.getHeight() ) / 2  ;
         dialog.setLocation(x ,y );
+        optionPane.setLocation( x , y );
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         dialog.pack();
          thread_dialog = new Thread(new Runnable() {

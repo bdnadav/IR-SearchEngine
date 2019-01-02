@@ -5,7 +5,6 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -17,7 +16,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Engine.View.View">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Engine.View.View">
     <children>
         <Pane layoutY="1.0" prefHeight="615.0" prefWidth="926.0" style="-fx-background-color:white">
             <children>
@@ -100,7 +99,6 @@
                   <ListView fx:id="lv_relevantDocs" prefHeight="307.0" prefWidth="297.0" />
                </children>
             </AnchorPane>
-            <ProgressIndicator fx:id="pi_progressIndicator" layoutX="554.0" layoutY="537.0" prefHeight="41.0" prefWidth="35.0" progress="0.0" />
             </children>
         </Pane>
     </children>

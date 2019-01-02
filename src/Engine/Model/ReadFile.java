@@ -144,8 +144,10 @@ public class ReadFile {
                             while (k < arr.length && !arr[k].equals("P=105")) k++;
                             doc_language = arr[k + 1];
                             doc_language = doc_language.toUpperCase();
-                            if ( Parse.isNumber(doc_language))
+                            if ( Parse.isNumber(doc_language)) {
+                                line = br.readLine();
                                 continue;
+                            }
                             languages.add(doc_language);
                         }
                         // Doc num

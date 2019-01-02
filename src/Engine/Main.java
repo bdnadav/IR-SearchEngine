@@ -28,9 +28,9 @@ public class Main extends Application {
         //view notify controller
         View view = fxmlLoader.getController();
         //view.setCitiesFilter() ;
-        view.posting_txt_field.appendText( "D:\\documents\\users\\bardanad\\Downloads\\פלטים 29.12\\PostingswithStemming950K" );
-        view.corpus_txt_field.appendText("d:\\documents\\users\\bardanad\\Downloads\\corpus\\corpus-10files");
-        view.query_file_path.appendText("C:\\Users\\bardanad\\QueriesTests\\queries.txt");
+        view.posting_txt_field.appendText( "d:\\documents\\users\\bardanad\\Downloads\\פלטים להגשה" );
+        view.corpus_txt_field.appendText("d:\\documents\\users\\bardanad\\Downloads\\corpus\\fullcor");
+        view.query_file_path.appendText("d:\\documents\\users\\bardanad\\Downloads\\queries.txt");
         view.check_stemming.setSelected(true);
         view.check_semmantics.setSelected(true);
         view.setParent(primaryStage) ;
