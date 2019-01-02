@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class CorpusProcessingManager {
-    public static final boolean testMode = true;
+    public static final boolean testMode = false;
 
     private static double MILLION = Math.pow(10, 6);
     private ReadFile reader; // The reader will be responsible for reading the files and breaking them into parts that will be passed to the parser

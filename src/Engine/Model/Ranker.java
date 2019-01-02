@@ -32,6 +32,16 @@ public class Ranker {
     private TreeMap<String, Double> QueryDescTermInHeaders;
     static StringBuilder sb_queriesResults = new StringBuilder();
     static StringBuilder sb_trecResults = new StringBuilder();
+    static private BufferedWriter results_bw;
+
+
+    static {
+        try {
+            results_bw = new BufferedWriter(new FileWriter("C:\\Users\\bardanad\\queriesTests\\results\\results.txt"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     private ArrayList<String> originalTitleTerms;
@@ -125,12 +135,20 @@ public class Ranker {
      * @param queryId
      */
     private void printResultToFile(ArrayList<String> ans,String queryId) {
+        try {
             sb_queriesResults.append("----QUERY ID: ").append(queryId).append("----").append("\n");
             for (int i = 0; i < ans.size(); i++) {
+                results_bw.append(queryId).append(" ").append("0").append(" ").
+                        append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
                 sb_queriesResults.append(i+1).append(". ").append(ans.get(i)).append("\n");
-               sb_trecResults.append(queryId).append(" ").append("0").append(" ").
+                sb_trecResults.append(queryId).append(" ").append("0").append(" ").
                         append(ans.get(i)).append(" ").append("1").append(" ").append("float-sim").append(" ").append("mt").append("\n");
             }
+            results_bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

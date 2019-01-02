@@ -28,11 +28,11 @@ public class Main extends Application {
         //view notify controller
         View view = fxmlLoader.getController();
         //view.setCitiesFilter() ;
-        view.posting_txt_field.appendText( "d:\\documents\\users\\bardanad\\Downloads\\פלטים להגשה" );
-        view.corpus_txt_field.appendText("d:\\documents\\users\\bardanad\\Downloads\\corpus\\fullcor");
-        view.query_file_path.appendText("d:\\documents\\users\\bardanad\\Downloads\\queries.txt");
-        view.check_stemming.setSelected(true);
-        view.check_semmantics.setSelected(true);
+//        view.posting_txt_field.appendText( "d:\\documents\\users\\bardanad\\Downloads\\corpus-output" );
+//        view.corpus_txt_field.appendText("d:\\documents\\users\\bardanad\\Downloads\\corpus");
+//        view.query_file_path.appendText("C:\\Users\\bardanad\\queriesTests\\queries.txt");
+//        view.check_stemming.setSelected(true);
+//        view.check_semmantics.setSelected(true);
         view.setParent(primaryStage) ;
         view.setScene(scene) ;
         view.addObserver(controller);
