@@ -11,6 +11,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Ranks the Docs returned from a Query according to a formula we decided and developed to get the best Retrivel results
+ */
 public class Ranker {
     private final int MAX_DOCS_TO_RETURN = 50; // The require number of docs to return
     /* Ranking factors and their weight*/
@@ -48,9 +51,7 @@ public class Ranker {
     private ArrayList<String> originalDescTerm;
 
     /**
-     * Ranks the results for a query
-     * @param numberOfDocsInCorpus
-     * @param avgDocsLength
+     * Ranks the Docs returned from a Query according to a formula we decided and developed to get the best Retrivel results
      */
     Ranker(int numberOfDocsInCorpus, double avgDocsLength) {
         this.NUM_OF_DOCS_IN_CORPUS = numberOfDocsInCorpus;
@@ -79,7 +80,7 @@ public class Ranker {
     }
 
     /**
-     *
+     *init the rank procces
      * @param queryId
      * @param relevantDocsByTitle
      * @param queryOtherTerms
@@ -169,6 +170,12 @@ public class Ranker {
     //HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsForEachQueryTerm; // <QueryTerm, <DocNo|tf, [DocDetails, DocHeaders]>>
         /* DocDetails = mostFreqTerm, mostFreqTermAppearanceNum, uniqueTermsNum, fullDocLength
            DocHeaders = [headerTerm, headerTerm, ... ] */
+
+    /**
+     * calculate the diffrent mesures for each doc , and then sends to other funcs to calc the value for the query terms
+     * @param relevantDocs
+     * @param queryOtherTerms
+     */
     private void calculateWeights(HashMap<String, HashMap<String, ArrayList<String>>> relevantDocs, ArrayList<String> queryOtherTerms) {
         HashMap<String, ArrayList<String>> allDocsHeaders = new HashMap<>(); // For future use (after the for loop)
         for (Object o1 : relevantDocs.entrySet()) {
@@ -219,6 +226,12 @@ public class Ranker {
         }
     }
 
+    /**
+     * return id's of relavent docs - which have at least on one of their headlines the certein term
+     * @param queryDescTerms
+     * @param queryTitleTerms
+     * @return
+     */
     private Set<String> getRelevantDocsWithHeaders(Set<String> queryDescTerms, ArrayList<String> queryTitleTerms) {
         HashSet<String> docsNum = new HashSet<>();
         for (String queryDescTerm : queryDescTerms){
@@ -242,7 +255,13 @@ public class Ranker {
         return docsNum;
     }
 
-
+    /**
+     * calc the weight for each doc that has the certein term in its headlines
+     * @param docNum
+     * @param docHeaders
+     * @param queryDescTerms
+     * @param queryTitleTerms
+     */
     private void calculateHeadersWeight(String docNum, ArrayList<String> docHeaders, Set<String> queryDescTerms, ArrayList<String> queryTitleTerms) {
         if (docHeaders == null || docHeaders.size() == 0)
             return;
@@ -312,7 +331,15 @@ public class Ranker {
         return ans;
     }
 
-
+    /**
+     * calc the value of BM25 saprately for title and Description of a query
+     * @param docNo
+     * @param tf
+     * @param docLength
+     * @param df
+     * @param mode
+     * @param queryTitleTerm
+     */
     private void addBM25ValueToDoc(String docNo, int tf, int docLength, int df, String mode, String queryTitleTerm) {
         double bm25Value = ( ( ( (K + 1) * tf ) / ( tf + K * (1 - B + B * docLength/AVG_LENGTH_OF_DOCS_IN_CORPUS) ) )
                 * Math.log((NUM_OF_DOCS_IN_CORPUS + 1) / df));
@@ -341,6 +368,10 @@ public class Ranker {
         }
     }
 
+    /**
+     * return the top 50 most relevant docs
+     * @return
+     */
     private ArrayList<String> getSortedDocs() {
         ArrayList<String> ans = new ArrayList<>();
         TreeSet<Map.Entry<String, Double>> sortedSet = entriesSortedByValues(rankedDocs);
@@ -368,6 +399,9 @@ public class Ranker {
         return sortedEntries;
     }
 
+    /**
+     * reset all String Builders
+     */
     public static void clearSB() {
         sb_queriesResults.delete(0,sb_queriesResults.length());
         sb_queriesResults.setLength(0);

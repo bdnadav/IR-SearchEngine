@@ -1,11 +1,15 @@
 INTRODUCTION
 ------------
-This is part A of the SearchEngine Project 
-the prog allow to procces a corpus , setting all the terms to posting files 
+This is Full version 2.0 of the SearchEngine Project 
+the prog allow to proces a corpus , setting all the terms to posting files 
 the prog will save to disk :
 doc  posting file & dictionary , term posting filed &  dictionary , cities dictionary  
 
-the processing could run with / without stemming
+This Version including the ability to Search the posting files ! and get all the relevant Docs to your Query !
+
+the processing could run with / without stemming 
+
+the Searching can be with or without semantics handling
 
 INFO 
 ----
@@ -28,3 +32,11 @@ After Processing
 3. load dic btn : will load the term dic to memory
 4. show dictionary : shows all the unique terms in the corpus 
 5. use stemming : stem the terms 
+6. search a single query or By file 
+7.the results will be represent IN GUI
+8. watch the 5 top TERMS in the DOC result 
+
+Enjoy your use 
+
+
+Harel & Nadav .
