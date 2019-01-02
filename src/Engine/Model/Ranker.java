@@ -14,10 +14,10 @@ import java.util.*;
 public class Ranker {
     private final int MAX_DOCS_TO_RETURN = 50; // The require number of docs to return
     /* Ranking factors and their weight*/
-    private final double BM25_TITLE_FACTOR_WEIGHT = 0.97;
-    private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0.01;
-    private final double TITLE_IN_HEADERS_FACTOR_WEIGHT = 0.01;
-    private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0.01;
+    private final double BM25_TITLE_FACTOR_WEIGHT = 0.70;
+    private final double BM25_DESCRIPTION_FACTOR_WEIGHT = 0.05;
+    private final double TITLE_IN_HEADERS_FACTOR_WEIGHT = 0.2;
+    private final double DESC_IN_HEADERS_FACTOR_WEIGHT = 0.05;
 
     /* BM25 Constants*/
     private final double K = 1.5;
@@ -66,6 +66,11 @@ public class Ranker {
         return sb_queriesResults.toString();
     }
 
+    /**
+     * The function returns the identification numbers of the documents found relevant to the query.
+     * The format to be returned is supported by treceval
+     * @return
+     */
     public static String getTrecFormatResults() {
         String results = sb_trecResults.toString();
         sb_trecResults = new StringBuilder();
@@ -73,6 +78,15 @@ public class Ranker {
         return results;
     }
 
+    /**
+     *
+     * @param queryId
+     * @param relevantDocsByTitle
+     * @param queryOtherTerms
+     * @param originalTitleTerms
+     * @param queryDescTerms
+     * @return
+     */
     public ArrayList<String> getRankDocs(String queryId, HashMap<String, HashMap<String, ArrayList<String>>> relevantDocsByTitle, ArrayList<String> queryOtherTerms, ArrayList<String> originalTitleTerms, ArrayList<String> queryDescTerms){ // queryOtherTerms is title/desc.
         this.originalTitleTerms = originalTitleTerms;
         this.originalDescTerm = queryDescTerms;
@@ -115,10 +129,10 @@ public class Ranker {
             }
 
 
-            double bm25Classic = BM25_TITLE_FACTOR_WEIGHT * bm25ClassicWeight * 1.8;
+            double bm25Classic = BM25_TITLE_FACTOR_WEIGHT * bm25ClassicWeight * 1.83;
             double bm25Description = BM25_DESCRIPTION_FACTOR_WEIGHT * bm25DescriptionWeight;
             double titleTermInHeader = TITLE_IN_HEADERS_FACTOR_WEIGHT * titleTermInHeadersWeight*37;
-            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight*37;
+            double descTermInHeader = DESC_IN_HEADERS_FACTOR_WEIGHT * descTermInHeadersWeight*23;
 
             double mergedValue = bm25Classic + bm25Description + titleTermInHeader + descTermInHeader;
 

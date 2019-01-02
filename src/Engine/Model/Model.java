@@ -1,6 +1,5 @@
 package Engine.Model;
 
-import Engine.View.View;
 import javafx.collections.ObservableList;
 import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
@@ -62,7 +61,7 @@ public class Model extends Observable {
         setChanged();
         notifyObservers("finished");
         JOptionPane.showMessageDialog(null, summery, "Build Info", JOptionPane.INFORMATION_MESSAGE);
-        loadDicToMemory(ifStemming());
+        loadDicToMemory(stemming,postingPath);
     }
 
     /**
@@ -88,9 +87,13 @@ public class Model extends Observable {
     /**
      * load the dic file from disk to memory - insert to termDictionary
      *
+     * @param postingPath
      * @param stemming
      */
-    public boolean loadDicToMemory(String stemming) {
+    public boolean loadDicToMemory(boolean stemming, String postingPath) {
+        //update
+        this.postingPath = postingPath ;
+        this.is_stemming = stemming ;
         String informationMsg = "";
         boolean ans = true;
         citiesView = new ArrayList<>();

@@ -139,7 +139,7 @@ public class Searcher {
 
             if ( !synonymous_terms.isEmpty()){
                 for (String s :synonymous_terms
-                ) {
+                        ) {
                     if (!queryTitleTerms.contains(s)) {// join syn and title
                         queryTitleTerms.add(s);
                         if (Model.debug)
@@ -208,7 +208,9 @@ public class Searcher {
     private ArrayList<String> getExtraTerms(ArrayList<String> queryDescTerms, ArrayList<String> queryTitleTerms) {
         ArrayList<String> ans = new ArrayList<>();
         queryDescTerms.removeAll(queryTitleTerms);
-        int termsExtra = (int)(queryDescTerms.size()/1.07) ;
+        queryDescTerms.remove("*document");
+        queryDescTerms.remove("document");
+        int termsExtra = (int)(queryDescTerms.size()/1.00) ;
         TreeMap<Integer, String> dfOfTerms = new TreeMap<>();
         for (int i = 0; i < queryDescTerms.size(); i++) {
             String term = queryDescTerms.get(i);
@@ -396,7 +398,7 @@ public class Searcher {
         String final_term = "";
         String[] split = synonymous_term.split(" ");
         for ( String s :split
-        ) {
+                ) {
             Stemmer stemmer = new Stemmer();
             stemmer.add(s.toCharArray(), s.length());
             stemmer.stem();

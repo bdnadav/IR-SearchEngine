@@ -18,6 +18,8 @@ public class Controller extends Observable implements Observer {
                 case "run":
                     /* The next two lines in comment only for test 8/12/18 10:45*/
                     model.run(view.corpus_txt_field.getText(), view.posting_txt_field.getText(), view.check_stemming.isSelected());
+                    view.updateLangLIst(model.list_lang);
+                    view.setCitiesView(model.getCitiesView());
                     break;
                 case "show_dic":
                     model.showDic();
@@ -26,11 +28,13 @@ public class Controller extends Observable implements Observer {
                     String stemming = "";
                     if ( view.check_stemming.isSelected())
                         stemming = "Stemming" ;
-                    boolean success = model.loadDicToMemory(stemming);
-                    if (success)
-                    view.enableSearchBtns();
-                    view.updateLangLIst(model.list_lang);
-                    view.setCitiesView(model.getCitiesView());
+                    boolean success = model.loadDicToMemory( view.check_stemming.isSelected() , view.posting_txt_field.getText());
+                    if (success) {
+                        view.enableSearchBtns();
+                        view.updateLangLIst(model.list_lang);
+                        view.setCitiesView(model.getCitiesView());
+                    }
+                    else view.loadProblem();
                     break;
                 case "reset":
                     model.resetAll();

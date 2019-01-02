@@ -84,6 +84,8 @@ public class View extends Observable {
             File selectedFile = fc.getSelectedFile();
             System.out.println("Selected file: " + selectedFile.getAbsolutePath());
             corpus_txt_field.appendText(selectedFile.getAbsolutePath());
+
+                //updatePaths();
         }
     }
 
@@ -99,6 +101,14 @@ public class View extends Observable {
             System.out.println("Selected file: " + selectedFile.getAbsolutePath());
             posting_txt_field.appendText(selectedFile.getAbsolutePath());
         }
+        if (posting_txt_field.getText().toString().length() > 0 ){
+            load_dic_btn.setDisable(false);
+            show_dic_btn.setDisable(false);
+            reset_btn.setDisable(false);
+            lang_list.setDisable(false);
+        }
+            //updatePaths();
+
     }
 
     public void run_btn_pressed() {
@@ -261,11 +271,22 @@ public class View extends Observable {
     }
 
     public void load_dic_mem() {
+        File dir = new File(posting_txt_field.getText().toString() + "\\Postings" + ifStemming());
+        if (dir == null || !dir.exists()) {
+            JOptionPane.showMessageDialog(null, "No Posting Files in this Directory , Try to Change Path", "Confirmation", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         showDialog("Loading dic to Memory");
         setChanged();
         notifyObservers("load_to_memory");
         closeDialog();
+        show_dic_btn.setDisable(false);
 
+    }
+    private String ifStemming() {
+        if (check_stemming.isSelected())
+            return "withStemming";
+        return "";
     }
 
     public boolean checkPathsProccese() {
@@ -539,6 +560,10 @@ public class View extends Observable {
     public void closeDialog(){
         dialog.setVisible(false);
         optionPane.setVisible(false);
+    }
+
+    public void loadProblem() {
+        JOptionPane.showMessageDialog(null, "Load unSuccessful!", "Error", JOptionPane.ERROR_MESSAGE);
     }
 
 //    public void indicateQueryHandled(String query_id) {
