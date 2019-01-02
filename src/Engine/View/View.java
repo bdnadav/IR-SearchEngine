@@ -12,12 +12,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.io.*;
 import java.util.*;
 
@@ -60,6 +65,10 @@ public class View extends Observable {
     public String selectedDocNo;
     public Stage secondryStage;
     public File resultsDirectory;
+    private JOptionPane optionPane;
+    private JDialog dialog;
+
+    private Thread thread_dialog;
 
     /***********Procces corpos  PART ****************************/
     public void browseCorpus() {
@@ -103,21 +112,25 @@ public class View extends Observable {
             return;
         }
         try {
-            boolean corpus_check = checkCorpusIsValid(corpus_txt_field.getText()) ;
-            if ( !corpus_check ) {
+            boolean corpus_check = checkCorpusIsValid(corpus_txt_field.getText());
+            if (!corpus_check) {
                 JOptionPane.showMessageDialog(null, "No Stop Word File Was Found ! ", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-        }catch (Exception e ){}
+        } catch (Exception e) {
+        }
 
 
-        JOptionPane.showMessageDialog(null, "Corpus Processing has started !", "Info", JOptionPane.INFORMATION_MESSAGE);
+        this.showDialog("Corpus Processing has started !");
+        //JOptionPane.showMessageDialog(null, "Corpus Processing has started !", "Info", JOptionPane.INFORMATION_MESSAGE);
         setChanged();
         notifyObservers("run");
         load_dic_btn.setDisable(false);
         show_dic_btn.setDisable(false);
         reset_btn.setDisable(false);
         lang_list.setDisable(false);
+        this.closeDialog();
+
 
 
     }
@@ -131,7 +144,7 @@ public class View extends Observable {
     }
 
     public void updateLangLIst(String[] list_lang) {
-        ArrayList<String> lang = new ArrayList<String>(Arrays.asList(list_lang));
+        ArrayList<String> lang = new ArrayList<>(Arrays.asList(list_lang));
         ObservableList<String> list = FXCollections.observableArrayList(lang);
         lang_list.setItems(list);
     }
@@ -163,7 +176,7 @@ public class View extends Observable {
     private String getDicDisplay(String text) throws IOException {
         StringBuilder sb = new StringBuilder();
         String path = "\\Postings";
-        if (check_stemming.isSelected()){
+        if (check_stemming.isSelected()) {
             path += "WithStemming";
         }
         path += "\\termDictionary.txt";
@@ -212,7 +225,6 @@ public class View extends Observable {
 //    }
 
 
-
     public void reset_btn_pressed() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Reset");
@@ -248,8 +260,10 @@ public class View extends Observable {
     }
 
     public void load_dic_mem() {
+        showDialog("Loading dic to Memory");
         setChanged();
         notifyObservers("load_to_memory");
+        closeDialog();
 
     }
 
@@ -267,7 +281,6 @@ public class View extends Observable {
         setChanged();
         notifyObservers("showTests");
     }
-
 
 
     /**********************Search FUNCS ***************************/
@@ -350,7 +363,7 @@ public class View extends Observable {
     }
 
     public void showEntities(String entities) {
-        txtArea_entities = (javafx.scene.control.TextArea)secondryStage.getScene().lookup("#txtArea_entities");
+        txtArea_entities = (javafx.scene.control.TextArea) secondryStage.getScene().lookup("#txtArea_entities");
         txtArea_entities.setText(entities);
         secondryStage.show();
     }
@@ -385,20 +398,22 @@ public class View extends Observable {
         }
     }
 
-    public void  search_query() {
-        if ( query_path_txtfield.getText().isEmpty()) {
+    public void search_query() {
+        if (query_path_txtfield.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Query is empty!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-
+        showDialog("Searching ... ");
         setChanged();
         notifyObservers("search_query");
-
+        closeDialog();
         enableAfterSearchBtns();
+
     }
-    public void  search_query_file() {
-        if ( query_file_path.getText().isEmpty()) {
+
+    public void search_query_file() {
+        if (query_file_path.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Path is missing!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -406,9 +421,10 @@ public class View extends Observable {
             JOptionPane.showMessageDialog(null, "Paths are Invalid", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        showDialog("Searching ...");
         setChanged();
         notifyObservers("file_search_query");
-
+        closeDialog();
         enableAfterSearchBtns();
 
 
@@ -431,6 +447,7 @@ public class View extends Observable {
         enableSearchBtns();
 
     }
+
     public boolean checkPathsSearch() {
         String queries = query_file_path.getText();
         posting_txt_field.getText();
@@ -440,28 +457,56 @@ public class View extends Observable {
         } else return false;
     }
 
-    public void enableSearchBtns(){
+    public void enableSearchBtns() {
         search_query_btn.setDisable(false);
     }
 
-    public void enableAfterSearchBtns(){
+    public void enableAfterSearchBtns() {
         btn_saveResults.setDisable(false);
         btn_showEntities.setDisable(false);
         btn_saveResults.setDisable(false);
     }
 
 
-
-    public boolean checkCorpusIsValid(String curposPath)throws FileNotFoundException  {
+    public boolean checkCorpusIsValid(String curposPath) throws FileNotFoundException {
         final File folder = new File(curposPath);
         for (final File fileEntry : folder.listFiles()) {
-                String t =  fileEntry.getName() ;
-                if ( t.equals("stop_words.txt"))
-                    return true ;
+            String t = fileEntry.getName();
+            if (t.equals("stop_words.txt"))
+                return true;
 
-            }
-            return false ;
         }
+        return false;
+    }
+
+
+    public void showDialog(String msg){
+
+         optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
+         dialog = new JDialog();
+        dialog.setTitle("Info");
+        dialog.setModal(true);
+
+        dialog.setContentPane(optionPane);
+        final Toolkit toolkit = Toolkit.getDefaultToolkit();
+        final Dimension screenSize = toolkit.getScreenSize();
+        final int x = (screenSize.width + dialog.getWidth()) / 2;
+        final int y = (screenSize.height + dialog.getHeight()) / 2;
+        dialog.setLocation(x ,y );
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.pack();
+         thread_dialog = new Thread(new Runnable() {
+            public void run() {
+                dialog.setVisible(true);
+            }
+        });
+        thread_dialog.start();
+    }
+
+    public void closeDialog(){
+        dialog.setVisible(false);
+        optionPane.setVisible(false);
+    }
 
 //    public void indicateQueryHandled(String query_id) {
 //        // can use an Alert, Dialog, or PopupWindow as needed...

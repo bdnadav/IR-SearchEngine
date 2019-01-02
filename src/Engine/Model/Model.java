@@ -94,7 +94,32 @@ public class Model extends Observable {
         String informationMsg = "";
         boolean ans = true;
         citiesView = new ArrayList<>();
+
+
         File dir = new File(postingPath + "\\Postings" + ifStemming());
+
+
+
+        if (dir != null && dir.exists()) {
+            ArrayList<String> list = new ArrayList<>();
+            list_lang = new String[0];
+            try {
+                BufferedReader br_dic = new BufferedReader(new FileReader(postingPath + "\\Postings" + ifStemming() +  "\\Languages"+  ".txt"));
+                String line = "";
+
+                while ((line = br_dic.readLine()) != null) {
+                    list.add(line);
+                }
+                list_lang = list.toArray(new String[list.size()]);
+                br_dic.close();
+            } catch (Exception e) {
+            }
+
+           // JOptionPane.showMessageDialog(null, "Langs dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            ans = false ;
+            JOptionPane.showMessageDialog(null, "Langs Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
+        }
         if (dir != null && dir.exists()) {
             StringBuilder sb = new StringBuilder();
             this.cleanAllDictionaries(); // reset all
@@ -277,25 +302,7 @@ public class Model extends Observable {
 
 
 
-        if (dir != null && dir.exists()) {
-            ArrayList<String> list = new ArrayList<>();
-            try {
-                BufferedReader br_dic = new BufferedReader(new FileReader(postingPath + "\\Postings" + ifStemming() +  "\\Languages"+  ".txt"));
-                String line = "";
 
-                while ((line = br_dic.readLine()) != null) {
-                   list.add(line);
-                }
-                list_lang = list.toArray(new String[list.size()]);
-                br_dic.close();
-            } catch (Exception e) {
-            }
-
-            JOptionPane.showMessageDialog(null, "Langs dictionary loaded to Memory", "Load", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            ans = false ;
-            JOptionPane.showMessageDialog(null, "Langs Directory does not Exists", "Error", JOptionPane.ERROR_MESSAGE);
-        }
         return ans;
     }
 
@@ -431,9 +438,9 @@ public class Model extends Observable {
      * read queries from file one by one
      *
      * @param path
-     * @param view
+     * @param
      */
-    public void readQueryFromFile(String path, ObservableList items, boolean useSemantics, View view) {
+    public void readQueryFromFile(String path, ObservableList items, boolean useSemantics) {
 //        int queriesCounter = 0;
 //        int queriesHandles = 0;
 //        String line1;

@@ -50,15 +50,15 @@ public class Posting {
     }
 
     public static void initTermPosting(String postingPath, boolean stemming) {
-        String termsPostingPath = postingPath + "\\Postings";
-        String docsPostingPath = postingPath + "\\Postings";
+        String termsPostingPath = postingPath + "\\Postings" + ifStemming(stemming);
+        String docsPostingPath = postingPath + "\\Postings" + ifStemming(stemming);
         if (!stemming){
             termsPostingPath += "\\Terms\\termsPosting.txt";
             docsPostingPath += "\\Docs\\docsPosting.txt";
         }
         else{
-            termsPostingPath += "withStemming\\Terms\\termsPosting.txt";
-            docsPostingPath += "withStemming\\Docs\\docsPosting.txt";
+            termsPostingPath += "\\Terms\\termsPosting.txt";
+            docsPostingPath += "\\Docs\\docsPosting.txt";
         }
 
         try {
@@ -67,6 +67,12 @@ public class Posting {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+    }
+
+    static private String ifStemming(boolean is_stemming) {
+        if (is_stemming)
+            return "withStemming";
+        return "";
     }
 
 
